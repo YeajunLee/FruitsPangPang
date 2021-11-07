@@ -3,18 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Network.h"
+#include <memory>
+#include "../../../Protocol/protocol.h"
 #include "GameFramework/Character.h"
 #include "MyCharacter.generated.h"
 
+
+
 UCLASS()
-class FPS_CPP_API AMyCharacter : public ACharacter
+class FPS_CPP_API AMyCharacter : public ACharacter , public std::enable_shared_from_this<AMyCharacter>
 {
 	GENERATED_BODY()
 
 public:
+
+
 	// Sets default values for this character's properties
 	AMyCharacter();
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* SpringArm;
 
