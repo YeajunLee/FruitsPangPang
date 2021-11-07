@@ -14,11 +14,14 @@ using namespace std;
 
 Network::Network() 
 	: prev_size(0)
+	, mMyCharacter(nullptr)
 {
 }
 
 Network::~Network()
 {
+	closesocket(s_socket);
+	WSACleanup();
 }
 
 std::shared_ptr<Network> Network::GetNetwork()
@@ -131,7 +134,8 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_dir* packet = reinterpret_cast<sc_packet_dir*>(p);
 		if (!packet->isValid)
 		{
-			AMyCharacter::GetMyCharacter()->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+			if(mMyCharacter!=NULL)
+				mMyCharacter->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 		}
 		break;
 	}

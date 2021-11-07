@@ -48,6 +48,7 @@ class FPS_CPP_API Network : public std::enable_shared_from_this<Network>
 	void error_display(int err_no);
 
 public:
+	class AMyCharacter* mMyCharacter;
 	static std::shared_ptr<class Network> GetNetwork();
 	unsigned char buf[BUFSIZE];
 	char recv_buf[BUFSIZE];

@@ -46,19 +46,7 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 420.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-
-}
-
-std::shared_ptr<AMyCharacter> AMyCharacter::GetMyCharacter()
-{
-	if (m_Character.use_count() == 0)
-	{
-		//m_Character = std::make_shared<AMyCharacter>();
-		abort();
-		exit(0);
-		return m_Character;
-	}
-	return m_Character;
+	Network::GetNetwork()->mMyCharacter = this;
 }
 
 // Called when the game starts or when spawned
@@ -67,8 +55,8 @@ void AMyCharacter::BeginPlay()
 	Super::BeginPlay();
 	//if (m_Character.use_count() == 0)
 	//시뮬레이션 종료 이후 다시 만들시, this포인터가 이상하게 비워짐.
-	if(m_Character.use_count() == 0)
-		m_Character = std::shared_ptr<AMyCharacter>(this);
+	//if(m_Character.use_count() == 0)
+	//	m_Character = std::shared_ptr<AMyCharacter>(this);
 	//else {
 	//	//while (m_Character.use_count() != 0)
 	//	//	m_Character.reset();
@@ -101,7 +89,7 @@ void AMyCharacter::Tick(float DeltaTime)
 				FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
 
 		}
-			}
+	}
 
 
 	
