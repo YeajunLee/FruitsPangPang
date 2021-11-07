@@ -126,6 +126,7 @@ void AFPS_CPPCharacter::MoveForward(float Value)
 
 void AFPS_CPPCharacter::MoveRight(float Value)
 {
+	
 	if ( (Controller != nullptr) && (Value != 0.0f) )
 	{
 		// find out which way is right
