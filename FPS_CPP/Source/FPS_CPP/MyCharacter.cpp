@@ -7,10 +7,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -43,13 +45,37 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 1080.f, 0.f); // 회전
 	GetCharacterMovement()->JumpZVelocity = 420.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+
+
+}
+
+std::shared_ptr<AMyCharacter> AMyCharacter::GetMyCharacter()
+{
+	if (m_Character.use_count() == 0)
+	{
+		//m_Character = std::make_shared<AMyCharacter>();
+		abort();
+		exit(0);
+		return m_Character;
+	}
+	return m_Character;
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//if (m_Character.use_count() == 0)
+	//시뮬레이션 종료 이후 다시 만들시, this포인터가 이상하게 비워짐.
+	if(m_Character.use_count() == 0)
+		m_Character = std::shared_ptr<AMyCharacter>(this);
+	//else {
+	//	//while (m_Character.use_count() != 0)
+	//	//	m_Character.reset();
+	//	m_Character = m_Character->shared_from_this(); //std::shared_ptr<AMyCharacter>(this);
+	//}
+	Network::GetNetwork()->init();
+	Network::GetNetwork()->C_Recv();
 }
 
 // Called every frame
@@ -65,8 +91,17 @@ void AMyCharacter::Tick(float DeltaTime)
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
+		auto a = GetTransform().GetLocation().Y;
 		Controller->SetControlRotation(RotationControl);
-	}
+		if (a != GetTransform().GetLocation().Y)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+				FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
+
+		}
+			}
 
 
 	
@@ -98,6 +133,7 @@ void AMyCharacter::MoveForward(float value)
 	{
 		
 
+		Network::GetNetwork()->send_dir_packet(GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -111,13 +147,15 @@ void AMyCharacter::MoveRight(float value)
 {
 	if (Controller != nullptr && value != 0.f)
 	{
+		Network::GetNetwork()->send_dir_packet(GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, value);
-
+		
+		//SetActorLocation(GetTransform().GetLocation() * 0.1);
 	}
 }
 
