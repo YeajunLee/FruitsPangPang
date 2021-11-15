@@ -26,6 +26,8 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
+	float x, y, z;				//pos
+	float rx, ry, rz, rw;		//rotate
 	char	direction;			// 0 : up,  1: down, 2:left, 3:right
 };
 
@@ -52,12 +54,15 @@ struct sc_packet_move {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y;
+	float x, y, z;
+	float rx, ry, rz, rw;
+	bool isValid;
 };
 
 struct sc_packet_dir {
 	unsigned char size;
 	char type;
+	int		id;
 	float x, y, z;
 	bool isValid;
 };

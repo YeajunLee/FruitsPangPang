@@ -49,6 +49,9 @@ class FPS_CPP_API Network : public std::enable_shared_from_this<Network>
 
 public:
 	class AMyCharacter* mMyCharacter;
+	class AMyCharacter* mOtherCharacter[MAX_USER];
+	int WorldCharacterCnt;
+	int mId;
 	static std::shared_ptr<class Network> GetNetwork();
 	unsigned char buf[BUFSIZE];
 	char recv_buf[BUFSIZE];
@@ -60,6 +63,7 @@ public:
 	bool init();
 	void C_Send();
 	void C_Recv();
-	void send_dir_packet(const float& x, const float& y, const float& z);
+	void send_login_packet();
+	void send_move_packet(const float& x, const float& y, const float& z,struct FQuat& rotate);
 	void process_packet(unsigned char* p);
 };

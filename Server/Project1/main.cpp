@@ -60,6 +60,7 @@ public:
 	char name[MAX_NAME_SIZE];
 	int	   _id;
 	float  x, y,z;
+	float rx, ry, rz, rw;
 
 	mutex state_lock;
 	STATE _state;
@@ -141,6 +142,12 @@ void send_move_packet(int c_id, int mover)
 	packet.type = SC_PACKET_MOVE;
 	packet.x = clients[mover].x;
 	packet.y = clients[mover].y;
+	packet.z = clients[mover].z;
+	packet.rx = clients[mover].rx;
+	packet.ry = clients[mover].ry;
+	packet.rz = clients[mover].rz;
+	packet.rw = clients[mover].rw;
+	packet.isValid = false;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -236,17 +243,23 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		int x = cl.x;
 		int y = cl.y;
-		switch (packet->direction) {
-		case 0: if (y > 0) y--; break;
-		case 1: if (y < (WORLD_HEIGHT - 1)) y++; break;
-		case 2: if (x > 0) x--; break;
-		case 3: if (x < (WORLD_WIDTH - 1)) x++; break;
-		default:
-			std::cout << "Invalid move in client " << client_id << endl;
-			exit(-1);
-		}
-		cl.x = x;
-		cl.y = y;
+		int z = cl.z;
+		//switch (packet->direction) {
+		//case 0: if (y > 0) y--; break;
+		//case 1: if (y < (WORLD_HEIGHT - 1)) y++; break;
+		//case 2: if (x > 0) x--; break;
+		//case 3: if (x < (WORLD_WIDTH - 1)) x++; break;
+		//default:
+		//	std::cout << "Invalid move in client " << client_id << endl;
+		//	exit(-1);
+		//}
+		cl.x = packet->x;
+		cl.y = packet->y;
+		cl.z = packet->z;
+		cl.rx = packet->rx;
+		cl.ry = packet->ry;
+		cl.rz = packet->rz;
+		cl.rw = packet->rw;
 		for (auto& cl : clients) {
 			cl.state_lock.lock();
 			if (ST_INGAME == cl._state)
@@ -264,11 +277,12 @@ void process_packet(int client_id, unsigned char* p)
 		auto dy = abs(cl.y - packet->y);
 		auto dz = abs(cl.z - packet->z);
 
-		if (dy > 4)
+		//if (dy > 4)
+		//{
+   		//	send_dir_packet(false, client_id);
+		//}
+		//else 
 		{
-   			send_dir_packet(false, client_id);
-		}
-		else {
 			cl.x = packet->x;
 			cl.y = packet->y; 
 			cl.z = packet->z;
