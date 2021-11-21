@@ -92,6 +92,11 @@ void AMyCharacter::BeginPlay()
 	//GetMesh()->SetVisibility(false);
 }
 
+void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
+{
+	Network::GetNetwork()->release();
+}
+
 // Called every frame
 void AMyCharacter::Tick(float DeltaTime)
 {
@@ -149,17 +154,17 @@ void AMyCharacter::MoveForward(float value)
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
+		
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, value);
 
 		auto pos = GetTransform().GetLocation();
 		auto rot = GetTransform().GetRotation();
 		
-		Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot);
+		Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot,value,MOVE_FORWARD);
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
 	}
 }
 
@@ -169,12 +174,14 @@ void AMyCharacter::MoveRight(float value)
 	{
 		auto pos = GetTransform().GetLocation();
 		auto rot = GetTransform().GetRotation();
-		Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot);
+		Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, value, MOVE_RIGHT);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("My pos:%f,%f,%f , value : %f "), Direction.X, Direction.Y, Direction.Z, value));
 		AddMovementInput(Direction, value);
 		
 		//SetActorLocation(GetTransform().GetLocation() * 0.1);
