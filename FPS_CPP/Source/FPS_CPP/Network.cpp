@@ -3,6 +3,7 @@
 
 #include "Network.h"
 #include "MyCharacter.h"
+#include "Engine/World.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -15,7 +16,13 @@ using namespace std;
 Network::Network() 
 	: prev_size(0)
 	, mMyCharacter(nullptr)
+	, WorldCharacterCnt(0)
+	, mId(0)
 {
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		mOtherCharacter[i] = nullptr;
+	}
 }
 
 Network::~Network()
@@ -59,6 +66,19 @@ bool Network::init()
 	return false;
 }
 
+void Network::release()
+{
+
+	prev_size = 0;
+	WorldCharacterCnt = 0;
+	mId = 0;
+	mMyCharacter = nullptr;
+	for (int i = 0; i < MAX_USER; ++i)
+		mOtherCharacter[i] = nullptr;
+
+	closesocket(s_socket);
+	WSACleanup();
+}
 
 void Network::error_display(int err_no)
 {
@@ -109,16 +129,32 @@ void Network::C_Recv()
 	}
 }
 
-void Network::send_dir_packet(const float& x,const float& y,const float& z)
+void Network::send_login_packet()
 {
-	cs_packet_dir packet;
-	packet.size = sizeof(cs_packet_dir);
-	packet.type = CS_PACKET_DIR;
+	cs_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_LOGIN;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_login), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
+
+void Network::send_move_packet(const float& x,const float& y,const float& z,FQuat& rotate,const float& value,const char& movetype)
+{
+	cs_packet_move packet;
+	packet.size = sizeof(cs_packet_move);
+	packet.type = CS_PACKET_MOVE;
+	packet.movetype = movetype;
 	packet.x = x;
 	packet.y = y;
-	packet.z = y;
-
-	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_dir), &packet);
+	packet.z = z;
+	packet.rx = rotate.X;
+	packet.ry = rotate.Y;
+	packet.rz = rotate.Z;
+	packet.rw = rotate.W;
+	packet.value = value;
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_move), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
@@ -128,6 +164,50 @@ void Network::process_packet(unsigned char* p)
 	switch (Type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		mId = packet->id;
+		break;
+	}
+	case SC_PACKET_MOVE: {
+		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+		int move_id = packet->id;
+		if (move_id == mId) {
+
+			//if (mMyCharacter != nullptr)
+			//	mMyCharacter->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+
+		}
+		else if (move_id < MAX_USER)
+		{
+			//if (packet->movetype == MOVE_FORWARD)
+			//{
+			//	if (mOtherCharacter[move_id] != nullptr)
+			//	{
+			//	//	const FRotator Rotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+			//	//	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
+			//	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			//	//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			//	//	//	FString::Printf(TEXT("MY id : %d My pos:%f,%f,%f , value : %f "), move_id, Direction.X, Direction.Y, Direction.Z, packet->value));
+			//	//	mOtherCharacter[move_id]->AddMovementInput(Direction, packet->value);
+			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+
+			//	}
+			//}
+			//else if (packet->movetype == MOVE_RIGHT)
+			//{
+			//	if (mOtherCharacter[move_id] != nullptr)
+			//	{
+			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+			//	}
+			//}
+			if (mOtherCharacter[move_id] != nullptr)
+			{
+				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+			}
+		}
 		break;
 	}
 	case SC_PACKET_DIR: {
@@ -137,6 +217,17 @@ void Network::process_packet(unsigned char* p)
 			if(mMyCharacter!=NULL)
 				mMyCharacter->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 		}
+		break;
+	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
+		int id = packet->id;
+		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+		break; 
+	}
+	case SC_PACKET_REMOVE_OBJECT: {
+		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
+		int other_id = packet->id;
 		break;
 	}
 	}

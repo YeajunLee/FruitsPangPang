@@ -46,31 +46,62 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 420.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	Network::GetNetwork()->mMyCharacter = this;
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//if (m_Character.use_count() == 0)
-	//시뮬레이션 종료 이후 다시 만들시, this포인터가 이상하게 비워짐.
-	//if(m_Character.use_count() == 0)
-	//	m_Character = std::shared_ptr<AMyCharacter>(this);
-	//else {
-	//	//while (m_Character.use_count() != 0)
-	//	//	m_Character.reset();
-	//	m_Character = m_Character->shared_from_this(); //std::shared_ptr<AMyCharacter>(this);
+	if (GetController()->IsPlayerController())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("other id ")));
+		Network::GetNetwork()->mMyCharacter = this;
+		Network::GetNetwork()->init();
+		Network::GetNetwork()->C_Recv();
+		Network::GetNetwork()->send_login_packet();
+	}
+	else {
+		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
+		Network::GetNetwork()->WorldCharacterCnt++;
+	}
+	//if (Network::GetNetwork()->WorldCharacterCnt == 0)
+	//{
+	//	if (GetController()->IsPlayerController())
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+	//			FString::Printf(TEXT("other id ")));
+	//	}
+	//	Network::GetNetwork()->mMyCharacter = this;
+	//	Network::GetNetwork()->init();
+	//	Network::GetNetwork()->C_Recv();
+	//	Network::GetNetwork()->send_login_packet();
+	//	Network::GetNetwork()->WorldCharacterCnt++;
 	//}
-	Network::GetNetwork()->init();
-	Network::GetNetwork()->C_Recv();
+	//else {
+	//	if (GetController()->IsPlayerController())
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+	//			FString::Printf(TEXT("other id ")));
+	//	}
+	//	auto tm = Network::GetNetwork()->WorldCharacterCnt;
+	//	//내 자신이 1 증가시키고 그다음부턴 others에 들어가게
+	//	Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt - 1] = this;
+	//	Network::GetNetwork()->WorldCharacterCnt++;
+	//}
+	//GetMesh()->SetVisibility(false);
+}
+
+void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
+{
+	Network::GetNetwork()->release();
 }
 
 // Called every frame
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -79,14 +110,14 @@ void AMyCharacter::Tick(float DeltaTime)
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
 		auto a = GetTransform().GetLocation().Y;
 		Controller->SetControlRotation(RotationControl);
 		if (a != GetTransform().GetLocation().Y)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-				FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			//	FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
 
 		}
 	}
@@ -120,14 +151,20 @@ void AMyCharacter::MoveForward(float value)
 	if (Controller != nullptr && value != 0.f)
 	{
 		
-
-		Network::GetNetwork()->send_dir_packet(GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
+		
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, value);
+
+		auto pos = GetTransform().GetLocation();
+		auto rot = GetTransform().GetRotation();
+		
+		Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot,value,MOVE_FORWARD);
+
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
 	}
 }
 
@@ -135,12 +172,16 @@ void AMyCharacter::MoveRight(float value)
 {
 	if (Controller != nullptr && value != 0.f)
 	{
-		Network::GetNetwork()->send_dir_packet(GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z);
+		auto pos = GetTransform().GetLocation();
+		auto rot = GetTransform().GetRotation();
+		Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, value, MOVE_RIGHT);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("My pos:%f,%f,%f , value : %f "), Direction.X, Direction.Y, Direction.Z, value));
 		AddMovementInput(Direction, value);
 		
 		//SetActorLocation(GetTransform().GetLocation() * 0.1);
