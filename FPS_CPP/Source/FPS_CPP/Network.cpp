@@ -4,6 +4,7 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Engine/World.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -186,8 +187,6 @@ void Network::process_packet(unsigned char* p)
 			//	//	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 			//	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-			//	//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			//	//	//	FString::Printf(TEXT("MY id : %d My pos:%f,%f,%f , value : %f "), move_id, Direction.X, Direction.Y, Direction.Z, packet->value));
 			//	//	mOtherCharacter[move_id]->AddMovementInput(Direction, packet->value);
 			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
@@ -201,11 +200,15 @@ void Network::process_packet(unsigned char* p)
 			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 			//	}
-			//}
+			////}
+			//auto t = mOtherCharacter[move_id]->GetCharacterMovement();
+			//auto VecXY=mOtherCharacter[move_id]->GetVelocity()* FVector(1.0, 1.0, 0.0);
+			//VecXY.Size();
 			if (mOtherCharacter[move_id] != nullptr)
 			{
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+				mOtherCharacter[move_id]->GroundSpeed = packet->value;
 			}
 		}
 		break;
