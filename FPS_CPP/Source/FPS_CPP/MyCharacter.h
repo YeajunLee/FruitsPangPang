@@ -38,8 +38,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 	float GroundSpeed;
 
-	//UFUNCTION(BlueprintCallable)
-	//void Throw();
+	UFUNCTION(BlueprintCallable)
+	void Throww();
+
+
 
 protected:
 	// Called when the game starts or when spawned

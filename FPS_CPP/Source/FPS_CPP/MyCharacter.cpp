@@ -201,11 +201,15 @@ void AMyCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-/*
-void AMyCharacter::Throw()
+
+void AMyCharacter::Throww()
 {
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 
-	//spawnActor함수 사용법 모르겠음 일단 skip
+	FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+	//spawnActor함수 사용법 모르겠음 일단 skip->는 개뿔 줫밥새끼
+
+
 }
-*/
