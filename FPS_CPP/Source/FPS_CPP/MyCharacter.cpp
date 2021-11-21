@@ -109,7 +109,13 @@ void AMyCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -20.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
-
+		if (GetController()->IsPlayerController()) {
+			auto pos = GetTransform().GetLocation();
+			auto rot = GetTransform().GetRotation();
+			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeed, MOVE_RIGHT);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+				FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
+		}
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		//	FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
 		auto a = GetTransform().GetLocation().Y;
@@ -158,11 +164,11 @@ void AMyCharacter::MoveForward(float value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, value);
 
-		auto pos = GetTransform().GetLocation();
-		auto rot = GetTransform().GetRotation();
+		//auto pos = GetTransform().GetLocation();
+		//auto rot = GetTransform().GetRotation();
+		//
+		//Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot, GroundSpeed,MOVE_FORWARD);
 		
-		Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot,value,MOVE_FORWARD);
-
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		//	FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
 	}
@@ -172,17 +178,14 @@ void AMyCharacter::MoveRight(float value)
 {
 	if (Controller != nullptr && value != 0.f)
 	{
-		auto pos = GetTransform().GetLocation();
-		auto rot = GetTransform().GetRotation();
-		Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, value, MOVE_RIGHT);
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		AddMovementInput(Direction, value);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		//	FString::Printf(TEXT("My pos:%f,%f,%f , value : %f "), Direction.X, Direction.Y, Direction.Z, value));
-		AddMovementInput(Direction, value);
 		
 		//SetActorLocation(GetTransform().GetLocation() * 0.1);
 	}
