@@ -4,6 +4,8 @@ const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 10;
+const char MOVE_FORWARD = 0;
+const char MOVE_RIGHT = 1;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -26,8 +28,10 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
+	char	movetype;			//forward = 0 , right = 1
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
+	float value;				//scala
 	char	direction;			// 0 : up,  1: down, 2:left, 3:right
 };
 
@@ -53,9 +57,11 @@ struct sc_packet_login_ok {
 struct sc_packet_move {
 	unsigned char size;
 	char type;
+	char movetype;
 	int		id;
 	float x, y, z;
 	float rx, ry, rz, rw;
+	float value;
 	bool isValid;
 };
 

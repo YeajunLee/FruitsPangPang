@@ -61,7 +61,7 @@ public:
 	int	   _id;
 	float  x, y,z;
 	float rx, ry, rz, rw;
-
+	
 	mutex state_lock;
 	STATE _state;
 
@@ -134,12 +134,13 @@ void send_login_ok_packet(int c_id)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void send_move_packet(int c_id, int mover)
+void send_move_packet(int c_id, int mover,float value,char movetype)
 {
 	sc_packet_move packet;
 	packet.id = mover;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_MOVE;
+	packet.movetype = movetype;
 	packet.x = clients[mover].x;
 	packet.y = clients[mover].y;
 	packet.z = clients[mover].z;
@@ -147,6 +148,7 @@ void send_move_packet(int c_id, int mover)
 	packet.ry = clients[mover].ry;
 	packet.rz = clients[mover].rz;
 	packet.rw = clients[mover].rw;
+	packet.value = value;
 	packet.isValid = false;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
@@ -260,12 +262,13 @@ void process_packet(int client_id, unsigned char* p)
 		cl.ry = packet->ry;
 		cl.rz = packet->rz;
 		cl.rw = packet->rw;
+		
 		for (auto& cl : clients) {
 			cl.state_lock.lock();
 			if (ST_INGAME == cl._state)
 			{
 				cl.state_lock.unlock();
-				send_move_packet(cl._id, client_id);
+				send_move_packet(cl._id, client_id,packet->value,packet->movetype);
 			}
 			else cl.state_lock.unlock();
 		}

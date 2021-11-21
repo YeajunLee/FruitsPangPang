@@ -60,10 +60,11 @@ public:
 	WSABUF mybuf_r;
 	Network();
 	~Network();
+	void release();
 	bool init();
 	void C_Send();
 	void C_Recv();
 	void send_login_packet();
-	void send_move_packet(const float& x, const float& y, const float& z,struct FQuat& rotate);
+	void send_move_packet(const float& x, const float& y, const float& z,struct FQuat& rotate,const float& value,const char& movetype);
 	void process_packet(unsigned char* p);
 };
