@@ -3,12 +3,17 @@
 
 #include "FoxAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "MyCharacter.h"
 
 void UFoxAnimInstance::NativeInitializeAnimation()
 {
 	if (Pawn == nullptr)
 	{
 		Pawn = TryGetPawnOwner();
+		if (Pawn)
+		{
+			MyFox = Cast<AMyCharacter>(Pawn);
+		}
 	}
 
 }
@@ -26,5 +31,9 @@ void UFoxAnimInstance::UpdateAnimationProperties()
 		MovementSpeed = LateralSpeed.Size();
 
 		bIsinAir = Pawn->GetMovementComponent()->IsFalling();
+		if (Pawn)
+		{
+			MyFox = Cast<AMyCharacter>(Pawn);
+		}
 	}
 }

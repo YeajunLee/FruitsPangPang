@@ -39,7 +39,7 @@ AMyCharacter::AMyCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 
-	GroundSpeed = 0.f;
+	//GroundSpeed = 0.f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; //캐릭터 방향에 따라
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 1080.f, 0.f); // 회전
@@ -112,7 +112,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		if (GetController()->IsPlayerController()) {
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
-			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeed, MOVE_RIGHT);
+			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd, MOVE_RIGHT);
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 				FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 		}
@@ -128,7 +128,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		}
 	}
 
-
+	
 	
 }
 
@@ -138,8 +138,11 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent); //플레이어 입력 구성 요소가 유효한지 확인하는 매크로
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMyCharacter::LMBDown);
+	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMyCharacter::LMBUp);
+
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -148,6 +151,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("LookUp", this, &AMyCharacter::AddControllerPitchInput);
 	//PlayerInputComponent->BindAxis("TurnRate", this, &AMain::TurnAtRate);
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AMain::LookUpAtRate);
+
 
 }
 
@@ -201,6 +205,52 @@ void AMyCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+
+
+void AMyCharacter::LMBDown()
+{
+	bLMBDown = true;
+	
+	//UE_LOG(LogTemp, Log, TEXT("lmbdown"));
+
+	Attack();
+}
+
+void AMyCharacter::LMBUp()
+{
+	bLMBDown = false;
+}
+
+void AMyCharacter::Attack()
+{
+	if (!bAttacking)
+	{
+		bAttacking = true;
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && ThrowMontage)
+		{
+			AnimInstance->Montage_Play(ThrowMontage, 2.f);
+			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+
+		}
+	}
+}
+
+void AMyCharacter::AttackEnd()
+{
+	bAttacking = false;
+	if (bLMBDown)
+	{
+		Attack();
+	}	
+}
+
+
+void AMyCharacter::Jump()
+{
+	Super::Jump();
+}
 
 void AMyCharacter::Throww()
 {
