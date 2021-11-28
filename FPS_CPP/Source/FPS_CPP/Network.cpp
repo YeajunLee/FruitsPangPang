@@ -159,6 +159,17 @@ void Network::send_move_packet(const float& x,const float& y,const float& z,FQua
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_anim_packet(AnimType type)
+{
+	cs_packet_anim packet;
+	packet.size = sizeof(cs_packet_anim);
+	packet.type = CS_PACKET_ANIM;
+	packet.animtype = static_cast<char>(type);
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_anim), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -210,6 +221,19 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->GroundSpeed = packet->value;
 			}
+		}
+		break;
+	}
+	case SC_PACKET_ANIM: {
+		sc_packet_anim* packet = reinterpret_cast<sc_packet_anim*>(p);
+		switch (packet->animtype)
+		{
+		case static_cast<char>(Network::AnimType::Throw) :
+			if (mOtherCharacter[packet->id] != nullptr)
+			{
+				mOtherCharacter[packet->id]->Throww();
+			}
+			break;
 		}
 		break;
 	}

@@ -11,12 +11,14 @@ const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_TEST = 99;
 const char CS_PACKET_DIR = 3;
+const char CS_PACKET_ANIM = 4;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_DIR = 5;
+const char SC_PACKET_ANIM = 6;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -47,6 +49,14 @@ struct cs_packet_test {
 	float zPos;
 };
 
+struct cs_packet_anim {
+	unsigned char size;
+	char type;
+	char animtype;
+};
+
+
+//-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
@@ -86,5 +96,12 @@ struct sc_packet_remove_object {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_anim {
+	unsigned char size;
+	char type;
+	int id;
+	char animtype;
 };
 #pragma pack(pop)

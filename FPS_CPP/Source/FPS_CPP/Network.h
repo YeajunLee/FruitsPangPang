@@ -48,6 +48,10 @@ class FPS_CPP_API Network : public std::enable_shared_from_this<Network>
 	void error_display(int err_no);
 
 public:
+	enum class AnimType
+	{
+		Throw
+	};
 	class AMyCharacter* mMyCharacter;
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	int WorldCharacterCnt;
@@ -66,5 +70,6 @@ public:
 	void C_Recv();
 	void send_login_packet();
 	void send_move_packet(const float& x, const float& y, const float& z,struct FQuat& rotate,const float& value,const char& movetype);
+	void send_anim_packet(AnimType type);
 	void process_packet(unsigned char* p);
 };
