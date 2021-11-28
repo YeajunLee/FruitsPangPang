@@ -36,12 +36,29 @@ public:
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
-	float GroundSpeed;
+	float GroundSpeedd;
+
+	virtual void Jump() override;
 
 	UFUNCTION(BlueprintCallable)
 	void Throww();
 
+	bool bLMBDown;
+	void LMBDown();
 
+	UFUNCTION(BlueprintCallable)
+	void LMBUp();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+	bool bAttacking;
+
+	void Attack();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+	class UAnimMontage* ThrowMontage;
 
 protected:
 	// Called when the game starts or when spawned
