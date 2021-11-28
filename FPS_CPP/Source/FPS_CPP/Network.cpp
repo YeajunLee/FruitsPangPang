@@ -219,7 +219,7 @@ void Network::process_packet(unsigned char* p)
 			{
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
-				mOtherCharacter[move_id]->GroundSpeed = packet->value;
+				mOtherCharacter[move_id]->GroundSpeedd = packet->value;
 			}
 		}
 		break;
