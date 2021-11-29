@@ -153,6 +153,16 @@ void send_move_packet(int c_id, int mover,float value,char movetype)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
+void send_anim_packet(int c_id,int thrower_character, char animtype)
+{
+	sc_packet_anim packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_ANIM;
+	packet.id = thrower_character;
+	packet.animtype = animtype;
+	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void send_dir_packet(bool isval,int c_id)
 {
 	sc_packet_dir packet;
@@ -292,6 +302,22 @@ void process_packet(int client_id, unsigned char* p)
 			send_dir_packet(true, client_id);
 		}
 		cout << dx << "," << dy << "," << dz << endl;
+		break;
+	}
+	case CS_PACKET_ANIM: {
+		cs_packet_anim* packet = reinterpret_cast<cs_packet_anim*>(p);
+
+		for (auto& cl : clients) {
+			if (cl._id == client_id) continue;
+			cl.state_lock.lock();
+			if (ST_INGAME == cl._state)
+			{
+				cl.state_lock.unlock();
+				send_anim_packet(cl._id,client_id,packet->animtype);
+			}
+			else cl.state_lock.unlock();
+		}
+
 		break;
 	}
 	}
