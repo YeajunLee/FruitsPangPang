@@ -226,14 +226,27 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_ANIM: {
 		sc_packet_anim* packet = reinterpret_cast<sc_packet_anim*>(p);
+		int thrower_character_id = packet->id;
+
 		switch (packet->animtype)
 		{
-		case static_cast<char>(Network::AnimType::Throw) :
-			if (mOtherCharacter[packet->id] != nullptr)
-			{
-				mOtherCharacter[packet->id]->Throww();
+		case static_cast<char>(Network::AnimType::Throw) : {
+
+			if (thrower_character_id == mId) {
+
+				//if (mMyCharacter != nullptr)
+				//	mMyCharacter->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+
+			}
+			else if (thrower_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					mOtherCharacter[packet->id]->LMBDown();
+				}
 			}
 			break;
+		}
+
 		}
 		break;
 	}

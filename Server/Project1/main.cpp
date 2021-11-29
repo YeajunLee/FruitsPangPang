@@ -153,12 +153,12 @@ void send_move_packet(int c_id, int mover,float value,char movetype)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void send_anim_packet(int c_id, char animtype)
+void send_anim_packet(int c_id,int thrower_character, char animtype)
 {
 	sc_packet_anim packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_ANIM;
-	packet.id = c_id;
+	packet.id = thrower_character;
 	packet.animtype = animtype;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
@@ -313,7 +313,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (ST_INGAME == cl._state)
 			{
 				cl.state_lock.unlock();
-				send_anim_packet(cl._id,packet->animtype);
+				send_anim_packet(cl._id,client_id,packet->animtype);
 			}
 			else cl.state_lock.unlock();
 		}
