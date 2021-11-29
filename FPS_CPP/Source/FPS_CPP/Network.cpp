@@ -241,7 +241,7 @@ void Network::process_packet(unsigned char* p)
 			else if (thrower_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					mOtherCharacter[packet->id]->LMBDown();
+					mOtherCharacter[packet->id]->Attack();
 				}
 			}
 			break;
