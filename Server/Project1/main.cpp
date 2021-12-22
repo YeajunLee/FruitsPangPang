@@ -306,7 +306,7 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	case CS_PACKET_ANIM: {
 		cs_packet_anim* packet = reinterpret_cast<cs_packet_anim*>(p);
-
+		cout << client_id << endl;
 		for (auto& cl : clients) {
 			if (cl._id == client_id) continue;
 			cl.state_lock.lock();

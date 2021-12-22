@@ -176,6 +176,7 @@ void Network::process_packet(unsigned char* p)
 	switch (Type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		mMyCharacter->c_id = packet->id;
 		mId = packet->id;
 		break;
 	}
@@ -263,6 +264,7 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		int id = packet->id;
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+		mOtherCharacter[id]->c_id = packet->id;
 		break; 
 	}
 	case SC_PACKET_REMOVE_OBJECT: {

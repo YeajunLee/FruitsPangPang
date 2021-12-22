@@ -60,6 +60,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 	class UAnimMontage* ThrowMontage;
 
+	int c_id;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -225,7 +225,7 @@ void AMyCharacter::Attack()
 {
 	if (!bAttacking)
 	{
-		if (GetController()->IsPlayerController()) {
+		if(c_id == Network::GetNetwork()->mId){
 			Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 		}
 		bAttacking = true;
@@ -262,7 +262,6 @@ void AMyCharacter::Throww()
 	FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
-	//Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 	//spawnActor함수 사용법 모르겠음 일단 skip->는 개뿔 줫밥새끼
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
