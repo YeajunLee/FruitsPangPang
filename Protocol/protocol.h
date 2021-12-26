@@ -12,6 +12,7 @@ const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_TEST = 99;
 const char CS_PACKET_DIR = 3;
 const char CS_PACKET_ANIM = 4;
+const char CS_PACKET_SPAWNOBJ = 5;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -19,6 +20,7 @@ const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_DIR = 5;
 const char SC_PACKET_ANIM = 6;
+const char SC_PACKET_SPAWNOBJ = 7;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -55,6 +57,13 @@ struct cs_packet_anim {
 	char animtype;
 };
 
+struct cs_packet_spawnobj {
+	unsigned char size;
+	char type;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
+	float sx, sy, sz;		//scale
+};
 
 //-------------------- server to client
 struct sc_packet_login_ok {
@@ -103,5 +112,14 @@ struct sc_packet_anim {
 	char type;
 	int id;
 	char animtype;
+};
+
+struct sc_packet_spawnobj {
+	unsigned char size;
+	char type;
+	int id;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
+	float sx, sy, sz;		//scale
 };
 #pragma pack(pop)

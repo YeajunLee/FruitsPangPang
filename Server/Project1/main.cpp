@@ -163,6 +163,23 @@ void send_anim_packet(int c_id,int thrower_character, char animtype)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
+void send_spawnobj_packet(int thrower_character, int lookat_character,
+	float rx, float ry, float rz,float rw,	//rotate
+	float lx, float ly, float lz,	//location
+	float sx, float sy, float sz	//scale
+)
+{
+	sc_packet_spawnobj packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_SPAWNOBJ;
+	packet.id = thrower_character;
+	packet.rx = rx, packet.ry = ry, packet.rz = rz, packet.rw = rw;
+	packet.lx = lx, packet.ly = ly, packet.lz = lz;
+	packet.sx = sx, packet.sy = sy, packet.sz = sz;
+	clients[lookat_character].do_send(sizeof(packet), &packet);
+}
+
+
 void send_dir_packet(bool isval,int c_id)
 {
 	sc_packet_dir packet;
@@ -319,6 +336,23 @@ void process_packet(int client_id, unsigned char* p)
 		}
 
 		break;
+	}
+	case CS_PACKET_SPAWNOBJ: {
+		cs_packet_spawnobj* packet = reinterpret_cast<cs_packet_spawnobj*>(p);
+
+		for (auto& cl : clients) {
+			if (cl._id == client_id) continue;
+			cl.state_lock.lock();
+			if (ST_INGAME == cl._state)
+			{
+				cl.state_lock.unlock();
+				send_spawnobj_packet(client_id, cl._id,
+					packet->rx, packet->ry, packet->rz, packet->rw,
+					packet->lx, packet->ly, packet->lz,
+					packet->sx, packet->sy, packet->sz);
+			}
+			else cl.state_lock.unlock();
+		}
 	}
 	}
 }
