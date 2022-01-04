@@ -170,12 +170,28 @@ void Network::send_anim_packet(AnimType type)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale)
+{
+	cs_packet_spawnobj packet;
+	packet.size = sizeof(cs_packet_spawnobj);
+	packet.type = CS_PACKET_SPAWNOBJ;
+	packet.rx = rotate.X, packet.ry = rotate.Y, packet.rz = rotate.Z, packet.rw = rotate.W;
+	packet.lx = locate.X,	packet.ly = locate.Y,	packet.lz = locate.Z;
+	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
+
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_spawnobj), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+
+}
+
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
 	switch (Type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		mMyCharacter->c_id = packet->id;
 		mId = packet->id;
 		break;
 	}
@@ -241,7 +257,13 @@ void Network::process_packet(unsigned char* p)
 			else if (thrower_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					mOtherCharacter[packet->id]->Attack();
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->AnimThrowMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->AnimThrowMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->AnimThrowMontage);
+
+					}
 				}
 			}
 			break;
@@ -263,12 +285,23 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		int id = packet->id;
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+		mOtherCharacter[id]->c_id = packet->id;
 		break; 
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
 		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 		int other_id = packet->id;
 		break;
+	}
+	case SC_PACKET_SPAWNOBJ: {
+		sc_packet_spawnobj* packet = reinterpret_cast<sc_packet_spawnobj*>(p);
+		int other_id = packet->id;
+
+		FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
+		FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+
 	}
 	}
 }
