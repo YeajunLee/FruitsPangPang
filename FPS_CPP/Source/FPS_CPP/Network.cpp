@@ -257,7 +257,13 @@ void Network::process_packet(unsigned char* p)
 			else if (thrower_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					mOtherCharacter[packet->id]->Attack();
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->AnimThrowMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->AnimThrowMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->AnimThrowMontage);
+
+					}
 				}
 			}
 			break;

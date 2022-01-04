@@ -226,7 +226,7 @@ void AMyCharacter::Attack()
 	if (!bAttacking)
 	{
 		if(c_id == Network::GetNetwork()->mId){
-			//Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
+			Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 		}
 		bAttacking = true;
 
