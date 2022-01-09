@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "FruitsPangPang",
+			"Path": "C:\\Users\\pzy11\\Documents\\GitHub\\GraduationProject\\FruitsPangPang\\FruitsPangPang\\Source\\FruitsPangPang.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "FruitsPangPangEditor",
+			"Path": "C:\\Users\\pzy11\\Documents\\GitHub\\GraduationProject\\FruitsPangPang\\FruitsPangPang\\Source\\FruitsPangPangEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
