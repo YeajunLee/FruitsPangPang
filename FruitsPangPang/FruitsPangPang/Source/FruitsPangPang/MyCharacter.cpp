@@ -231,10 +231,10 @@ void AMyCharacter::Attack()
 		bAttacking = true;
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage)
+		if (AnimInstance && ThrowMontage2)
 		{
-			AnimInstance->Montage_Play(ThrowMontage, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+			AnimInstance->Montage_Play(ThrowMontage2, 2.f);
+			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage2);
 
 		}
 	}
@@ -257,15 +257,16 @@ void AMyCharacter::Jump()
 
 void AMyCharacter::Throww()
 {
+	//Blueprint'/Game/Assets/tomato/Bomb.Bomb'
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	SocketTransform.GetRotation();
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
-	FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+	FName path = TEXT("Blueprint'/Game/Assets/tomato/Bomb.Bomb_C'");
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
-	//spawnActor함수 사용법 모르겠음 일단 skip->는 개뿔 줫밥새끼
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
