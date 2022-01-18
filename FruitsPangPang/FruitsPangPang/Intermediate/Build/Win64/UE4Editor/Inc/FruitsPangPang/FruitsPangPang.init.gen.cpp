@@ -21,7 +21,7 @@ void EmptyLinkFunctionForGeneratedCodeFruitsPangPang_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0x0039A446,
+				0xDA4F75A2,
 				0x46738FBF,
 				METADATA_PARAMS(nullptr, 0)
 			};
