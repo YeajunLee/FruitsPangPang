@@ -231,10 +231,10 @@ void AMyCharacter::Attack()
 		bAttacking = true;
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage2)
+		if (AnimInstance && ThrowMontage)
 		{
-			AnimInstance->Montage_Play(ThrowMontage2, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage2);
+			AnimInstance->Montage_Play(ThrowMontage, 2.f);
+			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 
 		}
 	}
