@@ -58,7 +58,7 @@ public:
 		void AttackEnd();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-		class UAnimMontage* ThrowMontage2;
+		class UAnimMontage* ThrowMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
