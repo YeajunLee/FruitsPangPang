@@ -5,7 +5,7 @@
 #include <chrono>
 #include <mutex>
 #include <concurrent_priority_queue.h>
-#include "protocol.h"
+#include "../../../../../Protocol/protocol.h"
 
 extern HANDLE hiocp;
 extern SOCKET s_socket;
@@ -24,6 +24,8 @@ void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	float lx, float ly, float lz,	//location
 	float sx, float sy, float sz	//scale
 );
+void send_update_inventory(int player_id, short slotNum);
+void send_update_treestat(int player_id, int object_id, bool CanHarvest, int FruitType = -1);
 
 void send_dir_packet(bool isval, int player_id);
 void send_remove_object(int player_id, int removeCharacter_id);
@@ -33,10 +35,7 @@ void send_remove_object(int player_id, int removeCharacter_id);
 
 
 enum COMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_NPC_AI,
-	CMD_SCRIPTNPC_MOVE, CMD_NPC_RESPAWN,
-	CMD_PLAYER_HEAL, CMD_PLAYER_STUNNED, CMD_PLAYER_BUFFREMOVE,
-	CMD_AUTO_SAVE
+	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_TREE_RESPAWN
 };
 
 class WSA_OVER_EX {
@@ -56,3 +55,24 @@ public:
 	WSABUF& getWsaBuf() { return _wsabuf; }
 
 };
+
+
+struct Timer_Event {
+
+	enum class TIMER_TYPE
+	{
+		TYPE_TREE_RESPAWN
+	};
+	int object_id;
+	int player_id;
+	std::chrono::system_clock::time_point exec_time;
+	TIMER_TYPE type;
+
+	constexpr bool operator < (const Timer_Event& R) const
+	{
+		return (exec_time > R.exec_time);
+	}
+};
+
+
+extern concurrency::concurrent_priority_queue <Timer_Event> timer_queue;

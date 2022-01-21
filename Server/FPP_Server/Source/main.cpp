@@ -2,8 +2,8 @@
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #include "Game/Network/Network.h"
-#include "Game/Network/protocol.h"
 #include "Game/Network/Thread/WorkerThread/WorkerThread.h"
+#include "Game/Network/Thread/TimerThread/TimerThread.h"
 #include "Game/Object/Object.h"
 #include "Game/Object/Character/Character.h"
 
@@ -22,7 +22,7 @@ int main()
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(4000);
+	server_addr.sin_port = htons(SERVER_PORT);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bind(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(s_socket, SOMAXCONN);
@@ -49,11 +49,13 @@ int main()
 
 	std::cout << "Creating Worker Threads\n";
 	vector<thread> worker_threads;
+	thread timer_thread{ TimerThread };
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
 	for (auto& th : worker_threads)
 		th.join();
 
+	timer_thread.join();
 	//스레드가 다 끝남. 그러니까 뮤텍스 필요없음.
 	for (auto& object : objects) {
 		if (!object->isPlayer()) break;

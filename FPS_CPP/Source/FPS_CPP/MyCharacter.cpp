@@ -12,6 +12,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "Tree.h"
 
 
 // Sets default values
@@ -57,9 +58,11 @@ void AMyCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
 		Network::GetNetwork()->mMyCharacter = this;
-		Network::GetNetwork()->init();
-		Network::GetNetwork()->C_Recv();
-		Network::GetNetwork()->send_login_packet();
+		if (Network::GetNetwork()->init())
+		{
+			Network::GetNetwork()->C_Recv();
+			Network::GetNetwork()->send_login_packet();
+		}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
@@ -143,6 +146,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMyCharacter::LMBDown);
 	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMyCharacter::LMBUp);
 
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMyCharacter::InteractDown);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AMyCharacter::InteractUp);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -205,7 +210,19 @@ void AMyCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMyCharacter::InteractDown()
+{
+	if (OverlapInTree)
+	{
+		GetFruits();
+		bInteractDown = true;
+	}
+}
 
+void AMyCharacter::InteractUp()
+{
+	bInteractDown = false;
+}
 
 void AMyCharacter::LMBDown()
 {
@@ -220,6 +237,7 @@ void AMyCharacter::LMBUp()
 {
 	bLMBDown = false;
 }
+
 
 void AMyCharacter::Attack()
 {
@@ -265,10 +283,13 @@ void AMyCharacter::Throww()
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
-	//spawnActor함수 사용법 모르겠음 일단 skip->는 개뿔 줫밥새끼
+	//spawnActor함수 사용법 모르겠음 일단 skip->는 
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
+}
 
-	
+void AMyCharacter::GetFruits()
+{
+	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
 }

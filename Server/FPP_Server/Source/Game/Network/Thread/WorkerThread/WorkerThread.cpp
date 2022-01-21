@@ -83,6 +83,21 @@ void WorkerThread()
 			AcceptEx(s_socket, c_socket, wsa_ex->getBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->getWsaOver());
 			break;
 		}
+		case CMD_TREE_RESPAWN: {
+			int randomFruit = 0;
+
+			for (auto& other : objects)
+			{
+				if (!other->isPlayer()) break;
+				auto player = reinterpret_cast<Character*>(other);
+				if (player->_state == Character::STATE::ST_INGAME)
+				{
+					cout << "과일나무 생성됐다고 보냅니다" << endl;
+					send_update_treestat(other->_id, client_id, true, randomFruit);
+				}
+			}
+			break;
+		}
 		}
 	}
 }

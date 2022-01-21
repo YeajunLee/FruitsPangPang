@@ -1,7 +1,9 @@
 #pragma once
 
+const short SERVER_PORT = 4000;
 const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
+const int BUFSIZE = 256;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 10;
 const char MOVE_FORWARD = 0;
@@ -13,6 +15,7 @@ const char CS_PACKET_TEST = 99;
 const char CS_PACKET_DIR = 3;
 const char CS_PACKET_ANIM = 4;
 const char CS_PACKET_SPAWNOBJ = 5;
+const char CS_PACKET_GETFRUITS = 6;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -21,6 +24,8 @@ const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_DIR = 5;
 const char SC_PACKET_ANIM = 6;
 const char SC_PACKET_SPAWNOBJ = 7;
+const char SC_PACKET_UPDATE_INVENTORY = 8;
+const char SC_PACKET_UPDATE_TREESTAT = 9;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -65,6 +70,11 @@ struct cs_packet_spawnobj {
 	float sx, sy, sz;		//scale
 };
 
+struct cs_packet_getfruits {
+	unsigned char size;
+	char type;
+	int tree_id;
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -121,5 +131,21 @@ struct sc_packet_spawnobj {
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 	float sx, sy, sz;		//scale
+};
+
+struct sc_packet_update_inventory {
+	unsigned char size;
+	char type;
+	short slotNum;	
+	short itemtype;	
+	short itemNum;
+};
+
+struct sc_packet_update_treestat {
+	unsigned char size;
+	char type;
+	int treeNum;		//몇 번째 나무
+	bool canharvest;	//나무의 상태
+	int	fruittype;		//열매의 타입
 };
 #pragma pack(pop)

@@ -3,8 +3,13 @@
 #include <mutex>
 #include <unordered_set>
 #include "../Object.h"
-#include "../../Network/protocol.h"
 #include "../../Network/Network.h"
+
+struct InventorySlot {
+	enum class TYPE{NONE, T_TOMATO};
+	TYPE type;
+	short num;
+};
 
 class Character : public Object
 {
@@ -26,5 +31,7 @@ public:
 public:
 	std::atomic_short hp;
 	short maxhp;
+	InventorySlot mSlot[4];
+
 };
 
