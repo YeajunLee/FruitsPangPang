@@ -104,3 +104,7 @@ Build/Android/res/*/*
 # GrowPlant Ignore
 Test/GrowPlant/Intermediate/*
 Test/GrowPlant/Saved/*
+
+# FruitsPangPang Ignore
+FruitsPangPang/FruitsPangPang/Saved/*
+FruitsPangPang/FruitsPangPang/Intermediate/*
