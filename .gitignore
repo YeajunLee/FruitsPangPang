@@ -100,3 +100,7 @@ Build/Android/res/*/*
 *.ilk
 *.idb
 *.recipe
+
+# GrowPlant Ignore
+Test/GrowPlant/Intermediate/*
+Test/GrowPlant/Saved/*
