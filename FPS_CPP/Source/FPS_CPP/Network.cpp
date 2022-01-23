@@ -4,6 +4,8 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Tree.h"
+#include "Inventory.h"
+#include "Item.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -211,6 +213,18 @@ void Network::send_getfruits_packet(const int& treeId)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_useitem_packet(const int& slotNum, const int& amount)
+{
+	cs_packet_useitem packet;
+	packet.size = sizeof(cs_packet_useitem);
+	packet.type = CS_PACKET_USEITEM;
+	packet.slotNum = slotNum;
+	packet.Amount = amount;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -331,18 +345,19 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_UPDATE_INVENTORY: {
 		sc_packet_update_inventory* packet = reinterpret_cast<sc_packet_update_inventory*>(p);
-		/*
-		mMyCharacter->mFruits = packet->itemNum;
-		
-		*/
-		
+
+		FItemInfo itemClass;
+		itemClass.ItemCode = packet->itemCode;
+		itemClass.IndexOfHotKeySlot = packet->slotNum;
+		mMyCharacter->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+			
 		break;
 	}
 	case SC_PACKET_UPDATE_TREESTAT: {
 		sc_packet_update_treestat* packet = reinterpret_cast<sc_packet_update_treestat*>(p);
-		if (packet->canharvest)	//积己 肺流
+		if (packet->canHarvest)	//积己 肺流
 		{
-			mTree[packet->treeNum]->GenerateFruit(packet->fruittype);
+			mTree[packet->treeNum]->GenerateFruit(packet->fruitType);
 		}
 		else {					//荐犬 肺流
 			mTree[packet->treeNum]->HarvestFruit();

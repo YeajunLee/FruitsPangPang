@@ -10,7 +10,7 @@
 extern HANDLE hiocp;
 extern SOCKET s_socket;
 
-extern std::array<class Object*, MAX_USER> objects;
+extern std::array<class Object*, MAX_OBJECT> objects;
 
 void error_display(int err_no);
 int Generate_Id();

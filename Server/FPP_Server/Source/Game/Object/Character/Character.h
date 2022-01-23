@@ -7,8 +7,15 @@
 
 struct InventorySlot {
 	enum class TYPE{NONE, T_TOMATO};
+
+	InventorySlot()
+		:type(InventorySlot::TYPE::NONE)
+		,amount(0)
+	{
+
+	}
 	TYPE type;
-	short num;
+	short amount;
 };
 
 class Character : public Object

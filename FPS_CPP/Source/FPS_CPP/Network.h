@@ -76,5 +76,6 @@ public:
 	void send_spawnobj_packet(const struct FVector& locate, const struct FQuat& rotate, const struct FVector& scale);
 	void send_anim_packet(AnimType type);
 	void send_getfruits_packet(const int& treeId);
+	void send_useitem_packet(const int& slotNum, const int& amount);
 	void process_packet(unsigned char* p);
 };

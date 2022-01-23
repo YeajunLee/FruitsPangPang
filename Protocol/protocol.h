@@ -5,7 +5,10 @@ const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int BUFSIZE = 256;
 const int  MAX_NAME_SIZE = 20;
-const int  MAX_USER = 10;
+const int  MAX_USER = 8;
+const int  TREEID_START = MAX_USER;
+const int  TREEID_END = TREEID_START + 3;
+const int  MAX_OBJECT = 100;
 const char MOVE_FORWARD = 0;
 const char MOVE_RIGHT = 1;
 
@@ -16,6 +19,7 @@ const char CS_PACKET_DIR = 3;
 const char CS_PACKET_ANIM = 4;
 const char CS_PACKET_SPAWNOBJ = 5;
 const char CS_PACKET_GETFRUITS = 6;
+const char CS_PACKET_USEITEM = 7;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -75,6 +79,15 @@ struct cs_packet_getfruits {
 	char type;
 	int tree_id;
 };
+
+struct cs_packet_useitem {
+	unsigned char size;
+	char type;
+	short slotNum;
+	short Amount;
+};
+
+
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -137,15 +150,15 @@ struct sc_packet_update_inventory {
 	unsigned char size;
 	char type;
 	short slotNum;	
-	short itemtype;	
-	short itemNum;
+	short itemCode;
+	short itemAmount;
 };
 
 struct sc_packet_update_treestat {
 	unsigned char size;
 	char type;
 	int treeNum;		//몇 번째 나무
-	bool canharvest;	//나무의 상태
-	int	fruittype;		//열매의 타입
+	bool canHarvest;	//나무의 상태
+	int	fruitType;		//열매의 타입
 };
 #pragma pack(pop)

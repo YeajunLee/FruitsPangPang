@@ -1,4 +1,6 @@
 #pragma once
+#include "../../../../../Protocol/protocol.h"
+
 class Object
 {
 public:
@@ -11,7 +13,7 @@ public:
 	int		_id;
 	OBJTYPE	_type;
 
-	bool isPlayer() { return _id < 8; }
+	bool isPlayer() { return _id < MAX_USER; }
 	bool isInteract() { return _id > 8; }
 };
 

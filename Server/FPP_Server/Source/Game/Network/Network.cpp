@@ -5,12 +5,13 @@
 #include "../Object/Object.h"
 #include "../Object/Character/Character.h"
 #include "../Object/Interact/Interact.h"
+#include "../Object/Interact/Tree/Tree.h"
 
 using namespace std;
 HANDLE hiocp;
 SOCKET s_socket;
 
-std::array<Object*, MAX_USER> objects;
+std::array<Object*, MAX_OBJECT> objects;
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
@@ -150,8 +151,8 @@ void send_update_inventory(int player_id, short slotNum)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_INVENTORY;
 	packet.slotNum = slotNum;
-	packet.itemtype = static_cast<short>(player->mSlot[slotNum].type);
-	packet.itemNum = player->mSlot[slotNum].num;
+	packet.itemCode = static_cast<short>(player->mSlot[slotNum].type);
+	packet.itemAmount = player->mSlot[slotNum].amount;
 	player->sendPacket(&packet, sizeof(packet));
 
 }
@@ -163,8 +164,8 @@ void send_update_treestat(int player_id, int object_id, bool CanHarvest, int Fru
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_TREESTAT;
 	packet.treeNum = object_id;
-	packet.canharvest = CanHarvest;
-	packet.fruittype = FruitType;
+	packet.canHarvest = CanHarvest;
+	packet.fruitType = FruitType;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -271,6 +272,7 @@ void process_packet(int client_id, unsigned char* p)
 		object->rw = packet->rw;
 
 		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
 			auto character = reinterpret_cast<Character*>(other);
 			character->state_lock.lock();
 			if (Character::STATE::ST_INGAME == character->_state)
@@ -306,19 +308,28 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_ANIM: {
 		cs_packet_anim* packet = reinterpret_cast<cs_packet_anim*>(p);
 		cout << client_id << endl;
-		for (auto& other : objects) {
-			if (!other->isPlayer()) break;
-			if (other->_id == client_id) continue;
-			auto character = reinterpret_cast<Character*>(other);
 
-			character->state_lock.lock();
-			if (Character::STATE::ST_INGAME == character->_state)
-			{
-				character->state_lock.unlock();
-				send_anim_packet(character->_id, client_id, packet->animtype);
+		switch (packet->animtype)
+		{
+		case 0://Throw
+		{
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				if (other->_id == client_id) continue;
+				auto character = reinterpret_cast<Character*>(other);
+
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					send_anim_packet(character->_id, client_id, packet->animtype);
+				}
+				else character->state_lock.unlock();
 			}
-			else character->state_lock.unlock();
+			break;
 		}
+		}
+		
 
 		break;
 	}
@@ -345,22 +356,21 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_GETFRUITS: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-
+		Tree* tree = reinterpret_cast<Tree*>(objects[packet->tree_id + TREEID_START]);
+		
+		if (!tree->canHarvest)
+			break;
+		
 		cout << "과일 받았습니다" << endl;
-		/*
-		Interact* tree = reinterpret_cast<Interact*>(objects[packet->tree_id]);
-		tree->CanHarvestLock.lock();
-		if(tree->CanHarvest == true)
-		{	
-			tree->CanHarvest = false;
-		*/
-		character->mSlot[0].num++;
+		tree->canHarvest = false;
+		character->mSlot[0].amount++;
 		send_update_inventory(client_id, 0);
 		Timer_Event instq;
 		instq.exec_time = chrono::system_clock::now() + 5000ms;
 		instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
 		instq.object_id = packet->tree_id;
 		timer_queue.push(instq);
+
 		for (auto& other : objects)
 		{
 			if (!other->isPlayer()) break;
@@ -375,6 +385,13 @@ void process_packet(int client_id, unsigned char* p)
 		tree->CanHarvestLock.unlock();
 		*/
 
+		break;
+	}
+	case CS_PACKET_USEITEM: {
+
+		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
+		Character* character = reinterpret_cast<Character*>(object);
+		character->mSlot[packet->slotNum].amount -= packet->Amount;
 		break;
 	}
 	}

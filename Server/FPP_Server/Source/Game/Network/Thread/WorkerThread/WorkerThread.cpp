@@ -2,6 +2,7 @@
 #include "WorkerThread.h"
 #include "../../Network.h"
 #include "../../../Object/Character/Character.h"
+#include "../../../Object/Interact/Tree/Tree.h"
 
 using namespace std;
 
@@ -92,6 +93,9 @@ void WorkerThread()
 				auto player = reinterpret_cast<Character*>(other);
 				if (player->_state == Character::STATE::ST_INGAME)
 				{
+					auto tree = reinterpret_cast<Tree*>(objects[client_id+TREEID_START]);
+					cout << "나무 id:" << client_id + TREEID_START << endl;
+					tree->canHarvest = true;
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
 					send_update_treestat(other->_id, client_id, true, randomFruit);
 				}

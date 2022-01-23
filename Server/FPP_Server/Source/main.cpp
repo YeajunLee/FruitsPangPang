@@ -5,6 +5,7 @@
 #include "Game/Network/Thread/WorkerThread/WorkerThread.h"
 #include "Game/Network/Thread/TimerThread/TimerThread.h"
 #include "Game/Object/Object.h"
+#include "Game/Object/Interact/Tree/Tree.h"
 #include "Game/Object/Character/Character.h"
 
 #pragma comment (lib,"WS2_32.lib")
@@ -45,6 +46,13 @@ int main()
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		objects[i] = new Character();
+		
+	}
+
+	for (int i = TREEID_START; i < TREEID_END; ++i)
+	{
+		objects[i] = new Tree();
+		objects[i]->_id = i;
 	}
 
 	std::cout << "Creating Worker Threads\n";
@@ -60,8 +68,14 @@ int main()
 	for (auto& object : objects) {
 		if (!object->isPlayer()) break;
 		auto character = reinterpret_cast<Character*>(object);
-		if (Character::STATE::ST_INGAME == character->_state)
-			;// Disconnect(character->_id);
+		//if (Character::STATE::ST_INGAME == character->_state)
+			// Disconnect(character->_id);
+	}
+
+	for (auto& object : objects)
+	{
+		if(object)
+			delete object;
 	}
 	closesocket(s_socket);
 	WSACleanup();

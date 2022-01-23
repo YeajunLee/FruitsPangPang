@@ -64,6 +64,8 @@ void ATree::GenerateFruit(int _FruitType)
             mFruitMesh[1] = world->SpawnActor<ATestTree>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
             SpawnLocation.X += 90.0f;
             mFruitMesh[2] = world->SpawnActor<ATestTree>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+            
+            CanHarvest = true;
             break;
         }
         }
