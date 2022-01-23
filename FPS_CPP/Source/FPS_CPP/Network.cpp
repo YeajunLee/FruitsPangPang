@@ -3,12 +3,16 @@
 
 #include "Network.h"
 #include "MyCharacter.h"
+#include "Tree.h"
+#include "Inventory.h"
+#include "Item.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 //#endif
+std::shared_ptr<class Network> m_Network;
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
@@ -23,6 +27,10 @@ Network::Network()
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		mOtherCharacter[i] = nullptr;
+	}
+	for (int i = 0; i < 10; ++i)
+	{
+		mTree[i] = nullptr;
 	}
 }
 
@@ -44,6 +52,7 @@ std::shared_ptr<Network> Network::GetNetwork()
 
 bool Network::init()
 {
+	isInit = true;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -62,23 +71,26 @@ bool Network::init()
 		cout << "connection eliminate." << endl;
 		//system("pause");
 		//exit(0);
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 void Network::release()
 {
-
-	prev_size = 0;
-	WorldCharacterCnt = 0;
-	mId = 0;
-	mMyCharacter = nullptr;
-	for (int i = 0; i < MAX_USER; ++i)
-		mOtherCharacter[i] = nullptr;
-
-	closesocket(s_socket);
-	WSACleanup();
+	if (isInit)
+	{
+		prev_size = 0;
+		WorldCharacterCnt = 0;
+		mId = 0;
+		mMyCharacter = nullptr;
+		for (int i = 0; i < MAX_USER; ++i)
+			mOtherCharacter[i] = nullptr;
+		closesocket(s_socket);
+		s_socket = NULL;
+		WSACleanup();
+		isInit = false;
+	}
 }
 
 void Network::error_display(int err_no)
@@ -113,7 +125,6 @@ void Network::C_Send()
 
 void Network::C_Recv()
 {
-	std::cout << "here's commin?" << std::endl;
 
 	DWORD recv_flag = 0;
 	ZeroMemory(&recv_expover._wsa_over, sizeof(recv_expover._wsa_over));
@@ -183,6 +194,35 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_spawnobj), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 
+}
+
+
+void Network::send_getfruits_packet(const int& treeId)
+{
+	if (treeId == -1)
+	{
+		//Exception Occurred
+		return;
+	}
+	cs_packet_getfruits packet;
+	packet.size = sizeof(cs_packet_getfruits);
+	packet.type = CS_PACKET_GETFRUITS;
+	packet.tree_id = treeId;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
+void Network::send_useitem_packet(const int& slotNum, const int& amount)
+{
+	cs_packet_useitem packet;
+	packet.size = sizeof(cs_packet_useitem);
+	packet.type = CS_PACKET_USEITEM;
+	packet.slotNum = slotNum;
+	packet.Amount = amount;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
 void Network::process_packet(unsigned char* p)
@@ -301,7 +341,29 @@ void Network::process_packet(unsigned char* p)
 		FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+		break;
+	}
+	case SC_PACKET_UPDATE_INVENTORY: {
+		sc_packet_update_inventory* packet = reinterpret_cast<sc_packet_update_inventory*>(p);
 
+		FItemInfo itemClass;
+		itemClass.ItemCode = packet->itemCode;
+		itemClass.IndexOfHotKeySlot = packet->slotNum;
+		mMyCharacter->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+			
+		break;
+	}
+	case SC_PACKET_UPDATE_TREESTAT: {
+		sc_packet_update_treestat* packet = reinterpret_cast<sc_packet_update_treestat*>(p);
+		if (packet->canHarvest)	//생성 로직
+		{
+			mTree[packet->treeNum]->GenerateFruit(packet->fruitType);
+		}
+		else {					//수확 로직
+			mTree[packet->treeNum]->HarvestFruit();
+			
+		}
+		break;
 	}
 	}
 }

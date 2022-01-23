@@ -10,9 +10,8 @@
 /**
  *
  */
-const int BUFSIZE = 256;
 
-static std::shared_ptr<class Network> m_Network;
+extern std::shared_ptr<class Network> m_Network;
 
 class EXP_OVER {
 public:
@@ -54,6 +53,7 @@ public:
 	};
 	class AMyCharacter* mMyCharacter;
 	class AMyCharacter* mOtherCharacter[MAX_USER];
+	class ATree* mTree[10];
 	int WorldCharacterCnt;
 	int mId;
 	static std::shared_ptr<class Network> GetNetwork();
@@ -64,6 +64,9 @@ public:
 	WSABUF mybuf_r;
 	Network();
 	~Network();
+private:
+	bool isInit;
+public:
 	void release();
 	bool init();
 	void C_Send();
@@ -72,5 +75,7 @@ public:
 	void send_move_packet(const float& x, const float& y, const float& z,struct FQuat& rotate,const float& value,const char& movetype); 
 	void send_spawnobj_packet(const struct FVector& locate, const struct FQuat& rotate, const struct FVector& scale);
 	void send_anim_packet(AnimType type);
+	void send_getfruits_packet(const int& treeId);
+	void send_useitem_packet(const int& slotNum, const int& amount);
 	void process_packet(unsigned char* p);
 };

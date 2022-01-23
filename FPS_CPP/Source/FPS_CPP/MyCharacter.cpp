@@ -12,6 +12,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "Tree.h"
+#include "Inventory.h"
 
 
 // Sets default values
@@ -57,9 +59,22 @@ void AMyCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
 		Network::GetNetwork()->mMyCharacter = this;
-		Network::GetNetwork()->init();
-		Network::GetNetwork()->C_Recv();
-		Network::GetNetwork()->send_login_packet();
+		
+
+		/*
+			Setting Actor Params Before SpawnActor's BeginPlay 
+		*/
+		FTransform spawnLocAndRot{ GetActorLocation() };
+		mInventory = GetWorld()->SpawnActorDeferred<AInventory>(AInventory::StaticClass(), spawnLocAndRot);
+		mInventory->mCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
+		mInventory->mAmountOfSlots = 5;
+		mInventory->FinishSpawning(spawnLocAndRot);
+
+		if (Network::GetNetwork()->init())
+		{
+			Network::GetNetwork()->C_Recv();
+			Network::GetNetwork()->send_login_packet();
+		}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
@@ -94,6 +109,11 @@ void AMyCharacter::BeginPlay()
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 {
+	if (mInventory)
+	{
+		mInventory->Destroy();
+		mInventory = nullptr;
+	}
 	Network::GetNetwork()->release();
 }
 
@@ -143,6 +163,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMyCharacter::LMBDown);
 	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMyCharacter::LMBUp);
 
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMyCharacter::InteractDown);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AMyCharacter::InteractUp);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -205,7 +227,22 @@ void AMyCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMyCharacter::InteractDown()
+{
+	if (OverlapInTree)
+	{
+		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
+		{
+			GetFruits();
+		}
+		bInteractDown = true;
+	}
+}
 
+void AMyCharacter::InteractUp()
+{
+	bInteractDown = false;
+}
 
 void AMyCharacter::LMBDown()
 {
@@ -221,21 +258,31 @@ void AMyCharacter::LMBUp()
 	bLMBDown = false;
 }
 
+
 void AMyCharacter::Attack()
 {
 	if (!bAttacking)
 	{
-		if(c_id == Network::GetNetwork()->mId){
-			Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
-		}
-		bAttacking = true;
-
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage)
+		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[0].Amount));
+		if (mInventory->mSlots[0].Amount > 0)
 		{
-			AnimInstance->Montage_Play(ThrowMontage, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+			mInventory->mSlots[0].Amount -= 1;
+			if (c_id == Network::GetNetwork()->mId) {
+				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(0, 1);
+			}
+			bAttacking = true;
 
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && ThrowMontage)
+			{
+				AnimInstance->Montage_Play(ThrowMontage, 2.f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+
+			}
+			
 		}
 	}
 }
@@ -265,10 +312,14 @@ void AMyCharacter::Throww()
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
-	//spawnActor함수 사용법 모르겠음 일단 skip->는 개뿔 줫밥새끼
+	//spawnActor함수 사용법 모르겠음 일단 skip->는 
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
+}
 
-	
+void AMyCharacter::GetFruits()
+{
+	Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest = false;
+	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
 }
