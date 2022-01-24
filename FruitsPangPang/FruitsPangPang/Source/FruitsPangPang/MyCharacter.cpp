@@ -57,9 +57,11 @@ void AMyCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
 		Network::GetNetwork()->mMyCharacter = this;
-		Network::GetNetwork()->init();
-		Network::GetNetwork()->C_Recv();
-		Network::GetNetwork()->send_login_packet();
+		if (Network::GetNetwork()->init())
+		{
+			Network::GetNetwork()->C_Recv();
+			Network::GetNetwork()->send_login_packet();
+		}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
