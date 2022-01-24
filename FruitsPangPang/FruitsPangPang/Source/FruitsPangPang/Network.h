@@ -64,6 +64,10 @@ public:
 	WSABUF mybuf_r;
 	Network();
 	~Network();
+private:
+	bool isInit;
+
+public:
 	void release();
 	bool init();
 	void C_Send();

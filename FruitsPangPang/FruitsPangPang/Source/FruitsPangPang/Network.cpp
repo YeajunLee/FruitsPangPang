@@ -44,6 +44,7 @@ std::shared_ptr<Network> Network::GetNetwork()
 
 bool Network::init()
 {
+	isInit = true;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -62,23 +63,28 @@ bool Network::init()
 		cout << "connection eliminate." << endl;
 		//system("pause");
 		//exit(0);
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 void Network::release()
 {
+	if (isInit)
+	{
+		prev_size = 0;
+		WorldCharacterCnt = 0;
+		mId = 0;
+		mMyCharacter = nullptr;
+		for (int i = 0; i < MAX_USER; ++i)
+			mOtherCharacter[i] = nullptr;
 
-	prev_size = 0;
-	WorldCharacterCnt = 0;
-	mId = 0;
-	mMyCharacter = nullptr;
-	for (int i = 0; i < MAX_USER; ++i)
-		mOtherCharacter[i] = nullptr;
+		closesocket(s_socket);
+		WSACleanup();
+		isInit = false;
+	}
+	
 
-	closesocket(s_socket);
-	WSACleanup();
 }
 
 void Network::error_display(int err_no)
