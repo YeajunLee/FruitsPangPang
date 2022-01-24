@@ -106,5 +106,9 @@ Test/GrowPlant/Intermediate/*
 Test/GrowPlant/Saved/*
 
 # FruitsPangPang Ignore
-FruitsPangPang/FruitsPangPang/Saved/*
-FruitsPangPang/FruitsPangPang/Intermediate/*
+*/FruitsPangPang/Saved/*
+*/FruitsPangPang/Intermediate/*
+
+# WhiteList txt File
+!미팅일지.txt
+!후르츠워 기획초안.txt
