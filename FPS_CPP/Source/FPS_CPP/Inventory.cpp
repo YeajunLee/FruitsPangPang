@@ -2,6 +2,8 @@
 
 
 #include "Inventory.h"
+#include "MainWidget.h"
+#include "InventorySlotWidget.h"
 
 // Sets default values
 AInventory::AInventory()
@@ -19,6 +21,19 @@ void AInventory::BeginPlay()
 	mSlots.Empty(mAmountOfSlots);	//Empty의 인자를 넣으면 Vector의 Reserve를 생각하면 될 것 같다. 
 	for (int i = 0; i < mAmountOfSlots; ++i)
 		mSlots.Add(FInventorySlot());
+
+	if (mMainWidget == nullptr)
+	{
+		mMainWidget = CreateWidget<UMainWidget>(GetWorld(), mMakerMainWidget);
+		if (mMainWidget != nullptr)
+		{
+			//... Do Something
+			mMainWidget->mInventory = this;
+			mMainWidget->minventorySlot->inventoryRef = this;
+			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
+			mMainWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
 }
 
 // Called every frame
@@ -61,5 +76,17 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		FString::Printf(TEXT("Slot Amount: %d"), slot.Amount));
+
+}
+
+void AInventory::GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount)
+{
+	isempty = mSlots.IsValidIndex(index);
+	if (!isempty)
+	{
+		iteminfo = mSlots[index].ItemClass;
+		amount = mSlots[index].Amount;
+		return;
+	}
 
 }

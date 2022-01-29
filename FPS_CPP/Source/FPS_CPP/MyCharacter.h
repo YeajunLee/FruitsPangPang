@@ -82,6 +82,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	class AInventory* mInventory;
 
+
 	int c_id;
 protected:
 	// Called when the game starts or when spawned
