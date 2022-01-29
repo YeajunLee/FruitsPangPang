@@ -23,8 +23,11 @@ public:
 	class UCanvasPanel* CanvasPanel;
 
 
+	//UPROPERTY(meta = (BindWidget))
+	TArray<class UInventorySlotWidget*> minventorySlot;
+
 	UPROPERTY(meta = (BindWidget))
-	class UInventorySlotWidget* minventorySlot;
+	class UHorizontalBox* InventoryBar;
 
 	class AInventory* mInventory;
 

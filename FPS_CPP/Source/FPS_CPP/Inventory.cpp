@@ -4,6 +4,7 @@
 #include "Inventory.h"
 #include "MainWidget.h"
 #include "InventorySlotWidget.h"
+#include "Components/HorizontalBox.h"
 
 // Sets default values
 AInventory::AInventory()
@@ -29,9 +30,15 @@ void AInventory::BeginPlay()
 		{
 			//... Do Something
 			mMainWidget->mInventory = this;
-			mMainWidget->minventorySlot->inventoryRef = this;
-			mMainWidget->minventorySlot->mIndex = 0;
-			mMainWidget->minventorySlot->Update();
+			for (int i = 0; i < 5; ++i)
+			{
+				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
+				slot->inventoryRef = this;
+				slot->mIndex = 0;
+				slot->Update();
+				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
+				mMainWidget->minventorySlot.Add(slot);
+			}
 			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
 			mMainWidget->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -57,8 +64,8 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
-	mMainWidget->minventorySlot->Update();
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
+	//mMainWidget->minventorySlot->Update();
 }
 
 void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
@@ -73,8 +80,8 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
-	mMainWidget->minventorySlot->Update();
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
+	//mMainWidget->minventorySlot->Update();
 }
 
 void AInventory::GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount)
@@ -97,14 +104,15 @@ void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 	if (mSlots[index].Amount > amount )
 	{
 		mSlots[index].Amount -= amount;
-		//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
-		mMainWidget->minventorySlot->Update();
+		mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+		//mMainWidget->minventorySlot->Update();
 		return;
 	}
 
 	mSlots[index].Amount = 0;
-	mSlots[index].ItemClass = FItemInfo();
-	mMainWidget->minventorySlot->Update();
+	mSlots[index].ItemClass = FItemInfo(); 
+	mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+	//mMainWidget->minventorySlot->Update();
 
 }
 
