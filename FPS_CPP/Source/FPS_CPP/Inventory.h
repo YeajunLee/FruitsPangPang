@@ -62,5 +62,6 @@ public:
 	void RemoveItemAtSlotIndex(const int& index, const int& amount);
 	bool IsSlotValid(const int& index);
 	const FText ItemCodeToItemName(const int& itemCode);
+	UTexture2D* ItemCodeToItemIcon(const int& itemCode);
 };
 

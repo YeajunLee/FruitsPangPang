@@ -48,8 +48,6 @@ void AInventory::Tick(float DeltaTime)
 void AInventory::AddItem(const FItemInfo& item, const int& amount)
 {
 	auto& slot = mSlots[item.IndexOfHotKeySlot];
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	FString::Printf(TEXT("num: %d,amount %d"),item.IndexOfHotKeySlot,amount));
 	if (slot.ItemClass.ItemCode == item.ItemCode)
 	{
 		slot.Amount += amount;
@@ -58,8 +56,6 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 		slot.ItemClass = item;
 		slot.Amount = amount;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	FString::Printf(TEXT("Slot Amount: %d"), slot.Amount));
 
 	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
 	mMainWidget->minventorySlot->Update();
@@ -76,8 +72,6 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 		slot.ItemClass = item;
 		slot.Amount = amount;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		FString::Printf(TEXT("Slot Amount: %d"), slot.Amount));
 
 	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
 	mMainWidget->minventorySlot->Update();
@@ -128,16 +122,34 @@ bool AInventory::IsSlotValid(const int& index)
 
 const FText AInventory::ItemCodeToItemName(const int& itemCode)
 {
+	FText res;
 	switch (itemCode)
 	{
 	case 1:
-		return FText::FromString(FString("Tomato"));
+		res = FText::FromString(FString("Tomato"));
 		break;
 	case 2:
-		return FText::FromString(FString("Quiui"));
+		res = FText::FromString(FString("Quiui"));
 		break;
 	default:
 		break;
 	}
-	return FText();
+
+	return res;
+}
+
+UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
+{
+	UTexture2D* res = nullptr;
+	switch (itemCode)
+	{
+	case 1:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/Icon_Potion.Icon_Potion"), NULL, LOAD_None, NULL);
+		break;
+	case 2:
+		break;
+	default:
+		break;
+	}
+	return res;
 }

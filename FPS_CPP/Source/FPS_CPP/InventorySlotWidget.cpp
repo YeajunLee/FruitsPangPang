@@ -38,6 +38,7 @@ void UInventorySlotWidget::Update()
 		Amount->SetText(FText::Format(LOCTEXT("Inventory", "x{0}"), amount));
 #undef LOCTEXT_NAMESPACE
 		Amount->SetVisibility(ESlateVisibility::Visible);
+		Icon->SetBrushFromTexture(iteminfo.Icon);
 		Icon->SetVisibility(ESlateVisibility::Visible);
 
 	}
