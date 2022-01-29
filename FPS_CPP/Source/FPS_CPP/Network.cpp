@@ -349,6 +349,7 @@ void Network::process_packet(unsigned char* p)
 		FItemInfo itemClass;
 		itemClass.ItemCode = packet->itemCode;
 		itemClass.IndexOfHotKeySlot = packet->slotNum;
+		itemClass.Name = mMyCharacter->mInventory->ItemCodeToItemName(packet->itemCode);
 		mMyCharacter->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 			
 		break;

@@ -363,6 +363,7 @@ void process_packet(int client_id, unsigned char* p)
 		
 		cout << "과일 받았습니다" << endl;
 		tree->canHarvest = false;
+		character->mSlot[0].type = tree->T_TYPE;
 		character->mSlot[0].amount++;
 		send_update_inventory(client_id, 0);
 		Timer_Event instq;

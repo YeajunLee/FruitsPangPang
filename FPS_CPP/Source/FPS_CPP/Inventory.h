@@ -58,5 +58,9 @@ public:
 
 	void AddItem(const FItemInfo& item, const int& amount);
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);
-	void GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
+	void GetItemInfoAtSlotIndex(__in const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
+	void RemoveItemAtSlotIndex(const int& index, const int& amount);
+	bool IsSlotValid(const int& index);
+	const FText ItemCodeToItemName(const int& itemCode);
 };
+

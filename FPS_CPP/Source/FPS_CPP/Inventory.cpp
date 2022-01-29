@@ -30,6 +30,8 @@ void AInventory::BeginPlay()
 			//... Do Something
 			mMainWidget->mInventory = this;
 			mMainWidget->minventorySlot->inventoryRef = this;
+			mMainWidget->minventorySlot->mIndex = 0;
+			mMainWidget->minventorySlot->Update();
 			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
 			mMainWidget->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -59,13 +61,13 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	FString::Printf(TEXT("Slot Amount: %d"), slot.Amount));
 
+	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot->Update();
 }
 
 void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 {
 	auto& slot = mSlots[item.IndexOfHotKeySlot];
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		FString::Printf(TEXT("num: %d,amount %d"), item.IndexOfHotKeySlot, amount));
 	if (slot.ItemClass.ItemCode == item.ItemCode)
 	{
 		slot.Amount = amount;
@@ -77,16 +79,65 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		FString::Printf(TEXT("Slot Amount: %d"), slot.Amount));
 
+	//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot->Update();
 }
 
 void AInventory::GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount)
 {
-	isempty = mSlots.IsValidIndex(index);
+	isempty = !IsSlotValid(index);
 	if (!isempty)
 	{
 		iteminfo = mSlots[index].ItemClass;
 		amount = mSlots[index].Amount;
+
 		return;
 	}
 
+}
+
+void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
+{
+	if (amount <= 0 || !IsSlotValid(index)) return;
+
+	if (mSlots[index].Amount > amount )
+	{
+		mSlots[index].Amount -= amount;
+		//mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); <- 이런식으로 바뀔 예정
+		mMainWidget->minventorySlot->Update();
+		return;
+	}
+
+	mSlots[index].Amount = 0;
+	mSlots[index].ItemClass = FItemInfo();
+	mMainWidget->minventorySlot->Update();
+
+}
+
+bool AInventory::IsSlotValid(const int& index)
+{
+	
+	if (mSlots[index].Amount <= 0) return false;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		FString::Printf(TEXT("ItemCode %d "), mSlots[index].ItemClass.ItemCode));
+	if (mSlots[index].ItemClass.ItemCode < 1) return false;
+
+
+	return true;
+}
+
+const FText AInventory::ItemCodeToItemName(const int& itemCode)
+{
+	switch (itemCode)
+	{
+	case 1:
+		return FText::FromString(FString("Tomato"));
+		break;
+	case 2:
+		return FText::FromString(FString("Quiui"));
+		break;
+	default:
+		break;
+	}
+	return FText();
 }

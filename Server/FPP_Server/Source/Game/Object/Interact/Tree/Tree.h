@@ -8,5 +8,6 @@ public:
 	virtual ~Tree();
 
 	std::atomic<bool> canHarvest;
+	FRUITTYPE T_TYPE;
 };
 

@@ -251,7 +251,7 @@ void AMyCharacter::Attack()
 			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[0].Amount));
 		if (mInventory->mSlots[0].Amount > 0)
 		{
-			mInventory->mSlots[0].Amount -= 1;
+			mInventory->RemoveItemAtSlotIndex(0, 1);
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 				Network::GetNetwork()->send_useitem_packet(0, 1);

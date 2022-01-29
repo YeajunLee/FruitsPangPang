@@ -24,29 +24,24 @@ void UInventorySlotWidget::NativeDestruct()
 void UInventorySlotWidget::Update()
 {
 	
-	if (isEmpty)
+
+	bool localisEmpty;
+	FItemInfo iteminfo;
+	int amount;
+	inventoryRef->GetItemInfoAtSlotIndex(mIndex, localisEmpty, iteminfo, amount);
+	if (localisEmpty)
 	{
 		SetBlank();
 	}
 	else {
-		bool localisEmpty;
-		FItemInfo iteminfo;
-		int amount;
-		inventoryRef->GetItemInfoAtSlotIndex(mIndex, localisEmpty, iteminfo, amount);
-		if (localisEmpty)
-		{
-			SetBlank();
-		}
-		else {
 #define LOCTEXT_NAMESPACE "Inventory"
-			Amount->SetText(FText::Format(LOCTEXT("Inventory", "x{0}"), amount));
+		Amount->SetText(FText::Format(LOCTEXT("Inventory", "x{0}"), amount));
 #undef LOCTEXT_NAMESPACE
-			Amount->SetVisibility(ESlateVisibility::Visible);
-			Icon->SetVisibility(ESlateVisibility::Visible);
+		Amount->SetVisibility(ESlateVisibility::Visible);
+		Icon->SetVisibility(ESlateVisibility::Visible);
 
-		}
 	}
-	
+
 }
 
 void UInventorySlotWidget::SetBlank()
