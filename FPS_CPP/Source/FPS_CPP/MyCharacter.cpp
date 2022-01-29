@@ -60,7 +60,6 @@ void AMyCharacter::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
-		Network::GetNetwork()->mMyCharacter = this;
 		
 
 
@@ -77,11 +76,12 @@ void AMyCharacter::BeginPlay()
 
 
 
-		if (Network::GetNetwork()->init())
-		{
-			Network::GetNetwork()->C_Recv();
-			Network::GetNetwork()->send_login_packet();
-		}
+		//Network::GetNetwork()->mMyCharacter = this;
+		//if (Network::GetNetwork()->init())
+		//{
+		//	Network::GetNetwork()->C_Recv();
+		//	Network::GetNetwork()->send_login_packet();
+		//}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
@@ -97,7 +97,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory->Destroy();
 		mInventory = nullptr;
 	}
-	Network::GetNetwork()->release();
+	//Network::GetNetwork()->release();
 }
 
 // Called every frame
