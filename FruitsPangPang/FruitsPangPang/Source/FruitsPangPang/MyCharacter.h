@@ -49,6 +49,26 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
 
+	// -- interact
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
+		bool bInteractDown;
+
+	void InteractDown();
+
+	void InteractUp();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		bool OverlapInTree;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		int OverlapTreeId;
+
+	UFUNCTION(BlueprintCallable)
+	void GetFruits();
+
+	// -- interact
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 		bool bAttacking;
 
@@ -62,6 +82,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+		class AInventory* mInventory;
 
 	int c_id;
 protected:
