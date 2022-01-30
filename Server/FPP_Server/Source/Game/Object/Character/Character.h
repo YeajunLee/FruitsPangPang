@@ -6,15 +6,14 @@
 #include "../../Network/Network.h"
 
 struct InventorySlot {
-	enum class TYPE{NONE, T_TOMATO};
 
 	InventorySlot()
-		:type(InventorySlot::TYPE::NONE)
+		:type(FRUITTYPE::NONE)
 		,amount(0)
 	{
 
 	}
-	TYPE type;
+	FRUITTYPE type;
 	short amount;
 };
 
@@ -40,5 +39,6 @@ public:
 	short maxhp;
 	InventorySlot mSlot[4];
 
+	void UpdateInventorySlot(const int& index, FRUITTYPE itemcode, const int& amount);
 };
 
