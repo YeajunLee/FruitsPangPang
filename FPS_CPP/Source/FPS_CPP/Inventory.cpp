@@ -34,7 +34,7 @@ void AInventory::BeginPlay()
 			{
 				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
 				slot->inventoryRef = this;
-				slot->mIndex = 0;
+				slot->mIndex = i;
 				slot->Update();
 				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
 				mMainWidget->minventorySlot.Add(slot);
@@ -139,6 +139,8 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 	case 2:
 		res = FText::FromString(FString("Quiui"));
 		break;
+	case 3:
+		res = FText::FromString(FString("Suback"));
 	default:
 		break;
 	}
@@ -155,6 +157,10 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/Icon_Potion.Icon_Potion"), NULL, LOAD_None, NULL);
 		break;
 	case 2:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/quiui.quiui"), NULL, LOAD_None, NULL);
+		break;
+	case 3:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/suback.suback"), NULL, LOAD_None, NULL);
 		break;
 	default:
 		break;

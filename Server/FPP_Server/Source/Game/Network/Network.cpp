@@ -363,9 +363,20 @@ void process_packet(int client_id, unsigned char* p)
 		
 		cout << "과일 받았습니다" << endl;
 		tree->canHarvest = false;
-		character->mSlot[0].type = tree->T_TYPE;
-		character->mSlot[0].amount++;
-		send_update_inventory(client_id, 0);
+		switch (tree->_ttype)
+		{
+		case TREETYPE::GREEN:
+			character->UpdateInventorySlot(0, tree->_ftype, 1);
+			send_update_inventory(client_id, 0);
+			break;
+		case TREETYPE::ORANGE:
+			character->UpdateInventorySlot(1, tree->_ftype, 1);
+			send_update_inventory(client_id, 1);
+			break;
+		}
+		//character->mSlot[0].type = tree->_ftype;
+		//character->mSlot[0].amount++;
+		//send_update_inventory(client_id, 0);
 		Timer_Event instq;
 		instq.exec_time = chrono::system_clock::now() + 5000ms;
 		instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;

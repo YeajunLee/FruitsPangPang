@@ -49,3 +49,16 @@ void Character::sendPacket(void* packet, int bytes)
 		}
 	}
 }
+
+void Character::UpdateInventorySlot(const int& index,FRUITTYPE itemcode,const int& amount)
+{
+	auto& slot = mSlot[index];
+	if (slot.type == itemcode)
+	{
+		slot.amount += amount;
+	}
+	else {
+		slot.type = itemcode;
+		slot.amount = amount;
+	}
+}
