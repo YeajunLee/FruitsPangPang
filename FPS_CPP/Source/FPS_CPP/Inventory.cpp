@@ -154,7 +154,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 	switch (itemCode)
 	{
 	case 1:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/Icon_Potion.Icon_Potion"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/tomato.tomato"), NULL, LOAD_None, NULL);
 		break;
 	case 2:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Objects/quiui.quiui"), NULL, LOAD_None, NULL);
