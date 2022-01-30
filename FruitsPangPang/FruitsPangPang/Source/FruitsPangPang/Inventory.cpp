@@ -116,6 +116,19 @@ void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 
 }
 
+void AInventory::ClearInventory()
+{
+	for (auto& slot : mSlots)
+	{
+		slot.Amount = 0;
+		slot.ItemClass = FItemInfo();
+	}
+	for (auto& slot : mInventoryMainWidget->minventorySlot)
+	{
+		slot->Update();
+	}
+}
+
 bool AInventory::IsSlotValid(const int& index)
 {
 

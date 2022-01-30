@@ -63,6 +63,7 @@ public:
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);
 	void GetItemInfoAtSlotIndex(__in const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
 	void RemoveItemAtSlotIndex(const int& index, const int& amount);
+	void ClearInventory();
 	bool IsSlotValid(const int& index);
 	const FText ItemCodeToItemName(const int& itemCode);
 	UTexture2D* ItemCodeToItemIcon(const int& itemCode);

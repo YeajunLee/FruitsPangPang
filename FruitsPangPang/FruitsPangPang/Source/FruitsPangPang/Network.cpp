@@ -231,6 +231,7 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mMyCharacter->c_id = packet->id;
 		mId = packet->id;
+		mMyCharacter->mInventory->ClearInventory();
 		break;
 	}
 	case SC_PACKET_MOVE: {

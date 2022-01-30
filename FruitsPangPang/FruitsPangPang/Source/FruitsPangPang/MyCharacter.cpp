@@ -73,6 +73,14 @@ void AMyCharacter::BeginPlay()
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
 
+		FItemInfo itemClass;
+		itemClass.ItemCode = 1;	//토마토 30개 생성
+		itemClass.IndexOfHotKeySlot = 0;
+		itemClass.Name = mInventory->ItemCodeToItemName(1);
+		itemClass.Icon = mInventory->ItemCodeToItemIcon(1);
+
+		mInventory->UpdateInventorySlot(itemClass, 30);
+
 
 		Network::GetNetwork()->mMyCharacter = this;
 		if (Network::GetNetwork()->init())
