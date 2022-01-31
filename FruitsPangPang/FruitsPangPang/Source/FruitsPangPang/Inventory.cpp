@@ -133,8 +133,6 @@ bool AInventory::IsSlotValid(const int& index)
 {
 
 	if (mSlots[index].Amount <= 0) return false;
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		FString::Printf(TEXT("ItemCode %d "), mSlots[index].ItemClass.ItemCode));
 	if (mSlots[index].ItemClass.ItemCode < 1) return false;
 
 

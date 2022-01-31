@@ -192,6 +192,17 @@ void send_remove_object(int player_id, int removeCharacter_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_update_userstatus(int player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_update_userstatus packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_UPDATE_USERSTATUS;
+	packet.hp = player->hp;
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -404,6 +415,15 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		character->mSlot[packet->slotNum].amount -= packet->Amount;
+		break;
+	}
+	case CS_PACKET_HIT: {
+		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
+		Character* character = reinterpret_cast<Character*>(object);
+		cout << client_id << "의 이전 hp : " << character->hp << endl;
+		character->hp = max(character->hp - 10, 0);
+		cout << client_id << "의 이후 hp : " << character->hp << endl;
+		send_update_userstatus(client_id);
 		break;
 	}
 	}

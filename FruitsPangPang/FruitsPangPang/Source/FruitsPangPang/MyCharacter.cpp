@@ -16,6 +16,7 @@
 #include "Inventory.h"
 #include "InventorySlotWidget.h"
 #include "InventoryMainWidget.h"
+#include "Projectile.h"
 
 
 // Sets default values
@@ -294,15 +295,15 @@ void AMyCharacter::Jump()
 void AMyCharacter::Throww()
 {
 	//Blueprint'/Game/Assets/tomato/Bomb.Bomb'
-	
+
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	SocketTransform.GetRotation();
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
+	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
@@ -316,4 +317,24 @@ void AMyCharacter::GetFruits()
 {
 	Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest = false;
 	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
+}
+
+void AMyCharacter::SendHitPacket()
+{
+
+}
+
+void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	auto other = Cast<AProjectile>(Other);
+	
+	if (other != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_hitmyself_packet();
+			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+		}
+	}
 }

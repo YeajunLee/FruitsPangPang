@@ -69,6 +69,17 @@ public:
 	// -- interact
 
 
+protected:
+	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
+		FVector HitLocation, FVector HitNormal,FVector NormalImpulse, const FHitResult& Hit) override;
+public:
+	UFUNCTION(BlueprintCallable)
+		void SendHitPacket();
+
+	short hp;
+	// -- hit event
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 		bool bAttacking;
 

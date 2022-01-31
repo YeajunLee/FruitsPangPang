@@ -79,5 +79,6 @@ public:
 	void send_anim_packet(AnimType type);
 	void send_getfruits_packet(const int& treeId);
 	void send_useitem_packet(const int& slotNum, const int& amount);
+	void send_hitmyself_packet(const int& FruitType = 0);
 	void process_packet(unsigned char* p);
 };

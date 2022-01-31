@@ -6,6 +6,7 @@
 #include "Tree.h"
 #include "Inventory.h"
 #include "Item.h"
+#include "Projectile.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -223,6 +224,19 @@ void Network::send_useitem_packet(const int& slotNum, const int& amount)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_hitmyself_packet(const int& FruitType)
+{
+	cs_packet_hit packet;
+	packet.size = sizeof(cs_packet_hit);
+	packet.type = CS_PACKET_HIT;
+	packet.fruitType = FruitType;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+	
+}
+
+
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -337,9 +351,9 @@ void Network::process_packet(unsigned char* p)
 		int other_id = packet->id;
 
 		FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
-		FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+		FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
 	}
 	case SC_PACKET_UPDATE_INVENTORY: {
@@ -364,6 +378,14 @@ void Network::process_packet(unsigned char* p)
 			mTree[packet->treeNum]->HarvestFruit();
 
 		}
+		break;
+	}
+	case SC_PACKET_UPDATE_USERSTATUS: {
+		sc_packet_update_userstatus* packet = reinterpret_cast<sc_packet_update_userstatus*>(p);
+		mMyCharacter->hp = packet->hp;
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
 		break;
 	}
 	}
