@@ -49,6 +49,37 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
 
+	// -- interact
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
+		bool bInteractDown;
+
+	void InteractDown();
+
+	void InteractUp();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		bool OverlapInTree;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		int OverlapTreeId;
+
+	UFUNCTION(BlueprintCallable)
+	void GetFruits();
+
+	// -- interact
+
+
+protected:
+	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
+		FVector HitLocation, FVector HitNormal,FVector NormalImpulse, const FHitResult& Hit) override;
+public:
+	UFUNCTION(BlueprintCallable)
+		void SendHitPacket();
+
+	short hp;
+	// -- hit event
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 		bool bAttacking;
 
@@ -62,6 +93,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+		class AInventory* mInventory;
 
 	int c_id;
 protected:

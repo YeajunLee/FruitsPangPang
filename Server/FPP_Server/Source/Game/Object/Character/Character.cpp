@@ -8,8 +8,9 @@ using namespace std;
 Character::Character(OBJTYPE type, STATE state)
 	:_state(state)
 	, _is_active(true)
-	,maxhp(100),hp(maxhp)
+	,maxhp(100)
 {
+	hp = maxhp;
 	_type = type;
 }
 

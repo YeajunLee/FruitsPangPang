@@ -54,6 +54,7 @@ public:
 	};
 	class AMyCharacter* mMyCharacter;
 	class AMyCharacter* mOtherCharacter[MAX_USER];
+	class ATree* mTree[10];
 	int WorldCharacterCnt;
 	int mId;
 	static std::shared_ptr<class Network> GetNetwork();
@@ -76,5 +77,8 @@ public:
 	void send_move_packet(const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value, const char& movetype);
 	void send_spawnobj_packet(const struct FVector& locate, const struct FQuat& rotate, const struct FVector& scale);
 	void send_anim_packet(AnimType type);
+	void send_getfruits_packet(const int& treeId);
+	void send_useitem_packet(const int& slotNum, const int& amount);
+	void send_hitmyself_packet(const int& FruitType = 0);
 	void process_packet(unsigned char* p);
 };

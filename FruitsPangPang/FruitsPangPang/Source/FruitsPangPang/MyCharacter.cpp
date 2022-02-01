@@ -12,6 +12,11 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "Tree.h"
+#include "Inventory.h"
+#include "InventorySlotWidget.h"
+#include "InventoryMainWidget.h"
+#include "Projectile.h"
 
 
 // Sets default values
@@ -56,6 +61,28 @@ void AMyCharacter::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
+
+
+		/*
+			Setting Actor Params Before SpawnActor's BeginPlay
+		*/
+		FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
+		UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		FTransform spawnLocAndRot{ GetActorLocation() };
+		mInventory = GetWorld()->SpawnActorDeferred<AInventory>(GeneratedInventoryBP, spawnLocAndRot);
+		mInventory->mCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
+		mInventory->mAmountOfSlots = 5;
+		mInventory->FinishSpawning(spawnLocAndRot);
+
+		FItemInfo itemClass;
+		itemClass.ItemCode = 1;	//토마토 30개 생성
+		itemClass.IndexOfHotKeySlot = 0;
+		itemClass.Name = mInventory->ItemCodeToItemName(1);
+		itemClass.Icon = mInventory->ItemCodeToItemIcon(1);
+
+		mInventory->UpdateInventorySlot(itemClass, 30);
+
+
 		Network::GetNetwork()->mMyCharacter = this;
 		if (Network::GetNetwork()->init())
 		{
@@ -67,35 +94,17 @@ void AMyCharacter::BeginPlay()
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
 		Network::GetNetwork()->WorldCharacterCnt++;
 	}
-	//if (Network::GetNetwork()->WorldCharacterCnt == 0)
-	//{
-	//	if (GetController()->IsPlayerController())
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//			FString::Printf(TEXT("other id ")));
-	//	}
-	//	Network::GetNetwork()->mMyCharacter = this;
-	//	Network::GetNetwork()->init();
-	//	Network::GetNetwork()->C_Recv();
-	//	Network::GetNetwork()->send_login_packet();
-	//	Network::GetNetwork()->WorldCharacterCnt++;
-	//}
-	//else {
-	//	if (GetController()->IsPlayerController())
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//			FString::Printf(TEXT("other id ")));
-	//	}
-	//	auto tm = Network::GetNetwork()->WorldCharacterCnt;
-	//	//내 자신이 1 증가시키고 그다음부턴 others에 들어가게
-	//	Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt - 1] = this;
-	//	Network::GetNetwork()->WorldCharacterCnt++;
-	//}
-	//GetMesh()->SetVisibility(false);
+	
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 {
+	if (mInventory)
+	{
+		mInventory->Destroy();
+		mInventory = nullptr;
+	}
+
 	Network::GetNetwork()->release();
 }
 
@@ -145,6 +154,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMyCharacter::LMBDown);
 	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMyCharacter::LMBUp);
 
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMyCharacter::InteractDown);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AMyCharacter::InteractUp);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
@@ -207,7 +218,22 @@ void AMyCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMyCharacter::InteractDown()
+{
+	if (OverlapInTree)
+	{
+		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
+		{
+			GetFruits();
+		}
+		bInteractDown = true;
+	}
+}
 
+void AMyCharacter::InteractUp()
+{
+	bInteractDown = false;
+}
 
 void AMyCharacter::LMBDown()
 {
@@ -227,16 +253,25 @@ void AMyCharacter::Attack()
 {
 	if (!bAttacking)
 	{
-		if (c_id == Network::GetNetwork()->mId) {
-			Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
-		}
-		bAttacking = true;
-
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage)
+		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[0].Amount));
+		if (mInventory->mSlots[0].Amount > 0)
 		{
-			AnimInstance->Montage_Play(ThrowMontage, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+			mInventory->RemoveItemAtSlotIndex(0, 1);
+			if (c_id == Network::GetNetwork()->mId) {
+				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(0, 1);
+			}
+			bAttacking = true;
+
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && ThrowMontage)
+			{
+				AnimInstance->Montage_Play(ThrowMontage, 2.f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
+
+			}
 
 		}
 	}
@@ -260,19 +295,46 @@ void AMyCharacter::Jump()
 void AMyCharacter::Throww()
 {
 	//Blueprint'/Game/Assets/tomato/Bomb.Bomb'
-	
+
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	SocketTransform.GetRotation();
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
+	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
 
 
+}
+
+
+void AMyCharacter::GetFruits()
+{
+	Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest = false;
+	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
+}
+
+void AMyCharacter::SendHitPacket()
+{
+
+}
+
+void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	auto other = Cast<AProjectile>(Other);
+	
+	if (other != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_hitmyself_packet();
+			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+		}
+	}
 }
