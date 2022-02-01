@@ -10,7 +10,7 @@
 /**
  *
  */
-const int BUFSIZE = 256;
+//const int BUFSIZE = 256;
 
 static std::shared_ptr<class Network> m_Network;
 
