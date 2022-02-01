@@ -85,8 +85,6 @@ void WorkerThread()
 			break;
 		}
 		case CMD_TREE_RESPAWN: {
-			int randomFruit = 0;
-
 			for (auto& other : objects)
 			{
 				if (!other->isPlayer()) break;
@@ -96,8 +94,10 @@ void WorkerThread()
 					auto tree = reinterpret_cast<Tree*>(objects[client_id+TREEID_START]);
 					cout << "나무 id:" << client_id + TREEID_START << endl;
 					tree->canHarvest = true;
+					tree->GenerateFruit();
+
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_treestat(other->_id, client_id, true, randomFruit);
+					send_update_treestat(other->_id, client_id, true, static_cast<int>(tree->_ftype));
 				}
 			}
 			break;

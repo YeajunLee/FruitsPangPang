@@ -51,8 +51,12 @@ int main()
 
 	for (int i = TREEID_START; i < TREEID_END; ++i)
 	{
-		objects[i] = new Tree();
-		objects[i]->_id = i;
+		if (i == TREEID_START + 1)
+			objects[i] = new Tree(TREETYPE::ORANGE);
+		else
+			objects[i] = new Tree(TREETYPE::GREEN);
+		auto tree = reinterpret_cast<Tree*>(objects[i]);
+		tree->_id = i;
 	}
 
 	std::cout << "Creating Worker Threads\n";

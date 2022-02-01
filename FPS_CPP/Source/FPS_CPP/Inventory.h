@@ -52,7 +52,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn = "true"))
 	int mAmountOfSlots;
 
+	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
+		TSubclassOf<class UMainWidget> mMakerMainWidget;
+	class UMainWidget* mMainWidget;
+	
+	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
+		TSubclassOf<class UInventorySlotWidget> mMakerInventorySlotWidget;
 
 	void AddItem(const FItemInfo& item, const int& amount);
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);
+	void GetItemInfoAtSlotIndex(__in const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
+	void RemoveItemAtSlotIndex(const int& index, const int& amount);
+	bool IsSlotValid(const int& index);
+	const FText ItemCodeToItemName(const int& itemCode);
+	UTexture2D* ItemCodeToItemIcon(const int& itemCode);
 };
+

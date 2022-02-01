@@ -1,6 +1,9 @@
 #pragma once
 #include "../../../../../Protocol/protocol.h"
 
+
+enum class FRUITTYPE { NONE, T_TOMATO,T_QUIUI,T_SUBACK };
+
 class Object
 {
 public:

@@ -14,6 +14,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Tree.h"
 #include "Inventory.h"
+#include "InventorySlotWidget.h"
+#include "MainWidget.h"
 
 
 // Sets default values
@@ -58,53 +60,34 @@ void AMyCharacter::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));
-		Network::GetNetwork()->mMyCharacter = this;
 		
+
 
 		/*
 			Setting Actor Params Before SpawnActor's BeginPlay 
 		*/
+		FName path = TEXT("Blueprint'/Game/Objects/minven.minven_C'"); //_C를 꼭 붙여야 된다고 함.
+		UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		FTransform spawnLocAndRot{ GetActorLocation() };
-		mInventory = GetWorld()->SpawnActorDeferred<AInventory>(AInventory::StaticClass(), spawnLocAndRot);
+		mInventory = GetWorld()->SpawnActorDeferred<AInventory>(GeneratedInventoryBP, spawnLocAndRot);
 		mInventory->mCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
 
-		if (Network::GetNetwork()->init())
-		{
-			Network::GetNetwork()->C_Recv();
-			Network::GetNetwork()->send_login_packet();
-		}
+
+
+		//Network::GetNetwork()->mMyCharacter = this;
+		//if (Network::GetNetwork()->init())
+		//{
+		//	Network::GetNetwork()->C_Recv();
+		//	Network::GetNetwork()->send_login_packet();
+		//}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
 		Network::GetNetwork()->WorldCharacterCnt++;
 	}
-	//if (Network::GetNetwork()->WorldCharacterCnt == 0)
-	//{
-	//	if (GetController()->IsPlayerController())
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//			FString::Printf(TEXT("other id ")));
-	//	}
-	//	Network::GetNetwork()->mMyCharacter = this;
-	//	Network::GetNetwork()->init();
-	//	Network::GetNetwork()->C_Recv();
-	//	Network::GetNetwork()->send_login_packet();
-	//	Network::GetNetwork()->WorldCharacterCnt++;
-	//}
-	//else {
-	//	if (GetController()->IsPlayerController())
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//			FString::Printf(TEXT("other id ")));
-	//	}
-	//	auto tm = Network::GetNetwork()->WorldCharacterCnt;
-	//	//내 자신이 1 증가시키고 그다음부턴 others에 들어가게
-	//	Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt - 1] = this;
-	//	Network::GetNetwork()->WorldCharacterCnt++;
-	//}
-	//GetMesh()->SetVisibility(false);
+
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -114,7 +97,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory->Destroy();
 		mInventory = nullptr;
 	}
-	Network::GetNetwork()->release();
+	//Network::GetNetwork()->release();
 }
 
 // Called every frame
@@ -268,7 +251,7 @@ void AMyCharacter::Attack()
 			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[0].Amount));
 		if (mInventory->mSlots[0].Amount > 0)
 		{
-			mInventory->mSlots[0].Amount -= 1;
+			mInventory->RemoveItemAtSlotIndex(0, 1);
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 				Network::GetNetwork()->send_useitem_packet(0, 1);
