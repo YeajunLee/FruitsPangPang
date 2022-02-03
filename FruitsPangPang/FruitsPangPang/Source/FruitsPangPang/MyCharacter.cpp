@@ -43,7 +43,7 @@ AMyCharacter::AMyCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; //캐릭터 방향에 따라
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 1080.f, 0.f); // 회전
-	GetCharacterMovement()->JumpZVelocity = 420.f;
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 }
