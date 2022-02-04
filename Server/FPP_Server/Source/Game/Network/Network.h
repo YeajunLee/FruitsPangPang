@@ -29,7 +29,7 @@ void send_update_treestat(int player_id, int object_id, bool CanHarvest, int Fru
 
 void send_dir_packet(bool isval, int player_id);
 void send_remove_object(int player_id, int removeCharacter_id);
-
+void send_update_userstatus(int player_id);
 
 
 

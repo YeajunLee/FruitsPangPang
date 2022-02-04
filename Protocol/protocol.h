@@ -20,6 +20,7 @@ const char CS_PACKET_ANIM = 4;
 const char CS_PACKET_SPAWNOBJ = 5;
 const char CS_PACKET_GETFRUITS = 6;
 const char CS_PACKET_USEITEM = 7;
+const char CS_PACKET_HIT = 8;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -30,6 +31,8 @@ const char SC_PACKET_ANIM = 6;
 const char SC_PACKET_SPAWNOBJ = 7;
 const char SC_PACKET_UPDATE_INVENTORY = 8;
 const char SC_PACKET_UPDATE_TREESTAT = 9;
+const char SC_PACKET_UPDATE_USERSTATUS = 10;
+
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -87,6 +90,11 @@ struct cs_packet_useitem {
 	short Amount;
 };
 
+struct cs_packet_hit {
+	unsigned char size;
+	char type;
+	int fruitType;
+};
 
 //-------------------- server to client
 struct sc_packet_login_ok {
@@ -160,5 +168,11 @@ struct sc_packet_update_treestat {
 	int treeNum;		//몇 번째 나무
 	bool canHarvest;	//나무의 상태
 	int	fruitType;		//열매의 타입
+};
+
+struct sc_packet_update_userstatus {
+	unsigned char size;
+	char type;
+	short hp;
 };
 #pragma pack(pop)
