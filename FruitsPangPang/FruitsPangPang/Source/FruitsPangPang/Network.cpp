@@ -152,12 +152,11 @@ void Network::send_login_packet()
 }
 
 
-void Network::send_move_packet(const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const char& movetype)
+void Network::send_move_packet(const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
 {
 	cs_packet_move packet;
 	packet.size = sizeof(cs_packet_move);
 	packet.type = CS_PACKET_MOVE;
-	packet.movetype = movetype;
 	packet.x = x;
 	packet.y = y;
 	packet.z = z;
@@ -165,7 +164,7 @@ void Network::send_move_packet(const float& x, const float& y, const float& z, F
 	packet.ry = rotate.Y;
 	packet.rz = rotate.Z;
 	packet.rw = rotate.W;
-	packet.value = value;
+	packet.speed = value;
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_move), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
@@ -259,36 +258,11 @@ void Network::process_packet(unsigned char* p)
 		}
 		else if (move_id < MAX_USER)
 		{
-			//if (packet->movetype == MOVE_FORWARD)
-			//{
-			//	if (mOtherCharacter[move_id] != nullptr)
-			//	{
-			//	//	const FRotator Rotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
-			//	//	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-			//	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-			//	//	mOtherCharacter[move_id]->AddMovementInput(Direction, packet->value);
-			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
-			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
-
-			//	}
-			//}
-			//else if (packet->movetype == MOVE_RIGHT)
-			//{
-			//	if (mOtherCharacter[move_id] != nullptr)
-			//	{
-			//		mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
-			//		mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
-			//	}
-			////}
-			//auto t = mOtherCharacter[move_id]->GetCharacterMovement();
-			//auto VecXY=mOtherCharacter[move_id]->GetVelocity()* FVector(1.0, 1.0, 0.0);
-			//VecXY.Size();
 			if (mOtherCharacter[move_id] != nullptr)
 			{
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
-				mOtherCharacter[move_id]->GroundSpeedd = packet->value;
+				mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
 			}
 		}
 		break;
@@ -322,15 +296,6 @@ void Network::process_packet(unsigned char* p)
 			break;
 		}
 
-		}
-		break;
-	}
-	case SC_PACKET_DIR: {
-		sc_packet_dir* packet = reinterpret_cast<sc_packet_dir*>(p);
-		if (!packet->isValid)
-		{
-			if (mMyCharacter != NULL)
-				mMyCharacter->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 		}
 		break;
 	}

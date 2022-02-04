@@ -123,7 +123,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		if (GetController()->IsPlayerController()) {
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
-			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd, MOVE_RIGHT);
+			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 		}

@@ -97,7 +97,7 @@ void WorkerThread()
 					tree->GenerateFruit();
 
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_treestat(other->_id, client_id, true, static_cast<int>(tree->_ftype));
+					send_update_treestat_packet(other->_id, client_id, true, static_cast<int>(tree->_ftype));
 				}
 			}
 			break;

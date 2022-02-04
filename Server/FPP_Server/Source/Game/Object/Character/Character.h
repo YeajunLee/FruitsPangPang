@@ -39,6 +39,7 @@ public:
 	short maxhp;
 	InventorySlot mSlot[4];
 
-	void UpdateInventorySlot(const int& index, FRUITTYPE itemcode, const int& amount);
+	void UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount);
+	void Die();
 };
 

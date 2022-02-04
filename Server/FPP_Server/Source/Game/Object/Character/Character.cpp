@@ -51,7 +51,7 @@ void Character::sendPacket(void* packet, int bytes)
 	}
 }
 
-void Character::UpdateInventorySlot(const int& index,FRUITTYPE itemcode,const int& amount)
+void Character::UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount)
 {
 	auto& slot = mSlot[index];
 	if (slot.type == itemcode)
@@ -62,4 +62,15 @@ void Character::UpdateInventorySlot(const int& index,FRUITTYPE itemcode,const in
 		slot.type = itemcode;
 		slot.amount = amount;
 	}
+}
+
+void Character::Die()
+{
+	Timer_Event instq;
+	instq.player_id = _id;
+	instq.type = Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN;
+	instq.exec_time = chrono::system_clock::now() + 5000ms;
+	timer_queue.push(instq);
+
+
 }
