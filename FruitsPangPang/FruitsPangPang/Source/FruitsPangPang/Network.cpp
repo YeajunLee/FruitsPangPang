@@ -353,6 +353,49 @@ void Network::process_packet(unsigned char* p)
 			FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
 		break;
 	}
+	case SC_PACKET_DIE: {
+		sc_packet_die* packet = reinterpret_cast<sc_packet_die*>(p);
+		//죽었을때 할 행동 ex) 죽은 ui, 죽은 Animation, 부활 ui
+		//현재는 그냥 꺾어놓기만 했음.
+		if (packet->id == mId) {
+
+			mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
+			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+
+		}
+		else if (packet->id < MAX_USER)
+		{
+			if (mOtherCharacter[packet->id] != nullptr)
+			{
+				mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
+			}
+		}
+		//
+
+		break;
+	}
+	case SC_PACKET_RESPAWN: {
+		sc_packet_respawn* packet = reinterpret_cast<sc_packet_respawn*>(p);
+
+		if (packet->id == mId) {
+			
+			mMyCharacter->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			mMyCharacter->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+			mMyCharacter->GroundSpeedd = 0;
+			mMyCharacter->EnableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+			
+		}
+		else if (packet->id < MAX_USER)
+		{
+			if (mOtherCharacter[packet->id] != nullptr)
+			{
+				mOtherCharacter[packet->id]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+				mOtherCharacter[packet->id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+				mOtherCharacter[packet->id]->GroundSpeedd = 0;
+			}
+		}
+		break;
+	}
 	}
 }
 

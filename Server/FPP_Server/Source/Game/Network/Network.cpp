@@ -189,9 +189,33 @@ void send_update_userstatus_packet(int player_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_die_packet(int player_id)
+void send_die_packet(int player_id,int deadplayer_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_die packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_DIE;
+	packet.id = deadplayer_id;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_respawn_packet(int player_id, int respawner_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	auto respawner = objects[respawner_id];
+	sc_packet_respawn packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_RESPAWN;
+	packet.id = respawner_id;
+	packet.lx = respawner->x;
+	packet.ly = respawner->y;
+	packet.lz = respawner->z;
+	packet.rx = respawner->rx;
+	packet.ry = respawner->ry;
+	packet.rz = respawner->rz;
+	packet.rw = respawner->rw;
+
+	player->sendPacket(&packet, sizeof(packet));
 }
 
 void process_packet(int client_id, unsigned char* p)

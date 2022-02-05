@@ -8,7 +8,7 @@ using namespace std;
 Character::Character(OBJTYPE type, STATE state)
 	:_state(state)
 	, _is_active(true)
-	,maxhp(100)
+	,maxhp(20)
 {
 	hp = maxhp;
 	_type = type;
@@ -71,6 +71,19 @@ void Character::Die()
 	instq.type = Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN;
 	instq.exec_time = chrono::system_clock::now() + 5000ms;
 	timer_queue.push(instq);
+	cout << "플레이어 " << _id << "사망\n";
+	for (auto& other : objects) {
+		if (!other->isPlayer()) break;
+		auto character = reinterpret_cast<Character*>(other);
+
+		character->state_lock.lock();
+		if (Character::STATE::ST_INGAME == character->_state)
+		{
+			character->state_lock.unlock();
+			send_die_packet(character->_id, _id);
+		}
+		else character->state_lock.unlock();
+	}
 
 
 }

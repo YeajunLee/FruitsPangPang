@@ -28,7 +28,7 @@ const char SC_PACKET_UPDATE_INVENTORY = 8;
 const char SC_PACKET_UPDATE_TREESTAT = 9;
 const char SC_PACKET_UPDATE_USERSTATUS = 10;
 const char SC_PACKET_DIE = 11;
-const char SC_PACKET_TELEPORT = 12;
+const char SC_PACKET_RESPAWN = 12;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -151,11 +151,15 @@ struct sc_packet_update_userstatus {
 struct sc_packet_die {
 	unsigned char size;
 	char type;
+	int	id;
 };
 
-struct sc_packet_teleport {
+struct sc_packet_respawn {
 	unsigned char size;
 	char type;
+	int	id;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
 
 };
 #pragma pack(pop)

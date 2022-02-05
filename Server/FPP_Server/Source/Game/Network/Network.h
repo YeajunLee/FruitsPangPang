@@ -29,7 +29,8 @@ void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, 
 
 void send_remove_object_packet(int player_id, int removeCharacter_id);
 void send_update_userstatus_packet(int player_id);
-void send_die_packet(int player_id);
+void send_die_packet(int player_id, int deadplayer_id);
+void send_respawn_packet(int player_id, int respawner_id);
 
 
 

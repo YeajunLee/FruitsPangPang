@@ -119,6 +119,9 @@ Test/언리얼 자동차/JparkCar/Saved/*
 */FruitsPangPang/Saved/*
 */FruitsPangPang/Intermediate/*
 
+# Server Ignore
+Server/FPP_Server/x64/*
+
 # WhiteList txt File
 !미팅일지.txt
 !후르츠워 기획초안.txt
