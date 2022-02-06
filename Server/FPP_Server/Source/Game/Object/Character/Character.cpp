@@ -9,8 +9,8 @@ Character::Character(OBJTYPE type, STATE state)
 	:_state(state)
 	, _is_active(true)
 	,maxhp(20)
+	,hp(maxhp)
 {
-	hp = maxhp;
 	_type = type;
 }
 

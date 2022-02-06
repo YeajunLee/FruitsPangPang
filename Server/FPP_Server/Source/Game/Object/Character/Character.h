@@ -35,8 +35,8 @@ public:
 	void sendPacket(void* packet, int bytes);
 
 public:
-	std::atomic_short hp;
 	short maxhp;
+	std::atomic_short hp;
 	InventorySlot mSlot[4];
 
 	void UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount);
