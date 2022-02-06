@@ -184,7 +184,11 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = 0;
 		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
 	}
 	else if (Key == EKeys::Two)
 	{
@@ -192,23 +196,35 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = 1;
 		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
 	}
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
-		if(tmp != SelectedHotKeySlotNum)
+		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
 		int tmp = SelectedHotKeySlotNum;
-		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 3);
+		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
 		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
 	}
 }
 

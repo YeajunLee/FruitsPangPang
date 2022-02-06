@@ -41,6 +41,7 @@ void AInventory::BeginPlay()
 			}
 			mInventoryMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
 			mInventoryMainWidget->SetVisibility(ESlateVisibility::Visible);
+			mInventoryMainWidget->minventorySlot[0]->Select();
 		}
 	}
 }

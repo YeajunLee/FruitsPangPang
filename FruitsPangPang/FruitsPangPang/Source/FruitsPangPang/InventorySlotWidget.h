@@ -28,6 +28,9 @@ public:
 		class UImage* Icon;
 
 	UPROPERTY(meta = (BindWidget))
+		class UImage* mSelect;
+
+	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* Amount;
 
 	bool isEmpty;
@@ -38,4 +41,6 @@ public:
 	void SetBlank();
 public:
 	void Update();
+	void Select();
+	void UnSelect();
 };
