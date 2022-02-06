@@ -80,5 +80,6 @@ public:
 	void send_getfruits_packet(const int& treeId);
 	void send_useitem_packet(const int& slotNum, const int& amount);
 	void send_hitmyself_packet(const int& FruitType = 0);
+	void send_change_hotkeyslot_packet(const int& slotNum);
 	void process_packet(unsigned char* p);
 };

@@ -408,7 +408,9 @@ void process_packet(int client_id, unsigned char* p)
 
 		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		character->mSlot[packet->slotNum].amount -= packet->Amount;
+		//character->mSlot[packet->slotNum].amount -= packet->Amount;
+		character->mSlot[character->mActivationSlot].amount -= 1;
+		cout << client_id<<"번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
 		break;
 	}
 	case CS_PACKET_HIT: {
@@ -422,6 +424,14 @@ void process_packet(int client_id, unsigned char* p)
 			character->Die();
 		}
 		send_update_userstatus_packet(client_id);
+		break;
+	}
+	case CS_PACKET_CHANGE_HOTKEYSLOT: {
+		cs_packet_change_hotkeyslot* packet = reinterpret_cast<cs_packet_change_hotkeyslot*>(p);
+
+		Character* character = reinterpret_cast<Character*>(object);
+		character->mActivationSlot = packet->HotkeySlotNum;
+
 		break;
 	}
 	}

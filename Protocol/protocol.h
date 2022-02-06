@@ -17,6 +17,7 @@ const char CS_PACKET_SPAWNOBJ = 5;
 const char CS_PACKET_GETFRUITS = 6;
 const char CS_PACKET_USEITEM = 7;
 const char CS_PACKET_HIT = 8;
+const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -78,6 +79,11 @@ struct cs_packet_hit {
 	int fruitType;
 };
 
+struct cs_packet_change_hotkeyslot {
+	unsigned char size;
+	char type;
+	int HotkeySlotNum;	//activated inventory slot num
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;

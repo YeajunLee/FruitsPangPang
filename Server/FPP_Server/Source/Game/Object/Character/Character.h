@@ -37,8 +37,8 @@ public:
 public:
 	short maxhp;
 	std::atomic_short hp;
-	InventorySlot mSlot[4];
-
+	InventorySlot mSlot[5];
+	std::atomic_int mActivationSlot;
 	void UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount);
 	void Die();
 };

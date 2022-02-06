@@ -235,6 +235,17 @@ void Network::send_hitmyself_packet(const int& FruitType)
 	
 }
 
+void Network::send_change_hotkeyslot_packet(const int& slotNum)
+{
+
+	cs_packet_change_hotkeyslot packet;
+	packet.size = sizeof(cs_packet_change_hotkeyslot);
+	packet.type = CS_PACKET_CHANGE_HOTKEYSLOT;
+	packet.HotkeySlotNum = slotNum;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
 
 void Network::process_packet(unsigned char* p)
 {
