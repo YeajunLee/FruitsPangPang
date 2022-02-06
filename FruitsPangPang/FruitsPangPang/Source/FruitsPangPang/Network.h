@@ -74,11 +74,12 @@ public:
 	void C_Send();
 	void C_Recv();
 	void send_login_packet();
-	void send_move_packet(const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value, const char& movetype);
+	void send_move_packet(const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
 	void send_spawnobj_packet(const struct FVector& locate, const struct FQuat& rotate, const struct FVector& scale);
 	void send_anim_packet(AnimType type);
 	void send_getfruits_packet(const int& treeId);
 	void send_useitem_packet(const int& slotNum, const int& amount);
 	void send_hitmyself_packet(const int& FruitType = 0);
+	void send_change_hotkeyslot_packet(const int& slotNum);
 	void process_packet(unsigned char* p);
 };

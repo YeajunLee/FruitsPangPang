@@ -97,9 +97,40 @@ void WorkerThread()
 					tree->GenerateFruit();
 
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_treestat(other->_id, client_id, true, static_cast<int>(tree->_ftype));
+					send_update_treestat_packet(other->_id, client_id, true, static_cast<int>(tree->_ftype));
 				}
 			}
+			delete wsa_ex;
+			break;
+		}
+		case CMD_PLAYER_RESPAWN: {
+
+			Character* RespawnPlayer = reinterpret_cast<Character*>(objects[client_id]);
+			if (RespawnPlayer->hp > 0)
+			{
+				delete wsa_ex;
+				break;
+			}
+			RespawnPlayer->hp = RespawnPlayer->maxhp;
+			RespawnPlayer->x = 32030, RespawnPlayer->y = 24480, RespawnPlayer->z = 398;
+			RespawnPlayer->rx = 0, RespawnPlayer->ry = 0, RespawnPlayer->rz = 0, RespawnPlayer->rw = 1;
+
+			cout << "플레이어 " << client_id << "리스폰\n";
+
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				auto character = reinterpret_cast<Character*>(other);
+
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					send_respawn_packet(character->_id, RespawnPlayer->_id);
+				}
+				else character->state_lock.unlock();
+			}
+
+			delete wsa_ex;
 			break;
 		}
 		}

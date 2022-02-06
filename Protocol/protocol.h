@@ -9,30 +9,27 @@ const int  MAX_USER = 8;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + 3;
 const int  MAX_OBJECT = 100;
-const char MOVE_FORWARD = 0;
-const char MOVE_RIGHT = 1;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
-const char CS_PACKET_TEST = 99;
-const char CS_PACKET_DIR = 3;
 const char CS_PACKET_ANIM = 4;
 const char CS_PACKET_SPAWNOBJ = 5;
 const char CS_PACKET_GETFRUITS = 6;
 const char CS_PACKET_USEITEM = 7;
 const char CS_PACKET_HIT = 8;
+const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
-const char SC_PACKET_DIR = 5;
 const char SC_PACKET_ANIM = 6;
 const char SC_PACKET_SPAWNOBJ = 7;
 const char SC_PACKET_UPDATE_INVENTORY = 8;
 const char SC_PACKET_UPDATE_TREESTAT = 9;
 const char SC_PACKET_UPDATE_USERSTATUS = 10;
-
+const char SC_PACKET_DIE = 11;
+const char SC_PACKET_RESPAWN = 12;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -44,23 +41,9 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	movetype;			//forward = 0 , right = 1
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
-	float value;				//scala
-	char	direction;			// 0 : up,  1: down, 2:left, 3:right
-};
-
-struct cs_packet_dir {
-	unsigned char size;
-	char	type;
-	float x, y, z;
-
-};
-struct cs_packet_test {
-	unsigned char size;
-	char type;
-	float zPos;
+	float speed;				//scala
 };
 
 struct cs_packet_anim {
@@ -96,6 +79,11 @@ struct cs_packet_hit {
 	int fruitType;
 };
 
+struct cs_packet_change_hotkeyslot {
+	unsigned char size;
+	char type;
+	int HotkeySlotNum;	//activated inventory slot num
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -107,20 +95,10 @@ struct sc_packet_login_ok {
 struct sc_packet_move {
 	unsigned char size;
 	char type;
-	char movetype;
 	int		id;
 	float x, y, z;
 	float rx, ry, rz, rw;
-	float value;
-	bool isValid;
-};
-
-struct sc_packet_dir {
-	unsigned char size;
-	char type;
-	int		id;
-	float x, y, z;
-	bool isValid;
+	float speed;
 };
 
 struct sc_packet_put_object {
@@ -174,5 +152,20 @@ struct sc_packet_update_userstatus {
 	unsigned char size;
 	char type;
 	short hp;
+};
+
+struct sc_packet_die {
+	unsigned char size;
+	char type;
+	int	id;
+};
+
+struct sc_packet_respawn {
+	unsigned char size;
+	char type;
+	int	id;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
+
 };
 #pragma pack(pop)

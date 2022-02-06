@@ -21,6 +21,7 @@
 
 // Sets default values
 AMyCharacter::AMyCharacter()
+	:SelectedHotKeySlotNum(0)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -82,6 +83,11 @@ void AMyCharacter::BeginPlay()
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
+		itemClass.ItemCode = 3;	//수박 30개 생성
+		itemClass.IndexOfHotKeySlot = 1;
+		itemClass.Name = mInventory->ItemCodeToItemName(3);
+		itemClass.Icon = mInventory->ItemCodeToItemIcon(3);
+		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		Network::GetNetwork()->mMyCharacter = this;
 		if (Network::GetNetwork()->init())
@@ -123,7 +129,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		if (GetController()->IsPlayerController()) {
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
-			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd, MOVE_RIGHT);
+			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 		}
@@ -162,12 +168,65 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAxis("Turn", this, &AMyCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMyCharacter::AddControllerPitchInput);
+
+
 	//PlayerInputComponent->BindAxis("TurnRate", this, &AMain::TurnAtRate);
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AMain::LookUpAtRate);
 
 
 }
 
+void AMyCharacter::AnyKeyPressed(FKey Key)
+{
+	if (Key == EKeys::One)
+	{
+		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
+		int tmp = SelectedHotKeySlotNum;
+		SelectedHotKeySlotNum = 0;
+		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
+	}
+	else if (Key == EKeys::Two)
+	{
+		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
+		int tmp = SelectedHotKeySlotNum;
+		SelectedHotKeySlotNum = 1;
+		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
+	}
+	else if (Key == EKeys::MouseScrollDown)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
+		int tmp = SelectedHotKeySlotNum;
+		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
+		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
+	}
+	else if (Key == EKeys::MouseScrollUp)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
+		int tmp = SelectedHotKeySlotNum;
+		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
+		if (tmp != SelectedHotKeySlotNum)
+		{
+			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+		}
+	}
+}
 
 void AMyCharacter::MoveForward(float value)
 {
@@ -255,13 +314,13 @@ void AMyCharacter::Attack()
 	{
 		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[0].Amount));
-		if (mInventory->mSlots[0].Amount > 0)
+			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount));
+		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			mInventory->RemoveItemAtSlotIndex(0, 1);
+			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(0, 1);
+				Network::GetNetwork()->send_useitem_packet(SelectedHotKeySlotNum, 1);
 			}
 			bAttacking = true;
 

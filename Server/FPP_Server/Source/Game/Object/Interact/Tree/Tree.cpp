@@ -18,6 +18,7 @@ Tree::Tree(TREETYPE ttype)
 	:Interact(Object::OBJTYPE::INTERACT, Interact::INTERTYPE::TREE)
 	, canHarvest(true)
 	, _ttype(ttype)
+	, _ftype(FRUITTYPE::NONE)
 {
 
 	/*나중에 랜덤으로 바꿔야함*/
