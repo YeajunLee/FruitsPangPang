@@ -15,7 +15,7 @@
 #include "Tree.h"
 #include "Inventory.h"
 #include "InventorySlotWidget.h"
-#include "InventoryMainWidget.h"
+#include "MainWidget.h"
 #include "Projectile.h"
 
 
@@ -185,8 +185,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = 0;
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -197,8 +197,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = 1;
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -209,8 +209,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -221,8 +221,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}

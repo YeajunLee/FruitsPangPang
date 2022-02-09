@@ -2,7 +2,7 @@
 
 
 #include "Inventory.h"
-#include "InventoryMainWidget.h"
+#include "MainWidget.h"
 #include "InventorySlotWidget.h"
 #include "Components/HorizontalBox.h"
 
@@ -23,25 +23,26 @@ void AInventory::BeginPlay()
 	for (int i = 0; i < mAmountOfSlots; ++i)
 		mSlots.Add(FInventorySlot());
 
-	if (mInventoryMainWidget == nullptr)
+	if (mMainWidget == nullptr)
 	{
-		mInventoryMainWidget = CreateWidget<UInventoryMainWidget>(GetWorld(), mMakerInventoryMainWidget);
-		if (mInventoryMainWidget != nullptr)
+		mMainWidget = CreateWidget<UMainWidget>(GetWorld(), mMakerMainWidget);
+		if (mMainWidget != nullptr)
 		{
 			//... Do Something
-			mInventoryMainWidget->mInventory = this;
+			mMainWidget->mInventory = this;
+			mMainWidget->mCharacter = mCharacter;
 			for (int i = 0; i < 5; ++i)
 			{
 				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
 				slot->inventoryRef = this;
 				slot->mIndex = i;
 				slot->Update();
-				mInventoryMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
-				mInventoryMainWidget->minventorySlot.Add(slot);
+				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
+				mMainWidget->minventorySlot.Add(slot);
 			}
-			mInventoryMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
-			mInventoryMainWidget->SetVisibility(ESlateVisibility::Visible);
-			mInventoryMainWidget->minventorySlot[0]->Select();
+			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
+			mMainWidget->SetVisibility(ESlateVisibility::Visible);
+			mMainWidget->minventorySlot[0]->Select();
 		}
 	}
 }
@@ -65,7 +66,7 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	mInventoryMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 }
 
@@ -81,7 +82,7 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	mInventoryMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 }
 
@@ -105,14 +106,14 @@ void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 	if (mSlots[index].Amount > amount)
 	{
 		mSlots[index].Amount -= amount;
-		mInventoryMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+		mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
 		//mInventoryMainWidget->minventorySlot->Update();
 		return;
 	}
 
 	mSlots[index].Amount = 0;
 	mSlots[index].ItemClass = FItemInfo();
-	mInventoryMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 
 }
@@ -124,7 +125,7 @@ void AInventory::ClearInventory()
 		slot.Amount = 0;
 		slot.ItemClass = FItemInfo();
 	}
-	for (auto& slot : mInventoryMainWidget->minventorySlot)
+	for (auto& slot : mMainWidget->minventorySlot)
 	{
 		slot->Update();
 	}

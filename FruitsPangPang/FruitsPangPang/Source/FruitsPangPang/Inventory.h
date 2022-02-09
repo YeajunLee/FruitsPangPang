@@ -52,9 +52,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn = "true"))
 		int mAmountOfSlots;
 
+
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
-		TSubclassOf<class UInventoryMainWidget> mMakerInventoryMainWidget;
-	class UInventoryMainWidget* mInventoryMainWidget;
+		TSubclassOf<class UMainWidget> mMakerMainWidget;
+	class UMainWidget* mMainWidget;
 
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
 		TSubclassOf<class UInventorySlotWidget> mMakerInventorySlotWidget;

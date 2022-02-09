@@ -9,6 +9,7 @@ const int  MAX_USER = 8;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + 3;
 const int  MAX_OBJECT = 100;
+const int PLAYER_HP = 20;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;

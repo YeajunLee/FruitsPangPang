@@ -9,6 +9,7 @@
 #include "Projectile.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "MainWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -359,7 +360,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_UPDATE_USERSTATUS: {
 		sc_packet_update_userstatus* packet = reinterpret_cast<sc_packet_update_userstatus*>(p);
 		mMyCharacter->hp = packet->hp;
-
+		mMyCharacter->mInventory->mMainWidget->UpdateHpBar();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
 		break;
