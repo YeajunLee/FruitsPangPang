@@ -3,6 +3,7 @@
 
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "Projectile.h"
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -35,3 +36,39 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+
+void AAICharacter::Attack()
+{
+	if (!bAttacking)
+	{
+		bAttacking = true;
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && ThrowMontage_AI)
+		{
+			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
+
+		}
+	}
+}
+
+void AAICharacter::AttackEnd()
+{
+	bAttacking = false;
+	Attack();
+}
+
+void AAICharacter::Throw_AI()
+{
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+	SocketTransform.GetRotation();
+	SocketTransform.GetLocation();
+	SocketTransform.GetScale3D();
+	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	
+
+}
