@@ -11,7 +11,7 @@
 
 void UInventorySlotWidget::NativePreConstruct()
 {
-
+	mSelect->SetVisibility(ESlateVisibility::Hidden);
 }
 
 
@@ -50,4 +50,14 @@ void UInventorySlotWidget::SetBlank()
 
 	Icon->SetVisibility(ESlateVisibility::Hidden);
 	Amount->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UInventorySlotWidget::Select()
+{
+	mSelect->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UInventorySlotWidget::UnSelect()
+{
+	mSelect->SetVisibility(ESlateVisibility::Hidden);
 }

@@ -78,7 +78,7 @@ void Disconnect(int c_id)
 			continue;
 		}
 		OtherPlayer->state_lock.unlock();
-		send_remove_object(OtherPlayer->_id, c_id);	//이거 언락위치 생각 
+		send_remove_object_packet(OtherPlayer->_id, c_id);	//이거 언락위치 생각 
 	}
 }
 
@@ -95,14 +95,13 @@ void send_login_ok_packet(int player_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_move_packet(int player_id, int mover_id, float value, char movetype)
+void send_move_packet(int player_id, int mover_id, float value)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_move packet;
 	packet.id = mover_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_MOVE;
-	packet.movetype = movetype;
 	packet.x = objects[mover_id]->x;
 	packet.y = objects[mover_id]->y;
 	packet.z = objects[mover_id]->z;
@@ -110,8 +109,7 @@ void send_move_packet(int player_id, int mover_id, float value, char movetype)
 	packet.ry = objects[mover_id]->ry;
 	packet.rz = objects[mover_id]->rz;
 	packet.rw = objects[mover_id]->rw;
-	packet.value = value;
-	packet.isValid = false;
+	packet.speed = value;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -144,7 +142,7 @@ void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 }
 
 
-void send_update_inventory(int player_id, short slotNum)
+void send_update_inventory_packet(int player_id, short slotNum)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_update_inventory packet;
@@ -157,7 +155,7 @@ void send_update_inventory(int player_id, short slotNum)
 
 }
 
-void send_update_treestat(int player_id, int object_id, bool CanHarvest, int FruitType)
+void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, int FruitType)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_update_treestat packet;
@@ -169,20 +167,8 @@ void send_update_treestat(int player_id, int object_id, bool CanHarvest, int Fru
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_dir_packet(bool isval, int player_id)
-{
-	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_dir packet;
-	packet.isValid = isval;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_DIR;
-	packet.x = player->x;
-	packet.y = player->y;
-	packet.z = player->z;
-	player->sendPacket(&packet, sizeof(packet));
-}
 
-void send_remove_object(int player_id, int removeCharacter_id)
+void send_remove_object_packet(int player_id, int removeCharacter_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_remove_object packet;
@@ -192,13 +178,42 @@ void send_remove_object(int player_id, int removeCharacter_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_update_userstatus(int player_id)
+void send_update_userstatus_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_update_userstatus packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_USERSTATUS;
 	packet.hp = player->hp;
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_die_packet(int player_id,int deadplayer_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_die packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_DIE;
+	packet.id = deadplayer_id;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_respawn_packet(int player_id, int respawner_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	auto respawner = objects[respawner_id];
+	sc_packet_respawn packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_RESPAWN;
+	packet.id = respawner_id;
+	packet.lx = respawner->x;
+	packet.ly = respawner->y;
+	packet.lz = respawner->z;
+	packet.rx = respawner->rx;
+	packet.ry = respawner->ry;
+	packet.rz = respawner->rz;
+	packet.rw = respawner->rw;
 
 	player->sendPacket(&packet, sizeof(packet));
 }
@@ -289,31 +304,10 @@ void process_packet(int client_id, unsigned char* p)
 			if (Character::STATE::ST_INGAME == character->_state)
 			{
 				character->state_lock.unlock();
-				send_move_packet(character->_id, client_id, packet->value, packet->movetype);
+				send_move_packet(character->_id, client_id, packet->speed);
 			}
 			else character->state_lock.unlock();
 		}
-		break;
-	}
-	case CS_PACKET_DIR: {
-		cs_packet_dir* packet = reinterpret_cast<cs_packet_dir*>(p);
-		auto character = reinterpret_cast<Character*>(object);
-		auto dx = abs(character->x - packet->x);
-		auto dy = abs(character->y - packet->y);
-		auto dz = abs(character->z - packet->z);
-
-		//if (dy > 4)
-		//{
-		//	send_dir_packet(false, client_id);
-		//}
-		//else 
-		{
-			character->x = packet->x;
-			character->y = packet->y;
-			character->z = packet->z;
-			send_dir_packet(true, client_id);
-		}
-		cout << dx << "," << dy << "," << dz << endl;
 		break;
 	}
 	case CS_PACKET_ANIM: {
@@ -377,12 +371,12 @@ void process_packet(int client_id, unsigned char* p)
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
-			character->UpdateInventorySlot(0, tree->_ftype, 1);
-			send_update_inventory(client_id, 0);
+			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 1);
+			send_update_inventory_packet(client_id, 0);
 			break;
 		case TREETYPE::ORANGE:
-			character->UpdateInventorySlot(1, tree->_ftype, 1);
-			send_update_inventory(client_id, 1);
+			character->UpdateInventorySlotAtIndex(1, tree->_ftype, 1);
+			send_update_inventory_packet(client_id, 1);
 			break;
 		}
 		//character->mSlot[0].type = tree->_ftype;
@@ -401,7 +395,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
 				cout << "과일나무 떨어졌다고 보냅니다" << endl;
-				send_update_treestat(other->_id, packet->tree_id, false);
+				send_update_treestat_packet(other->_id, packet->tree_id, false);
 			}
 		}
 		/*}
@@ -414,7 +408,9 @@ void process_packet(int client_id, unsigned char* p)
 
 		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		character->mSlot[packet->slotNum].amount -= packet->Amount;
+		//character->mSlot[packet->slotNum].amount -= packet->Amount;
+		character->mSlot[character->mActivationSlot].amount -= 1;
+		cout << client_id<<"번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
 		break;
 	}
 	case CS_PACKET_HIT: {
@@ -423,7 +419,19 @@ void process_packet(int client_id, unsigned char* p)
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
 		character->hp = max(character->hp - 10, 0);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
-		send_update_userstatus(client_id);
+		if (character->hp <= 0)
+		{
+			character->Die();
+		}
+		send_update_userstatus_packet(client_id);
+		break;
+	}
+	case CS_PACKET_CHANGE_HOTKEYSLOT: {
+		cs_packet_change_hotkeyslot* packet = reinterpret_cast<cs_packet_change_hotkeyslot*>(p);
+
+		Character* character = reinterpret_cast<Character*>(object);
+		character->mActivationSlot = packet->HotkeySlotNum;
+
 		break;
 	}
 	}

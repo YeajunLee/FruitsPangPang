@@ -118,6 +118,11 @@ public:
 	void TurnAtRate(float rate);
 	void LookUpAtRate(float rate);
 
+	UFUNCTION(BlueprintCallable)
+	void AnyKeyPressed(FKey Key);
+
+	int SelectedHotKeySlotNum;
+
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };

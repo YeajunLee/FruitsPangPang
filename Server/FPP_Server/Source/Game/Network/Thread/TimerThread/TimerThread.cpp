@@ -4,6 +4,7 @@
 #include <concurrent_priority_queue.h>
 #include "TimerThread.h"
 #include "../../Network.h"
+#include "../../../Object/Character/Character.h"
 
 using namespace std;
 
@@ -24,7 +25,18 @@ void TimerThread()
 						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 						wsa_ex->setCmd(CMD_TREE_RESPAWN);
 						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
-						//타입 별로 다른 Cmd를 넣어주면 Script인지 아닌지 구분이 가능하다. 
+					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN)
+					{
+						//이런 간단한 검사정도만 타이머스레드에서 작업 if문 1개정도..
+						auto player = reinterpret_cast<Character*>(objects[is_already.player_id]);
+						if (player->hp <= 0)
+						{
+							WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+							wsa_ex->setCmd(CMD_PLAYER_RESPAWN);
+							PostQueuedCompletionStatus(hiocp, 1, is_already.player_id, &wsa_ex->getWsaOver());
+						}
+
 					}
 					triger = false;
 
@@ -41,7 +53,18 @@ void TimerThread()
 					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 					wsa_ex->setCmd(CMD_TREE_RESPAWN);
 					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
-					//타입 별로 다른 Cmd를 넣어주면 Script인지 아닌지 구분이 가능하다. 
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN)
+				{
+					//이런 간단한 검사정도만 타이머스레드에서 작업 if문 1개정도..
+					auto player = reinterpret_cast<Character*>(objects[exec_event.player_id]);
+					if (player->hp <= 0)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_PLAYER_RESPAWN);
+						PostQueuedCompletionStatus(hiocp, 1, exec_event.player_id, &wsa_ex->getWsaOver());
+					}
+
 				}
 			}
 			else {
