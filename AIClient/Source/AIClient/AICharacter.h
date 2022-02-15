@@ -6,10 +6,14 @@
 #include "GameFramework/Character.h"
 #include "AICharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+
+
 UCLASS()
 class AICLIENT_API AAICharacter : public ACharacter
 {
 	GENERATED_BODY()
+
 
 public:
 	// Sets default values for this character's properties
@@ -28,8 +32,16 @@ public:
 
 	void Attack();
 
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
+	//UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Delegate")
+	FOnAttackEndDelegate OnAttackEnd;
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UAnimInstance* AnimInstance;
+
+	//UFUNCTION(BlueprintCallable)
+	//void AttackEnd();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 	class UAnimMontage* ThrowMontage_AI;
@@ -48,5 +60,5 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	//virtual void PostInitializeComponents() override;
 };

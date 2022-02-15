@@ -13,5 +13,6 @@ UCLASS()
 class AICLIENT_API AAIClientGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+	AAIClientGameModeBase();
 };

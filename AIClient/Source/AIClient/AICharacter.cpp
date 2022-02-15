@@ -19,7 +19,7 @@ AAICharacter::AAICharacter()
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -39,25 +39,37 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AAICharacter::Attack()
 {
-	if (!bAttacking)
+	/*if (!bAttacking)
 	{
-		bAttacking = true;
+		bAttacking = true;	
+	}*/
 
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage_AI)
-		{
-			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
+	//Play Throw Montage
+	AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && ThrowMontage_AI)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack!"));
 
-		}
+		AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 	}
+
+	//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
+	AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+
 }
 
-void AAICharacter::AttackEnd()
-{
-	bAttacking = false;
-	Attack();
-}
+//void AAICharacter::PostInitializeComponents()
+//{
+//	Super::PostInitializeComponents();
+//
+//}
+
+//void AAICharacter::AttackEnd()
+//{
+//	bAttacking = false;
+//	Attack();
+//}
 
 void AAICharacter::Throw_AI()
 {
@@ -66,9 +78,13 @@ void AAICharacter::Throw_AI()
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
-	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
 	
-
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
 }
+
+void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	OnAttackEnd.Broadcast();
+} 
