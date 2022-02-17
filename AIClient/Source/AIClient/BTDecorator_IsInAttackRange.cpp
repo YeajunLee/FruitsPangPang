@@ -21,6 +21,6 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	AMyCharacter* Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
 	if (nullptr == Target) return false;
 
-	bool bResult = (Target->GetDistanceTo(ControllingPawn) <= 300.0f);
+	bool bResult = (Target->GetDistanceTo(ControllingPawn) <= 500.0f);
 	return bResult;
 }
