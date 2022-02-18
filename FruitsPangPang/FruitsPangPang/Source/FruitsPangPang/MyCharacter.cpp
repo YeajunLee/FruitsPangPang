@@ -13,6 +13,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Tree.h"
+#include "Punnet.h"
 #include "Inventory.h"
 #include "InventorySlotWidget.h"
 #include "MainWidget.h"
@@ -22,6 +23,7 @@
 // Sets default values
 AMyCharacter::AMyCharacter()
 	:SelectedHotKeySlotNum(0)
+	,SavedHotKeyItemCode(0)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,9 +63,7 @@ void AMyCharacter::BeginPlay()
 	if (GetController()->IsPlayerController())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("other id ")));
-
-
+			FString::Printf(TEXT("other id ")));		
 		/*
 			Setting Actor Params Before SpawnActor's BeginPlay
 		*/
@@ -279,7 +279,7 @@ void AMyCharacter::LookUpAtRate(float rate)
 
 void AMyCharacter::InteractDown()
 {
-	if (OverlapInTree)
+	if (OverlapInteract)
 	{
 		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
 		{
@@ -317,6 +317,7 @@ void AMyCharacter::Attack()
 			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount));
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
+			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
@@ -360,7 +361,9 @@ void AMyCharacter::Throww()
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	FName path = mInventory->ItemCodeToItemPath(SavedHotKeyItemCode);
+
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
@@ -374,8 +377,15 @@ void AMyCharacter::Throww()
 
 void AMyCharacter::GetFruits()
 {
-	Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest = false;
-	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
+	if (OverlapType)
+	{
+		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+		Network::GetNetwork()->send_getfruits_tree_packet(OverlapInteractId);
+	}
+	else{
+		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+		Network::GetNetwork()->send_getfruits_punnet_packet(OverlapInteractId);
+	}
 }
 
 void AMyCharacter::SendHitPacket()

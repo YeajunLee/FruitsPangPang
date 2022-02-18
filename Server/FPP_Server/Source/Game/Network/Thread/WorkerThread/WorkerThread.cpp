@@ -2,7 +2,8 @@
 #include "WorkerThread.h"
 #include "../../Network.h"
 #include "../../../Object/Character/Character.h"
-#include "../../../Object/Interact/Tree/Tree.h"
+#include "../../../Object/Interaction/Tree/Tree.h"
+#include "../../../Object/Interaction/Punnet/Punnet.h"
 
 using namespace std;
 
@@ -91,13 +92,32 @@ void WorkerThread()
 				auto player = reinterpret_cast<Character*>(other);
 				if (player->_state == Character::STATE::ST_INGAME)
 				{
-					auto tree = reinterpret_cast<Tree*>(objects[client_id+TREEID_START]);
-					cout << "나무 id:" << client_id + TREEID_START << endl;
+					auto tree = reinterpret_cast<Tree*>(objects[client_id]);
+					cout << "나무 id:" << client_id << endl;
 					tree->canHarvest = true;
 					tree->GenerateFruit();
 
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_treestat_packet(other->_id, client_id, true, static_cast<int>(tree->_ftype));
+					send_update_treestat_packet(other->_id, client_id - TREEID_START, true, static_cast<int>(tree->_ftype));
+				}
+			}
+			delete wsa_ex;
+			break;
+		}		
+		case CMD_PUNNET_RESPAWN: {
+			for (auto& other : objects)
+			{
+				if (!other->isPlayer()) break;
+				auto player = reinterpret_cast<Character*>(other);
+				if (player->_state == Character::STATE::ST_INGAME)
+				{
+					auto tree = reinterpret_cast<Punnet*>(objects[client_id]);
+					cout << "바구니 id:" << client_id << endl;
+					tree->canHarvest = true;
+					//tree->GenerateFruit();
+
+					cout << "과일바구니 생성됐다고 보냅니다" << endl;
+					//send_update_treestat_packet(other->_id, client_id, true, static_cast<int>(tree->_ftype));
 				}
 			}
 			delete wsa_ex;

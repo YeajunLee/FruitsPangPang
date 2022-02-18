@@ -8,14 +8,17 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 8;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + 3;
+const int PUNNET_START = TREEID_END;
+const int PUNNET_END = PUNNET_START + 3;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
-const char CS_PACKET_ANIM = 4;
-const char CS_PACKET_SPAWNOBJ = 5;
-const char CS_PACKET_GETFRUITS = 6;
+const char CS_PACKET_ANIM = 3;
+const char CS_PACKET_SPAWNOBJ = 4;
+const char CS_PACKET_GETFRUITS_PUNNET = 5;
+const char CS_PACKET_GETFRUITS_TREE = 6;
 const char CS_PACKET_USEITEM = 7;
 const char CS_PACKET_HIT = 8;
 const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
@@ -64,7 +67,7 @@ struct cs_packet_spawnobj {
 struct cs_packet_getfruits {
 	unsigned char size;
 	char type;
-	int tree_id;
+	int obj_id;
 };
 
 struct cs_packet_useitem {

@@ -4,8 +4,9 @@
 #include "Network.h"
 #include "../Object/Object.h"
 #include "../Object/Character/Character.h"
-#include "../Object/Interact/Interact.h"
-#include "../Object/Interact/Tree/Tree.h"
+#include "../Object/Interaction/Interaction.h"
+#include "../Object/Interaction/Tree/Tree.h"
+#include "../Object/Interaction/Punnet/Punnet.h"
 
 using namespace std;
 HANDLE hiocp;
@@ -358,16 +359,15 @@ void process_packet(int client_id, unsigned char* p)
 		}
 		break;
 	}
-	case CS_PACKET_GETFRUITS: {
+	case CS_PACKET_GETFRUITS_TREE: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		Tree* tree = reinterpret_cast<Tree*>(objects[packet->tree_id + TREEID_START]);
+		Tree* tree = reinterpret_cast<Tree*>(objects[packet->obj_id + TREEID_START]);
 		
 		if (!tree->canHarvest)
 			break;
 		
 		cout << "과일 받았습니다" << endl;
-		tree->canHarvest = false;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -382,11 +382,12 @@ void process_packet(int client_id, unsigned char* p)
 		//character->mSlot[0].type = tree->_ftype;
 		//character->mSlot[0].amount++;
 		//send_update_inventory(client_id, 0);
-		Timer_Event instq;
-		instq.exec_time = chrono::system_clock::now() + 5000ms;
-		instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
-		instq.object_id = packet->tree_id;
-		timer_queue.push(instq);
+		tree->interact();
+		//Timer_Event instq;
+		//instq.exec_time = chrono::system_clock::now() + 5000ms;
+		//instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
+		//instq.object_id = packet->tree_id;
+		//timer_queue.push(instq);
 
 		for (auto& other : objects)
 		{
@@ -395,13 +396,41 @@ void process_packet(int client_id, unsigned char* p)
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
 				cout << "과일나무 떨어졌다고 보냅니다" << endl;
-				send_update_treestat_packet(other->_id, packet->tree_id, false);
+				send_update_treestat_packet(other->_id, packet->obj_id, false);
 			}
 		}
+		tree->canHarvest = false;
 		/*}
 		tree->CanHarvestLock.unlock();
 		*/
 
+		break;
+	}
+	case CS_PACKET_GETFRUITS_PUNNET: {
+		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
+		Character* character = reinterpret_cast<Character*>(object);
+		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNET_START]);
+
+		if (!punnet->canHarvest)
+			break;
+
+		cout << "과일 받았습니다" << endl;
+
+		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 1);
+		send_update_inventory_packet(client_id, 3);
+		punnet->interact();
+
+		for (auto& other : objects)
+		{
+			if (!other->isPlayer()) break;
+			auto player = reinterpret_cast<Character*>(other);
+			if (player->_state == Character::STATE::ST_INGAME)
+			{
+				cout << "과일박스 먹었다고 보냅니다" << endl;
+				send_update_treestat_packet(other->_id, packet->obj_id, false);
+			}
+		}
+		punnet->canHarvest = false;
 		break;
 	}
 	case CS_PACKET_USEITEM: {

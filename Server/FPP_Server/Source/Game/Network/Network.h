@@ -35,7 +35,7 @@ void send_respawn_packet(int player_id, int respawner_id);
 
 
 enum COMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_TREE_RESPAWN, CMD_PLAYER_RESPAWN
+	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_TREE_RESPAWN, CMD_PLAYER_RESPAWN,CMD_PUNNET_RESPAWN
 };
 
 class WSA_OVER_EX {
@@ -61,7 +61,7 @@ struct Timer_Event {
 
 	enum class TIMER_TYPE
 	{
-		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN
+		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN,TYPE_PUNNET_RESPAWN
 	};
 	int object_id;
 	int player_id;

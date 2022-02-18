@@ -67,6 +67,7 @@ public:
 	void ClearInventory();
 	bool IsSlotValid(const int& index);
 	const FText ItemCodeToItemName(const int& itemCode);
+	const FName ItemCodeToItemPath(const int& itemCode);
 	UTexture2D* ItemCodeToItemIcon(const int& itemCode);
 };
 

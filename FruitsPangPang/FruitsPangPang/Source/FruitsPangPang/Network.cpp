@@ -196,7 +196,7 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 
 }
 
-void Network::send_getfruits_packet(const int& treeId)
+void Network::send_getfruits_tree_packet(const int& treeId)
 {
 	if (treeId == -1)
 	{
@@ -205,8 +205,24 @@ void Network::send_getfruits_packet(const int& treeId)
 	}
 	cs_packet_getfruits packet;
 	packet.size = sizeof(cs_packet_getfruits);
-	packet.type = CS_PACKET_GETFRUITS;
-	packet.tree_id = treeId;
+	packet.type = CS_PACKET_GETFRUITS_TREE;
+	packet.obj_id = treeId;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
+void Network::send_getfruits_punnet_packet(const int& punnetId)
+{
+	if (punnetId == -1)
+	{
+		//Exception Occurred
+		return;
+	}
+	cs_packet_getfruits packet;
+	packet.size = sizeof(cs_packet_getfruits);
+	packet.type = CS_PACKET_GETFRUITS_PUNNET;
+	packet.obj_id = punnetId;
 
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);

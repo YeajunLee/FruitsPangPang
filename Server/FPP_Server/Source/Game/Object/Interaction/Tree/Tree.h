@@ -1,5 +1,5 @@
 #pragma once
-#include "../Interact.h"
+#include "../Interaction.h"
 #include <atomic>
 
 enum class TREETYPE
@@ -8,7 +8,7 @@ enum class TREETYPE
 };
 
 
-class Tree : public Interact
+class Tree : public Interaction
 {
 public:
 	Tree();
@@ -19,5 +19,6 @@ public:
 	FRUITTYPE _ftype;
 	TREETYPE _ttype;
 	void GenerateFruit();
+	virtual void interact() override;
 };
 

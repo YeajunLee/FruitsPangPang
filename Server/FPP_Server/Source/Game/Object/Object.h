@@ -2,7 +2,7 @@
 #include "../../../../../Protocol/protocol.h"
 
 
-enum class FRUITTYPE { NONE, T_TOMATO,T_QUIUI,T_SUBACK };
+enum class FRUITTYPE { NONE, T_TOMATO,T_QUIUI,T_SUBACK,T_NUT };
 
 class Object
 {

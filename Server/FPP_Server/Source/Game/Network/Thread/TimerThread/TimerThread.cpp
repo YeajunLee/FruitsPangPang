@@ -26,6 +26,12 @@ void TimerThread()
 						wsa_ex->setCmd(CMD_TREE_RESPAWN);
 						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
 					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_PUNNET_RESPAWN)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_PUNNET_RESPAWN);
+						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
+					}
 					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN)
 					{
 						//이런 간단한 검사정도만 타이머스레드에서 작업 if문 1개정도..
@@ -52,6 +58,12 @@ void TimerThread()
 				{
 					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 					wsa_ex->setCmd(CMD_TREE_RESPAWN);
+					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_PUNNET_RESPAWN)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_PUNNET_RESPAWN);
 					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
 				}
 				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN)

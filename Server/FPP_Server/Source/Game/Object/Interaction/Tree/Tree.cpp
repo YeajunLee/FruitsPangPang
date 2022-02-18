@@ -1,11 +1,11 @@
 #include "Tree.h"
 #include <random>
 #include <iostream>
-
+#include "../../../Network/Network.h"
 using namespace std;
 
 Tree::Tree()
-	:Interact(Object::OBJTYPE::INTERACT,Interact::INTERTYPE::TREE)
+	:Interaction(Object::OBJTYPE::INTERACT, Interaction::INTERTYPE::TREE)
 	,canHarvest(true)
 	,_ftype(FRUITTYPE::NONE)
 	,_ttype(TREETYPE::NONE)
@@ -15,7 +15,7 @@ Tree::Tree()
 
 
 Tree::Tree(TREETYPE ttype)
-	:Interact(Object::OBJTYPE::INTERACT, Interact::INTERTYPE::TREE)
+	:Interaction(Object::OBJTYPE::INTERACT, Interaction::INTERTYPE::TREE)
 	, canHarvest(true)
 	, _ttype(ttype)
 	, _ftype(FRUITTYPE::NONE)
@@ -38,6 +38,16 @@ Tree::~Tree()
 
 }
 
+void Tree::interact()
+{
+	Interaction::interact();
+
+	Timer_Event instq;
+	instq.exec_time = chrono::system_clock::now() + 5000ms;
+	instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
+	instq.object_id = _id;
+	timer_queue.push(instq);
+}
 
 void Tree::GenerateFruit()
 {

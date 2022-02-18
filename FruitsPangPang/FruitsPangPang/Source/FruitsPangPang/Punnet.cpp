@@ -1,17 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Tree.h"
+#include "Punnet.h"
 #include "Fruit.h"
 #include "MyCharacter.h"
 
-ATree::ATree()
+APunnet::APunnet()
     : CanHarvest(true)
 {
 }
 
-
-void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APunnet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
@@ -22,13 +21,13 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
         if (player)
         {
             player->OverlapInteract = true;
-            player->OverlapType = true;
-            player->OverlapInteractId = TreeId;
+            player->OverlapInteractId = PunnetId;
+            player->OverlapType = false;
         }
     }
 }
 
-void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void APunnet::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 
@@ -38,13 +37,15 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
         if (player)
         {
             player->OverlapInteract = false;
-            player->OverlapType = true;
             player->OverlapInteractId = 0;
+            player->OverlapType = false;
         }
     }
 }
 
-void ATree::GenerateFruit(int _FruitType)
+
+
+void APunnet::GenerateFruit(int _FruitType)
 {
     UWorld* world = GetWorld();
     if (world)
@@ -66,11 +67,11 @@ void ATree::GenerateFruit(int _FruitType)
         SpawnParams.Owner = this;
         FRotator rotator;
         FVector  SpawnLocation = GetActorLocation();
-        SpawnLocation.Z += 90.0f;
+        SpawnLocation.Z += 10.0f;
         mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        SpawnLocation.X -= 45.0f;
+        SpawnLocation.X -= 20.0f;
         mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        SpawnLocation.X += 90.0f;
+        SpawnLocation.X += 20.0f;
         mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
 
         CanHarvest = true;
@@ -78,7 +79,7 @@ void ATree::GenerateFruit(int _FruitType)
 }
 
 
-void ATree::HarvestFruit()
+void APunnet::HarvestFruit()
 {
     /*
     여기에 뭐 Harvest 되는 행동을 취하면 됨. 지금은 Destory로 단순히 없애기만함.
@@ -96,11 +97,11 @@ void ATree::HarvestFruit()
 
 }
 // Called when the game starts or when spawned
-void ATree::BeginPlay()
+void APunnet::BeginPlay()
 {
     Super::BeginPlay();
     {
-        Network::GetNetwork()->mTree[TreeId] = this;
+        Network::GetNetwork()->mPunnet[PunnetId] = this;
 
         UWorld* world = GetWorld();
         if (world)
@@ -121,7 +122,7 @@ void ATree::BeginPlay()
     }
 }
 
-void ATree::EndPlay(EEndPlayReason::Type Reason)
+void APunnet::EndPlay(EEndPlayReason::Type Reason)
 {
-    Network::GetNetwork()->mTree[TreeId] = nullptr;
+    Network::GetNetwork()->mPunnet[PunnetId] = nullptr;
 }
