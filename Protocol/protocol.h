@@ -62,6 +62,7 @@ struct cs_packet_spawnobj {
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 	float sx, sy, sz;		//scale
+	int fruitType;			//item code
 };
 
 struct cs_packet_getfruits {
@@ -134,6 +135,7 @@ struct sc_packet_spawnobj {
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 	float sx, sy, sz;		//scale
+	int fruitType;			//item code
 };
 
 struct sc_packet_update_inventory {

@@ -181,7 +181,7 @@ void Network::send_anim_packet(AnimType type)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
-void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale)
+void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale, const int& fruitType)
 {
 	cs_packet_spawnobj packet;
 	packet.size = sizeof(cs_packet_spawnobj);
@@ -189,6 +189,7 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 	packet.rx = rotate.X, packet.ry = rotate.Y, packet.rz = rotate.Z, packet.rw = rotate.W;
 	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
+	packet.fruitType = fruitType;
 
 
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_spawnobj), &packet);
@@ -344,7 +345,8 @@ void Network::process_packet(unsigned char* p)
 		int other_id = packet->id;
 
 		FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
-		FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
+		//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
+		FName path = AInventory::ItemCodeToItemPath(packet->fruitType);
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
@@ -355,8 +357,8 @@ void Network::process_packet(unsigned char* p)
 		FItemInfo itemClass;
 		itemClass.ItemCode = packet->itemCode;
 		itemClass.IndexOfHotKeySlot = packet->slotNum;
-		itemClass.Name = mMyCharacter->mInventory->ItemCodeToItemName(packet->itemCode);
-		itemClass.Icon = mMyCharacter->mInventory->ItemCodeToItemIcon(packet->itemCode);
+		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		mMyCharacter->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 
 		break;

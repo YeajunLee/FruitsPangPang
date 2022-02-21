@@ -128,7 +128,8 @@ void send_anim_packet(int player_id, int animCharacter_id, char animtype)
 void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	float rx, float ry, float rz, float rw,	//rotate
 	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz	//scale
+	float sx, float sy, float sz,	//scale
+	int fruittype	//item code
 )
 {
 	auto player = reinterpret_cast<Character*>(objects[other_character_id]);
@@ -139,6 +140,7 @@ void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	packet.rx = rx, packet.ry = ry, packet.rz = rz, packet.rw = rw;
 	packet.lx = lx, packet.ly = ly, packet.lz = lz;
 	packet.sx = sx, packet.sy = sy, packet.sz = sz;
+	packet.fruitType = fruittype;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -353,7 +355,8 @@ void process_packet(int client_id, unsigned char* p)
 				send_throwfruit_packet(client_id, character->_id,
 					packet->rx, packet->ry, packet->rz, packet->rw,
 					packet->lx, packet->ly, packet->lz,
-					packet->sx, packet->sy, packet->sz);
+					packet->sx, packet->sy, packet->sz,
+					packet->fruitType);
 			}
 			else character->state_lock.unlock();
 		}
@@ -416,7 +419,7 @@ void process_packet(int client_id, unsigned char* p)
 
 		cout << "과일 받았습니다" << endl;
 
-		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 1);
+		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
 		send_update_inventory_packet(client_id, 3);
 		punnet->interact();
 

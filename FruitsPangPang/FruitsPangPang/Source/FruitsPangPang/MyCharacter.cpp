@@ -78,15 +78,22 @@ void AMyCharacter::BeginPlay()
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = mInventory->ItemCodeToItemName(1);
-		itemClass.Icon = mInventory->ItemCodeToItemIcon(1);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 3;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = mInventory->ItemCodeToItemName(3);
-		itemClass.Icon = mInventory->ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(3);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		mInventory->UpdateInventorySlot(itemClass, 30);
+
+
+		itemClass.ItemCode = 4;	//밤 30개 생성
+		itemClass.IndexOfHotKeySlot = 3;
+		itemClass.Name = AInventory::ItemCodeToItemName(4);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		Network::GetNetwork()->mMyCharacter = this;
@@ -362,11 +369,11 @@ void AMyCharacter::Throww()
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
 	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
-	FName path = mInventory->ItemCodeToItemPath(SavedHotKeyItemCode);
+	FName path = AInventory::ItemCodeToItemPath(SavedHotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
-	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
+	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
@@ -406,4 +413,41 @@ void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimit
 			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
 		}
 	}
+}
+
+float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// Apply damage와 연계되는 take damage 함수.
+	// 사용 예시는 아래와 같다.
+	/*
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
+		if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
+		{
+			Damage *= 5; // 맞은 부위가 Head면, 데미지 5배.
+		}
+	}
+	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
+	
+	CurrentHP -= Damage;
+	*/
+
+	auto other = Cast<AProjectile>(DamageCauser);
+
+	if (other != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_hitmyself_packet();
+			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+		}
+	}
+
+	return Damage;
 }

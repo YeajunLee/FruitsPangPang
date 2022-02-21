@@ -22,7 +22,8 @@ void send_anim_packet(int player_id, int animCharacter_id, char animtype);
 void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	float rx, float ry, float rz, float rw,	//rotate
 	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz	//scale
+	float sx, float sy, float sz,	//scale
+	int fruittype	//item code
 );
 void send_update_inventory_packet(int player_id, short slotNum);
 void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, int FruitType = -1);
