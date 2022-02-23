@@ -399,8 +399,8 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일나무 떨어졌다고 보냅니다" << endl;
-				send_update_interstat_packet(other->_id, packet->obj_id,INTERACT_TYPE_TREE, false);
+				cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
+				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}
 		tree->canHarvest = false;
@@ -430,8 +430,8 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일박스 먹었다고 보냅니다" << endl;
-				send_update_interstat_packet(other->_id, packet->obj_id,INTERACT_TYPE_PUNNET, false);
+				cout << "과일박스 먹었다고 보냅니다" <<packet->obj_id<<"," << endl;
+				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_PUNNET);
 			}
 		}
 		punnet->canHarvest = false;

@@ -4,7 +4,7 @@
 #include "Tree.h"
 #include "Fruit.h"
 #include "MyCharacter.h"
-
+#include "Inventory.h"
 ATree::ATree()
     : CanHarvest(true)
 {
@@ -60,7 +60,8 @@ void ATree::GenerateFruit(int _FruitType)
         }
         // 일단 임시로 모든 과일 다 토마토로 작업.
 
-        FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
+        FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
+        //FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
         UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
         FActorSpawnParameters SpawnParams;
         SpawnParams.Owner = this;

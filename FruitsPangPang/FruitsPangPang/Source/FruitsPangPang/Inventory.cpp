@@ -165,7 +165,7 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 	return res;
 }
 
-const FName AInventory::ItemCodeToItemPath(const int& itemCode)
+const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 {
 	switch (itemCode)
 	{
@@ -184,6 +184,24 @@ const FName AInventory::ItemCodeToItemPath(const int& itemCode)
 	}
 }
 
+const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
+{
+	switch (itemCode)
+	{
+	case 1:
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Fruit_Tomato.Fruit_Tomato_C'");
+	case 2:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
+	case 3:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
+	case 4:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
+	case 5:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/Fruit_Durian.Fruit_Durian_C'");
+	default:
+		return TEXT("None");
+	}
+}
 
 UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 {

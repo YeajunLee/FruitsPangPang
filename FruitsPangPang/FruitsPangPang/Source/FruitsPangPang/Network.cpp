@@ -4,6 +4,7 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Tree.h"
+#include "Punnet.h"
 #include "Inventory.h"
 #include "Item.h"
 #include "Projectile.h"
@@ -359,7 +360,7 @@ void Network::process_packet(unsigned char* p)
 
 		FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
 		//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
-		FName path = AInventory::ItemCodeToItemPath(packet->fruitType);
+		FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
@@ -387,7 +388,8 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
+				UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
+				mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
 		else {					//수확 로직
@@ -398,7 +400,8 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
+				UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
+				mPunnet[packet->objNum]->HarvestFruit();
 			}
 
 		}
