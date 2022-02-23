@@ -90,10 +90,10 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 
-		itemClass.ItemCode = 4;	//广 30俺 积己
+		itemClass.ItemCode = 5;	//滴府救 30俺 积己
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(4);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
+		itemClass.Name = AInventory::ItemCodeToItemName(5);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		Network::GetNetwork()->mMyCharacter = this;
@@ -373,6 +373,7 @@ void AMyCharacter::Throww()
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	bomb->BombOwner = this;
 	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
@@ -388,10 +389,12 @@ void AMyCharacter::GetFruits()
 	{
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 		Network::GetNetwork()->send_getfruits_tree_packet(OverlapInteractId);
+		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 	}
 	else{
 		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
 		Network::GetNetwork()->send_getfruits_punnet_packet(OverlapInteractId);
+		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 	}
 }
 

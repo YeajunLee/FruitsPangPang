@@ -158,13 +158,14 @@ void send_update_inventory_packet(int player_id, short slotNum)
 
 }
 
-void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, int FruitType)
+void send_update_interstat_packet(const int& player_id, const int& object_id, const bool& CanHarvest, const int& interactType, const int& FruitType)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_treestat packet;
+	sc_packet_update_interstat packet;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_UPDATE_TREESTAT;
-	packet.treeNum = object_id;
+	packet.type = SC_PACKET_UPDATE_INTERSTAT;
+	packet.useType = interactType;
+	packet.objNum = object_id;
 	packet.canHarvest = CanHarvest;
 	packet.fruitType = FruitType;
 	player->sendPacket(&packet, sizeof(packet));
@@ -370,7 +371,7 @@ void process_packet(int client_id, unsigned char* p)
 		if (!tree->canHarvest)
 			break;
 		
-		cout << "과일 받았습니다" << endl;
+		cout << "과일 받았습니다(나무)" << endl;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -399,7 +400,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
 				cout << "과일나무 떨어졌다고 보냅니다" << endl;
-				send_update_treestat_packet(other->_id, packet->obj_id, false);
+				send_update_interstat_packet(other->_id, packet->obj_id,INTERACT_TYPE_TREE, false);
 			}
 		}
 		tree->canHarvest = false;
@@ -412,12 +413,12 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_GETFRUITS_PUNNET: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNET_START]);
+		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNETID_START]);
 
 		if (!punnet->canHarvest)
 			break;
 
-		cout << "과일 받았습니다" << endl;
+		cout << "과일 받았습니다(과일상자)" << endl;
 
 		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
 		send_update_inventory_packet(client_id, 3);
@@ -430,7 +431,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
 				cout << "과일박스 먹었다고 보냅니다" << endl;
-				send_update_treestat_packet(other->_id, packet->obj_id, false);
+				send_update_interstat_packet(other->_id, packet->obj_id,INTERACT_TYPE_PUNNET, false);
 			}
 		}
 		punnet->canHarvest = false;
@@ -449,13 +450,8 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
-		character->hp = max(character->hp - 10, 0);
+		character->Hurt(10);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
-		if (character->hp <= 0)
-		{
-			character->Die();
-		}
-		send_update_userstatus_packet(client_id);
 		break;
 	}
 	case CS_PACKET_CHANGE_HOTKEYSLOT: {
@@ -464,6 +460,27 @@ void process_packet(int client_id, unsigned char* p)
 		Character* character = reinterpret_cast<Character*>(object);
 		character->mActivationSlot = packet->HotkeySlotNum;
 
+		break;
+	}
+	case CS_PACKET_POS: {
+		cs_packet_pos* packet = reinterpret_cast<cs_packet_pos*>(p);
+
+		switch (packet->useType)
+		{
+		case POS_TYPE_DURIAN: {
+
+			cout << "위치 : 네트워크 패킷" << packet->x << "," << packet->y << "," << packet->z  << endl;
+			Timer_Event instq;
+			instq.object_id = static_cast<int>(packet->x);
+			instq.player_id = static_cast<int>(packet->y);
+			instq.spare = static_cast<int>(packet->z);
+			instq.spare2 = 5;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
+			instq.exec_time = chrono::system_clock::now() + 2000ms;
+			timer_queue.push(instq);
+			break;
+		}
+		}
 		break;
 	}
 	}

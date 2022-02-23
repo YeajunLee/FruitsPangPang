@@ -11,6 +11,7 @@ public:
 	Interaction(OBJTYPE type = OBJTYPE::INTERACT, INTERTYPE itype = INTERTYPE::NONE);
 	virtual ~Interaction();
 	virtual void interact();
+	virtual void GenerateFruit();
 	INTERTYPE _itype;
 };
 

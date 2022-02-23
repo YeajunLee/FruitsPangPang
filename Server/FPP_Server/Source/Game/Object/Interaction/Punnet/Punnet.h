@@ -10,6 +10,7 @@ public:
 	std::atomic<bool> canHarvest;
 	FRUITTYPE _ftype;
 
+	virtual void GenerateFruit() override;
 	virtual void interact() override;
 };
 

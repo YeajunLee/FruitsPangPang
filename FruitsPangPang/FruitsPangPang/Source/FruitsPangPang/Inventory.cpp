@@ -156,6 +156,8 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 		res = FText::FromString(FString("Watermelon"));
 	case 4:
 		res = FText::FromString(FString("Nut"));
+	case 5:
+		res = FText::FromString(FString("Durian"));
 	default:
 		break;
 	}
@@ -175,6 +177,8 @@ const FName AInventory::ItemCodeToItemPath(const int& itemCode)
 		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
+	case 5:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb.DurianBomb_C'");
 	default:
 		return TEXT("None");
 	}
@@ -198,6 +202,8 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 	case 4:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Icon_nut.Icon_nut"), NULL, LOAD_None, NULL);
 		break;
+	case 5:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Icon_durian.Icon_durian"), NULL, LOAD_None, NULL);
 	default:
 		break;
 	}

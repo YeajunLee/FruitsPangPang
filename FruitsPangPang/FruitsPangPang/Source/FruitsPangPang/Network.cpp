@@ -265,6 +265,19 @@ void Network::send_change_hotkeyslot_packet(const int& slotNum)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_pos_packet(const float& x, const float& y, const float& z, const char& type)
+{
+	cs_packet_pos packet;
+	packet.size = sizeof(cs_packet_pos);
+	packet.type = CS_PACKET_POS;
+	packet.useType = POS_TYPE_DURIAN;
+	packet.x = x;
+	packet.y = y;
+	packet.z = z;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_pos), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -363,14 +376,30 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
-	case SC_PACKET_UPDATE_TREESTAT: {
-		sc_packet_update_treestat* packet = reinterpret_cast<sc_packet_update_treestat*>(p);
+	case SC_PACKET_UPDATE_INTERSTAT: {
+		sc_packet_update_interstat* packet = reinterpret_cast<sc_packet_update_interstat*>(p);
+
 		if (packet->canHarvest)	//积己 肺流
 		{
-			mTree[packet->treeNum]->GenerateFruit(packet->fruitType);
+			if (packet->useType == INTERACT_TYPE_TREE)
+			{
+				mTree[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
+			else if (packet->useType == INTERACT_TYPE_PUNNET)
+			{
+				//mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
 		}
 		else {					//荐犬 肺流
-			mTree[packet->treeNum]->HarvestFruit();
+
+			if (packet->useType == INTERACT_TYPE_TREE)
+			{
+				mTree[packet->objNum]->HarvestFruit();
+			}
+			else if (packet->useType == INTERACT_TYPE_PUNNET)
+			{
+				//mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
 
 		}
 		break;

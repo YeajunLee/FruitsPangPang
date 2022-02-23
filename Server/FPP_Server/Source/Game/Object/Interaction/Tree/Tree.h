@@ -18,7 +18,7 @@ public:
 	std::atomic<bool> canHarvest;
 	FRUITTYPE _ftype;
 	TREETYPE _ttype;
-	void GenerateFruit();
+	virtual void GenerateFruit() override;
 	virtual void interact() override;
 };
 

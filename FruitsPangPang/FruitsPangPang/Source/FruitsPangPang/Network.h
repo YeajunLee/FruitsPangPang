@@ -83,5 +83,6 @@ public:
 	void send_useitem_packet(const int& slotNum, const int& amount);
 	void send_hitmyself_packet(const int& FruitType = 0);
 	void send_change_hotkeyslot_packet(const int& slotNum);
+	void send_pos_packet(const float& x, const float& y, const float& z, const char& type);
 	void process_packet(unsigned char* p);
 };

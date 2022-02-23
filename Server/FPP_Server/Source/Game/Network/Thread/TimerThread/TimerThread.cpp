@@ -44,6 +44,16 @@ void TimerThread()
 						}
 
 					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_DURIAN_DMG);
+						memcpy(wsa_ex->getBuf(), &is_already.object_id, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int), &is_already.player_id, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int) + sizeof(int), &is_already.spare, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &is_already.spare2, sizeof(char));
+						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
+					}
 					triger = false;
 
 				}
@@ -77,6 +87,16 @@ void TimerThread()
 						PostQueuedCompletionStatus(hiocp, 1, exec_event.player_id, &wsa_ex->getWsaOver());
 					}
 
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_DURIAN_DMG);
+					memcpy(wsa_ex->getBuf(), &exec_event.object_id, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int), &exec_event.player_id, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int) + sizeof(int), &exec_event.spare, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &exec_event.spare2, sizeof(char));
+					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
 				}
 			}
 			else {

@@ -23,4 +23,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+		void durianPacket(const FVector& pos);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+		class AMyCharacter* BombOwner;
+
 };

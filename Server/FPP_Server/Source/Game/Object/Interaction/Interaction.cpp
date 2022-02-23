@@ -18,3 +18,8 @@ void Interaction::interact()
 {
 
 }
+
+void Interaction::GenerateFruit()
+{
+
+}

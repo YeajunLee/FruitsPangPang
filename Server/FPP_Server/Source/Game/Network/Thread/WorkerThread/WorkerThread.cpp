@@ -98,7 +98,7 @@ void WorkerThread()
 					tree->GenerateFruit();
 
 					cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_treestat_packet(other->_id, client_id - TREEID_START, true, static_cast<int>(tree->_ftype));
+					send_update_interstat_packet(other->_id, client_id - TREEID_START, true,INTERACT_TYPE_TREE, static_cast<int>(tree->_ftype));
 				}
 			}
 			delete wsa_ex;
@@ -111,13 +111,13 @@ void WorkerThread()
 				auto player = reinterpret_cast<Character*>(other);
 				if (player->_state == Character::STATE::ST_INGAME)
 				{
-					auto tree = reinterpret_cast<Punnet*>(objects[client_id]);
+					auto punnet = reinterpret_cast<Punnet*>(objects[client_id]);
 					cout << "바구니 id:" << client_id << endl;
-					tree->canHarvest = true;
-					//tree->GenerateFruit();
+					punnet->canHarvest = true;
+					punnet->GenerateFruit();
 
 					cout << "과일바구니 생성됐다고 보냅니다" << endl;
-					//send_update_treestat_packet(other->_id, client_id, true, static_cast<int>(tree->_ftype));
+					send_update_interstat_packet(other->_id, client_id - PUNNETID_START, true,INTERACT_TYPE_PUNNET, static_cast<int>(punnet->_ftype));
 				}
 			}
 			delete wsa_ex;
@@ -146,10 +146,61 @@ void WorkerThread()
 				{
 					character->state_lock.unlock();
 					send_respawn_packet(character->_id, RespawnPlayer->_id);
+					if (character->_id == RespawnPlayer->_id)
+					{
+						send_update_userstatus_packet(RespawnPlayer->_id);
+					}
 				}
 				else character->state_lock.unlock();
 			}
 
+			delete wsa_ex;
+			break;
+		}
+		case CMD_DURIAN_DMG: {
+
+			int x{}, y{}, z{};
+			int r = 300;
+			char times{};
+			memcpy(&x, wsa_ex->getBuf(), sizeof(int));
+			memcpy(&y, wsa_ex->getBuf() + sizeof(int), sizeof(int));
+			memcpy(&z, wsa_ex->getBuf() + sizeof(int) * 2, sizeof(int));
+			memcpy(&times, wsa_ex->getBuf() + sizeof(int) * 3, sizeof(char));
+			cout <<"위치 : 워커스레드"<<  x << "," << y << "," << z << "," << times << endl;
+			if (times <= 0)
+			{
+				delete wsa_ex;
+				break;
+			}
+			for (auto& other : objects)
+			{
+				if (!other->isPlayer())break;
+				if ((other->x - x) * (other->x - x) + (other->y - y) * (other->y - y) + (other->z - z) * (other->z - z) <= r * r)
+				{
+					//lock하고 검사하는 것 보다, 범위로 쓸데없는 경우 먼저 짜르고 그다음에 lock하는게 더 빠를것이라 판단하여 이렇게 짰다.
+					auto character = reinterpret_cast<Character*>(other);
+					character->state_lock.lock();
+					if (Character::STATE::ST_INGAME == character->_state)
+					{
+						character->state_lock.unlock();
+						character->Hurt(4);						
+					}
+					else character->state_lock.unlock();
+					//dmg apply
+				}
+			}
+			// timerThread
+			if (0 < times - 1)
+			{
+				Timer_Event instq;
+				instq.object_id = x;
+				instq.player_id = y;
+				instq.spare = z;
+				instq.spare2 = times - 1;
+				instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
+				instq.exec_time = chrono::system_clock::now() + 2000ms;
+				timer_queue.push(instq);
+			}
 			delete wsa_ex;
 			break;
 		}

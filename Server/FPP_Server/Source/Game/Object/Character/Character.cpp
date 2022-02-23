@@ -87,3 +87,14 @@ void Character::Die()
 
 
 }
+
+void Character::Hurt(const int& damage)
+{
+	hp = max(hp - damage, 0);
+	send_update_userstatus_packet(_id);
+	cout << _id << "ÀÇ ÀÌÈÄ hp : " << hp << endl;
+	if (hp <= 0)
+	{
+		Die();
+	}
+}

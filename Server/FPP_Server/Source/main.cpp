@@ -60,7 +60,7 @@ int main()
 		tree->_id = i;
 	}
 
-	for (int i = PUNNET_START; i < PUNNET_END; ++i)
+	for (int i = PUNNETID_START; i < PUNNETID_END; ++i)
 	{
 		objects[i] = new Punnet();
 		auto punnet = reinterpret_cast<Punnet*>(objects[i]);

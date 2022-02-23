@@ -2,9 +2,12 @@
 
 
 #include "Projectile.h"
+#include "MyCharacter.h"
+#include "Network.h"
 
 // Sets default values
 AProjectile::AProjectile()
+	:BombOwner(nullptr)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,3 +28,14 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
+void AProjectile::durianPacket(const FVector& pos)
+{
+	if (BombOwner != nullptr)
+	{
+		if (BombOwner->GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_pos_packet(pos.X, pos.Y, pos.Z, POS_TYPE_DURIAN);
+			//send packet
+		}
+	}
+}

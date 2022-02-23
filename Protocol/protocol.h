@@ -8,10 +8,15 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 8;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + 3;
-const int PUNNET_START = TREEID_END;
-const int PUNNET_END = PUNNET_START + 3;
+const int PUNNETID_START = TREEID_END;
+const int PUNNETID_END = PUNNETID_START + 3;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
+
+const char POS_TYPE_DURIAN = 1;
+
+const char INTERACT_TYPE_TREE = 1;
+const char INTERACT_TYPE_PUNNET = 2;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -22,6 +27,7 @@ const char CS_PACKET_GETFRUITS_TREE = 6;
 const char CS_PACKET_USEITEM = 7;
 const char CS_PACKET_HIT = 8;
 const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
+const char CS_PACKET_POS = 10;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -30,7 +36,7 @@ const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_ANIM = 6;
 const char SC_PACKET_SPAWNOBJ = 7;
 const char SC_PACKET_UPDATE_INVENTORY = 8;
-const char SC_PACKET_UPDATE_TREESTAT = 9;
+const char SC_PACKET_UPDATE_INTERSTAT = 9;
 const char SC_PACKET_UPDATE_USERSTATUS = 10;
 const char SC_PACKET_DIE = 11;
 const char SC_PACKET_RESPAWN = 12;
@@ -89,6 +95,13 @@ struct cs_packet_change_hotkeyslot {
 	char type;
 	int HotkeySlotNum;	//activated inventory slot num
 };
+
+struct cs_packet_pos {
+	unsigned char size;
+	char type;
+	char useType;
+	float x, y, z;	//pos
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -146,11 +159,12 @@ struct sc_packet_update_inventory {
 	short itemAmount;
 };
 
-struct sc_packet_update_treestat {
+struct sc_packet_update_interstat {
 	unsigned char size;
 	char type;
-	int treeNum;		//몇 번째 나무
-	bool canHarvest;	//나무의 상태
+	char useType;		//Tree = 1, Punnet = 2
+	int objNum;			//몇 번째 오브젝트인지
+	bool canHarvest;	//오브젝트의 상태
 	int	fruitType;		//열매의 타입
 };
 
