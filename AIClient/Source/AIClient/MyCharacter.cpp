@@ -12,6 +12,12 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "Projectile.h"
+#include "Components/SceneComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Math/Quat.h"
+#include "Kismet/KismetMathLibrary.h"
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
@@ -62,7 +68,7 @@ void AMyCharacter::Tick(float DeltaTime)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 
-		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -20.f, 30.f);
+		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 45.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 
@@ -174,12 +180,20 @@ void AMyCharacter::Jump()
 
 void AMyCharacter::Throw()
 {
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+	//FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+	FVector SocketLocation = GetMesh()->GetSocketLocation("BombSocket");
+
+	FRotator SpawnActorRotation = FollowCamera->GetComponentRotation();
 
 
 	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketLocation, SpawnActorRotation);
 
+	FVector FowardVector = UKismetMathLibrary::GetForwardVector(SpawnActorRotation) * 1000.f;
+	
+	//UPrimitiveComponent* PhysicsSetter = nullptr;
+	//SetPhysicsLinearVelocity(SocketForward);
 
 }

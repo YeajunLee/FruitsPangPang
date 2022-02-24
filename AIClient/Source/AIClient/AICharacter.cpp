@@ -81,7 +81,10 @@ void AAICharacter::Throw_AI()
 	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
 	
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	GetWorld()->SpawnActor<AActor>(GeneratedBP, SocketTransform);
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+
+	
+	bomb->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "BombSocket");
 }
 
 void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
