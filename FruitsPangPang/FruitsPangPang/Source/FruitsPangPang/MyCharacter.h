@@ -58,10 +58,11 @@ public:
 	void InteractUp();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		bool OverlapInTree;
-
+		bool OverlapInteract;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		int OverlapTreeId;
+		int OverlapInteractId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
+		bool OverlapType;	//true == Tree , false == Punnet
 
 	UFUNCTION(BlueprintCallable)
 	void GetFruits();
@@ -72,6 +73,9 @@ public:
 protected:
 	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
 		FVector HitLocation, FVector HitNormal,FVector NormalImpulse, const FHitResult& Hit) override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	UFUNCTION(BlueprintCallable)
 		void SendHitPacket();
@@ -122,6 +126,7 @@ public:
 	void AnyKeyPressed(FKey Key);
 
 	int SelectedHotKeySlotNum;
+	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
