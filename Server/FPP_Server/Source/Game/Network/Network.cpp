@@ -4,8 +4,9 @@
 #include "Network.h"
 #include "../Object/Object.h"
 #include "../Object/Character/Character.h"
-#include "../Object/Interact/Interact.h"
-#include "../Object/Interact/Tree/Tree.h"
+#include "../Object/Interaction/Interaction.h"
+#include "../Object/Interaction/Tree/Tree.h"
+#include "../Object/Interaction/Punnet/Punnet.h"
 
 using namespace std;
 HANDLE hiocp;
@@ -127,7 +128,8 @@ void send_anim_packet(int player_id, int animCharacter_id, char animtype)
 void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	float rx, float ry, float rz, float rw,	//rotate
 	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz	//scale
+	float sx, float sy, float sz,	//scale
+	int fruittype	//item code
 )
 {
 	auto player = reinterpret_cast<Character*>(objects[other_character_id]);
@@ -138,6 +140,7 @@ void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	packet.rx = rx, packet.ry = ry, packet.rz = rz, packet.rw = rw;
 	packet.lx = lx, packet.ly = ly, packet.lz = lz;
 	packet.sx = sx, packet.sy = sy, packet.sz = sz;
+	packet.fruitType = fruittype;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -155,13 +158,14 @@ void send_update_inventory_packet(int player_id, short slotNum)
 
 }
 
-void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, int FruitType)
+void send_update_interstat_packet(const int& player_id, const int& object_id, const bool& CanHarvest, const int& interactType, const int& FruitType)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_treestat packet;
+	sc_packet_update_interstat packet;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_UPDATE_TREESTAT;
-	packet.treeNum = object_id;
+	packet.type = SC_PACKET_UPDATE_INTERSTAT;
+	packet.useType = interactType;
+	packet.objNum = object_id;
 	packet.canHarvest = CanHarvest;
 	packet.fruitType = FruitType;
 	player->sendPacket(&packet, sizeof(packet));
@@ -352,22 +356,22 @@ void process_packet(int client_id, unsigned char* p)
 				send_throwfruit_packet(client_id, character->_id,
 					packet->rx, packet->ry, packet->rz, packet->rw,
 					packet->lx, packet->ly, packet->lz,
-					packet->sx, packet->sy, packet->sz);
+					packet->sx, packet->sy, packet->sz,
+					packet->fruitType);
 			}
 			else character->state_lock.unlock();
 		}
 		break;
 	}
-	case CS_PACKET_GETFRUITS: {
+	case CS_PACKET_GETFRUITS_TREE: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		Tree* tree = reinterpret_cast<Tree*>(objects[packet->tree_id + TREEID_START]);
+		Tree* tree = reinterpret_cast<Tree*>(objects[packet->obj_id + TREEID_START]);
 		
 		if (!tree->canHarvest)
 			break;
 		
-		cout << "과일 받았습니다" << endl;
-		tree->canHarvest = false;
+		cout << "과일 받았습니다(나무)" << endl;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -382,11 +386,12 @@ void process_packet(int client_id, unsigned char* p)
 		//character->mSlot[0].type = tree->_ftype;
 		//character->mSlot[0].amount++;
 		//send_update_inventory(client_id, 0);
-		Timer_Event instq;
-		instq.exec_time = chrono::system_clock::now() + 5000ms;
-		instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
-		instq.object_id = packet->tree_id;
-		timer_queue.push(instq);
+		tree->interact();
+		//Timer_Event instq;
+		//instq.exec_time = chrono::system_clock::now() + 5000ms;
+		//instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
+		//instq.object_id = packet->tree_id;
+		//timer_queue.push(instq);
 
 		for (auto& other : objects)
 		{
@@ -394,14 +399,42 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일나무 떨어졌다고 보냅니다" << endl;
-				send_update_treestat_packet(other->_id, packet->tree_id, false);
+				cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
+				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}
+		tree->canHarvest = false;
 		/*}
 		tree->CanHarvestLock.unlock();
 		*/
 
+		break;
+	}
+	case CS_PACKET_GETFRUITS_PUNNET: {
+		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
+		Character* character = reinterpret_cast<Character*>(object);
+		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNETID_START]);
+
+		if (!punnet->canHarvest)
+			break;
+
+		cout << "과일 받았습니다(과일상자)" << endl;
+
+		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
+		send_update_inventory_packet(client_id, 3);
+		punnet->interact();
+
+		for (auto& other : objects)
+		{
+			if (!other->isPlayer()) break;
+			auto player = reinterpret_cast<Character*>(other);
+			if (player->_state == Character::STATE::ST_INGAME)
+			{
+				cout << "과일박스 먹었다고 보냅니다" <<packet->obj_id<<"," << endl;
+				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_PUNNET);
+			}
+		}
+		punnet->canHarvest = false;
 		break;
 	}
 	case CS_PACKET_USEITEM: {
@@ -417,13 +450,8 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
-		character->hp = max(character->hp - 10, 0);
+		character->Hurt(10);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
-		if (character->hp <= 0)
-		{
-			character->Die();
-		}
-		send_update_userstatus_packet(client_id);
 		break;
 	}
 	case CS_PACKET_CHANGE_HOTKEYSLOT: {
@@ -432,6 +460,27 @@ void process_packet(int client_id, unsigned char* p)
 		Character* character = reinterpret_cast<Character*>(object);
 		character->mActivationSlot = packet->HotkeySlotNum;
 
+		break;
+	}
+	case CS_PACKET_POS: {
+		cs_packet_pos* packet = reinterpret_cast<cs_packet_pos*>(p);
+
+		switch (packet->useType)
+		{
+		case POS_TYPE_DURIAN: {
+
+			cout << "위치 : 네트워크 패킷" << packet->x << "," << packet->y << "," << packet->z  << endl;
+			Timer_Event instq;
+			instq.object_id = static_cast<int>(packet->x);
+			instq.player_id = static_cast<int>(packet->y);
+			instq.spare = static_cast<int>(packet->z);
+			instq.spare2 = 5;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
+			instq.exec_time = chrono::system_clock::now() + 2000ms;
+			timer_queue.push(instq);
+			break;
+		}
+		}
 		break;
 	}
 	}

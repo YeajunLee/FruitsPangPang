@@ -5,7 +5,8 @@
 #include "Game/Network/Thread/WorkerThread/WorkerThread.h"
 #include "Game/Network/Thread/TimerThread/TimerThread.h"
 #include "Game/Object/Object.h"
-#include "Game/Object/Interact/Tree/Tree.h"
+#include "Game/Object/Interaction/Tree/Tree.h"
+#include "Game/Object/Interaction/Punnet/Punnet.h"
 #include "Game/Object/Character/Character.h"
 
 #pragma comment (lib,"WS2_32.lib")
@@ -57,6 +58,13 @@ int main()
 			objects[i] = new Tree(TREETYPE::GREEN);
 		auto tree = reinterpret_cast<Tree*>(objects[i]);
 		tree->_id = i;
+	}
+
+	for (int i = PUNNETID_START; i < PUNNETID_END; ++i)
+	{
+		objects[i] = new Punnet();
+		auto punnet = reinterpret_cast<Punnet*>(objects[i]);
+		punnet->_id = i;
 	}
 
 	std::cout << "Creating Worker Threads\n";

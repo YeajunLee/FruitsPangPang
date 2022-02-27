@@ -2,7 +2,7 @@
 
 
 #include "Inventory.h"
-#include "InventoryMainWidget.h"
+#include "MainWidget.h"
 #include "InventorySlotWidget.h"
 #include "Components/HorizontalBox.h"
 
@@ -23,25 +23,26 @@ void AInventory::BeginPlay()
 	for (int i = 0; i < mAmountOfSlots; ++i)
 		mSlots.Add(FInventorySlot());
 
-	if (mInventoryMainWidget == nullptr)
+	if (mMainWidget == nullptr)
 	{
-		mInventoryMainWidget = CreateWidget<UInventoryMainWidget>(GetWorld(), mMakerInventoryMainWidget);
-		if (mInventoryMainWidget != nullptr)
+		mMainWidget = CreateWidget<UMainWidget>(GetWorld(), mMakerMainWidget);
+		if (mMainWidget != nullptr)
 		{
 			//... Do Something
-			mInventoryMainWidget->mInventory = this;
+			mMainWidget->mInventory = this;
+			mMainWidget->mCharacter = mCharacter;
 			for (int i = 0; i < 5; ++i)
 			{
 				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
 				slot->inventoryRef = this;
 				slot->mIndex = i;
 				slot->Update();
-				mInventoryMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
-				mInventoryMainWidget->minventorySlot.Add(slot);
+				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
+				mMainWidget->minventorySlot.Add(slot);
 			}
-			mInventoryMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
-			mInventoryMainWidget->SetVisibility(ESlateVisibility::Visible);
-			mInventoryMainWidget->minventorySlot[0]->Select();
+			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
+			mMainWidget->SetVisibility(ESlateVisibility::Visible);
+			mMainWidget->minventorySlot[0]->Select();
 		}
 	}
 }
@@ -65,7 +66,7 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	mInventoryMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 }
 
@@ -81,7 +82,7 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	mInventoryMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 }
 
@@ -105,14 +106,14 @@ void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 	if (mSlots[index].Amount > amount)
 	{
 		mSlots[index].Amount -= amount;
-		mInventoryMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+		mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
 		//mInventoryMainWidget->minventorySlot->Update();
 		return;
 	}
 
 	mSlots[index].Amount = 0;
 	mSlots[index].ItemClass = FItemInfo();
-	mInventoryMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
+	mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
 	//mInventoryMainWidget->minventorySlot->Update();
 
 }
@@ -124,7 +125,7 @@ void AInventory::ClearInventory()
 		slot.Amount = 0;
 		slot.ItemClass = FItemInfo();
 	}
-	for (auto& slot : mInventoryMainWidget->minventorySlot)
+	for (auto& slot : mMainWidget->minventorySlot)
 	{
 		slot->Update();
 	}
@@ -153,11 +154,53 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 		break;
 	case 3:
 		res = FText::FromString(FString("Watermelon"));
+	case 4:
+		res = FText::FromString(FString("Nut"));
+	case 5:
+		res = FText::FromString(FString("Durian"));
 	default:
 		break;
 	}
 
 	return res;
+}
+
+const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
+{
+	switch (itemCode)
+	{
+	case 1: 
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	case 2:
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	case 3:
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	case 4:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
+	case 5:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb.DurianBomb_C'");
+	default:
+		return TEXT("None");
+	}
+}
+
+const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
+{
+	switch (itemCode)
+	{
+	case 1:
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Fruit_Tomato.Fruit_Tomato_C'");
+	case 2:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
+	case 3:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
+	case 4:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
+	case 5:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/Fruit_Durian.Fruit_Durian_C'");
+	default:
+		return TEXT("None");
+	}
 }
 
 UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
@@ -174,6 +217,11 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 	case 3:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Icon_watermelon.Icon_watermelon"), NULL, LOAD_None, NULL);
 		break;
+	case 4:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Icon_nut.Icon_nut"), NULL, LOAD_None, NULL);
+		break;
+	case 5:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Icon_durian.Icon_durian"), NULL, LOAD_None, NULL);
 	default:
 		break;
 	}

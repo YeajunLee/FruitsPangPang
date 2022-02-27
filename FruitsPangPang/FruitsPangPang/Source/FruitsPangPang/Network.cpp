@@ -4,11 +4,13 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Tree.h"
+#include "Punnet.h"
 #include "Inventory.h"
 #include "Item.h"
 #include "Projectile.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "MainWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -180,7 +182,7 @@ void Network::send_anim_packet(AnimType type)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
-void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale)
+void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale, const int& fruitType)
 {
 	cs_packet_spawnobj packet;
 	packet.size = sizeof(cs_packet_spawnobj);
@@ -188,6 +190,7 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 	packet.rx = rotate.X, packet.ry = rotate.Y, packet.rz = rotate.Z, packet.rw = rotate.W;
 	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
+	packet.fruitType = fruitType;
 
 
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_spawnobj), &packet);
@@ -195,7 +198,7 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 
 }
 
-void Network::send_getfruits_packet(const int& treeId)
+void Network::send_getfruits_tree_packet(const int& treeId)
 {
 	if (treeId == -1)
 	{
@@ -204,8 +207,24 @@ void Network::send_getfruits_packet(const int& treeId)
 	}
 	cs_packet_getfruits packet;
 	packet.size = sizeof(cs_packet_getfruits);
-	packet.type = CS_PACKET_GETFRUITS;
-	packet.tree_id = treeId;
+	packet.type = CS_PACKET_GETFRUITS_TREE;
+	packet.obj_id = treeId;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
+
+void Network::send_getfruits_punnet_packet(const int& punnetId)
+{
+	if (punnetId == -1)
+	{
+		//Exception Occurred
+		return;
+	}
+	cs_packet_getfruits packet;
+	packet.size = sizeof(cs_packet_getfruits);
+	packet.type = CS_PACKET_GETFRUITS_PUNNET;
+	packet.obj_id = punnetId;
 
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_getfruits), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
@@ -247,6 +266,19 @@ void Network::send_change_hotkeyslot_packet(const int& slotNum)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
+void Network::send_pos_packet(const float& x, const float& y, const float& z, const char& type)
+{
+	cs_packet_pos packet;
+	packet.size = sizeof(cs_packet_pos);
+	packet.type = CS_PACKET_POS;
+	packet.useType = POS_TYPE_DURIAN;
+	packet.x = x;
+	packet.y = y;
+	packet.z = z;
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_pos), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -327,7 +359,8 @@ void Network::process_packet(unsigned char* p)
 		int other_id = packet->id;
 
 		FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
-		FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
+		//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
+		FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
@@ -338,20 +371,38 @@ void Network::process_packet(unsigned char* p)
 		FItemInfo itemClass;
 		itemClass.ItemCode = packet->itemCode;
 		itemClass.IndexOfHotKeySlot = packet->slotNum;
-		itemClass.Name = mMyCharacter->mInventory->ItemCodeToItemName(packet->itemCode);
-		itemClass.Icon = mMyCharacter->mInventory->ItemCodeToItemIcon(packet->itemCode);
+		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		mMyCharacter->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 
 		break;
 	}
-	case SC_PACKET_UPDATE_TREESTAT: {
-		sc_packet_update_treestat* packet = reinterpret_cast<sc_packet_update_treestat*>(p);
+	case SC_PACKET_UPDATE_INTERSTAT: {
+		sc_packet_update_interstat* packet = reinterpret_cast<sc_packet_update_interstat*>(p);
+
 		if (packet->canHarvest)	//생성 로직
 		{
-			mTree[packet->treeNum]->GenerateFruit(packet->fruitType);
+			if (packet->useType == INTERACT_TYPE_TREE)
+			{
+				mTree[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
+			else if (packet->useType == INTERACT_TYPE_PUNNET)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
+				mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
 		}
 		else {					//수확 로직
-			mTree[packet->treeNum]->HarvestFruit();
+
+			if (packet->useType == INTERACT_TYPE_TREE)
+			{
+				mTree[packet->objNum]->HarvestFruit();
+			}
+			else if (packet->useType == INTERACT_TYPE_PUNNET)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
+				mPunnet[packet->objNum]->HarvestFruit();
+			}
 
 		}
 		break;
@@ -359,7 +410,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_UPDATE_USERSTATUS: {
 		sc_packet_update_userstatus* packet = reinterpret_cast<sc_packet_update_userstatus*>(p);
 		mMyCharacter->hp = packet->hp;
-
+		mMyCharacter->mInventory->mMainWidget->UpdateHpBar();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
 		break;

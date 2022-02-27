@@ -8,7 +8,7 @@ using namespace std;
 Character::Character(OBJTYPE type, STATE state)
 	:_state(state)
 	, _is_active(true)
-	,maxhp(20)
+	,maxhp(PLAYER_HP)
 	,hp(maxhp)
 {
 	_type = type;
@@ -86,4 +86,15 @@ void Character::Die()
 	}
 
 
+}
+
+void Character::Hurt(const int& damage)
+{
+	hp = max(hp - damage, 0);
+	send_update_userstatus_packet(_id);
+	cout << _id << "ÀÇ ÀÌÈÄ hp : " << hp << endl;
+	if (hp <= 0)
+	{
+		Die();
+	}
 }
