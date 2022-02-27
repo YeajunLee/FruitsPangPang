@@ -22,10 +22,11 @@ void send_anim_packet(int player_id, int animCharacter_id, char animtype);
 void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	float rx, float ry, float rz, float rw,	//rotate
 	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz	//scale
+	float sx, float sy, float sz,	//scale
+	int fruittype	//item code
 );
 void send_update_inventory_packet(int player_id, short slotNum);
-void send_update_treestat_packet(int player_id, int object_id, bool CanHarvest, int FruitType = -1);
+void send_update_interstat_packet(const int& player_id, const int& object_id, const bool& CanHarvest, const int& interactType, const int& FruitType = -1);
 
 void send_remove_object_packet(int player_id, int removeCharacter_id);
 void send_update_userstatus_packet(int player_id);
@@ -35,7 +36,9 @@ void send_respawn_packet(int player_id, int respawner_id);
 
 
 enum COMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_TREE_RESPAWN, CMD_PLAYER_RESPAWN
+	CMD_ACCEPT, CMD_RECV, CMD_SEND, //basic
+	CMD_TREE_RESPAWN, CMD_PUNNET_RESPAWN, CMD_PLAYER_RESPAWN, //respawn
+	CMD_DURIAN_DMG //Damage
 };
 
 class WSA_OVER_EX {
@@ -61,10 +64,12 @@ struct Timer_Event {
 
 	enum class TIMER_TYPE
 	{
-		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN
+		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN,TYPE_PUNNET_RESPAWN,TYPE_DURIAN_DMG
 	};
 	int object_id;
 	int player_id;
+	int spare;
+	char spare2;
 	std::chrono::system_clock::time_point exec_time;
 	TIMER_TYPE type;
 

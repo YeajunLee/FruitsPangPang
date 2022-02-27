@@ -52,9 +52,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn = "true"))
 		int mAmountOfSlots;
 
+
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
-		TSubclassOf<class UInventoryMainWidget> mMakerInventoryMainWidget;
-	class UInventoryMainWidget* mInventoryMainWidget;
+		TSubclassOf<class UMainWidget> mMakerMainWidget;
+	class UMainWidget* mMainWidget;
 
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
 		TSubclassOf<class UInventorySlotWidget> mMakerInventorySlotWidget;
@@ -65,7 +66,10 @@ public:
 	void RemoveItemAtSlotIndex(const int& index, const int& amount);
 	void ClearInventory();
 	bool IsSlotValid(const int& index);
-	const FText ItemCodeToItemName(const int& itemCode);
-	UTexture2D* ItemCodeToItemIcon(const int& itemCode);
+	static const FText ItemCodeToItemName(const int& itemCode);
+	static const FName ItemCodeToItemBombPath(const int& itemCode);
+	static const FName ItemCodeToItemFruitPath(const int& itemCode);
+	static UTexture2D* ItemCodeToItemIcon(const int& itemCode);
+
 };
 

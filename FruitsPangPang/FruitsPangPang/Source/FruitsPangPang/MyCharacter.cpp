@@ -13,15 +13,17 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Tree.h"
+#include "Punnet.h"
 #include "Inventory.h"
 #include "InventorySlotWidget.h"
-#include "InventoryMainWidget.h"
+#include "MainWidget.h"
 #include "Projectile.h"
 
 
 // Sets default values
 AMyCharacter::AMyCharacter()
 	:SelectedHotKeySlotNum(0)
+	,SavedHotKeyItemCode(0)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,9 +63,7 @@ void AMyCharacter::BeginPlay()
 	if (GetController()->IsPlayerController())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("other id ")));
-
-
+			FString::Printf(TEXT("other id ")));		
 		/*
 			Setting Actor Params Before SpawnActor's BeginPlay
 		*/
@@ -78,15 +78,22 @@ void AMyCharacter::BeginPlay()
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = mInventory->ItemCodeToItemName(1);
-		itemClass.Icon = mInventory->ItemCodeToItemIcon(1);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 3;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = mInventory->ItemCodeToItemName(3);
-		itemClass.Icon = mInventory->ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(3);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		mInventory->UpdateInventorySlot(itemClass, 30);
+
+
+		itemClass.ItemCode = 5;	//두리안 30개 생성
+		itemClass.IndexOfHotKeySlot = 3;
+		itemClass.Name = AInventory::ItemCodeToItemName(5);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		Network::GetNetwork()->mMyCharacter = this;
@@ -185,8 +192,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = 0;
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -197,8 +204,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = 1;
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -209,8 +216,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -221,8 +228,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
 		if (tmp != SelectedHotKeySlotNum)
 		{
-			mInventory->mInventoryMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mInventoryMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
 		}
 	}
@@ -279,7 +286,7 @@ void AMyCharacter::LookUpAtRate(float rate)
 
 void AMyCharacter::InteractDown()
 {
-	if (OverlapInTree)
+	if (OverlapInteract)
 	{
 		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
 		{
@@ -317,6 +324,7 @@ void AMyCharacter::Attack()
 			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount));
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
+			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
@@ -360,10 +368,13 @@ void AMyCharacter::Throww()
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
+
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
-	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D());
+	bomb->BombOwner = this;
+	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));
@@ -374,8 +385,17 @@ void AMyCharacter::Throww()
 
 void AMyCharacter::GetFruits()
 {
-	Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest = false;
-	Network::GetNetwork()->send_getfruits_packet(OverlapTreeId);
+	if (OverlapType)
+	{
+		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+		Network::GetNetwork()->send_getfruits_tree_packet(OverlapInteractId);
+		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+	}
+	else{
+		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+		Network::GetNetwork()->send_getfruits_punnet_packet(OverlapInteractId);
+		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+	}
 }
 
 void AMyCharacter::SendHitPacket()
@@ -396,4 +416,41 @@ void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimit
 			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
 		}
 	}
+}
+
+float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// Apply damage와 연계되는 take damage 함수.
+	// 사용 예시는 아래와 같다.
+	/*
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
+		if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
+		{
+			Damage *= 5; // 맞은 부위가 Head면, 데미지 5배.
+		}
+	}
+	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
+	
+	CurrentHP -= Damage;
+	*/
+
+	auto other = Cast<AProjectile>(DamageCauser);
+
+	if (other != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_hitmyself_packet();
+			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+		}
+	}
+
+	return Damage;
 }
