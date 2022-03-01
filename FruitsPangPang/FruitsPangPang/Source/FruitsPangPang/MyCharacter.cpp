@@ -119,6 +119,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 	}
 
 	Network::GetNetwork()->release();
+	//Network::GetNetwork().reset();
 }
 
 // Called every frame
