@@ -76,7 +76,7 @@ public:
 	void C_Recv();
 	void send_login_packet();
 	void send_move_packet(const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
-	void send_spawnobj_packet(const struct FVector& locate, const struct FQuat& rotate, const struct FVector& scale, const int& fruitType);
+	void send_spawnobj_packet(const struct FVector& locate, const struct FRotator& rotate, const struct FVector& scale, const int& fruitType);
 	void send_anim_packet(AnimType type);
 	void send_getfruits_tree_packet(const int& treeId);
 	void send_getfruits_punnet_packet(const int& punnetId);

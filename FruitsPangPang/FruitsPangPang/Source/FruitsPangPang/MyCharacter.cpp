@@ -119,6 +119,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 	}
 
 	Network::GetNetwork()->release();
+	//Network::GetNetwork().reset();
 }
 
 // Called every frame
@@ -367,6 +368,7 @@ void AMyCharacter::Throww()
 	SocketTransform.GetRotation();
 	SocketTransform.GetLocation();
 	SocketTransform.GetScale3D();
+	
 	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
 	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
@@ -374,7 +376,7 @@ void AMyCharacter::Throww()
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 	bomb->BombOwner = this;
-	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), SocketTransform.GetRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), FollowCamera->GetComponentRotation() , SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	//	FString::Printf(TEXT("My pos: ")));

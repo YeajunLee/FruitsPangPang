@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Network.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AICharacter.generated.h"
@@ -26,6 +27,44 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Throw_AI();
 
+public:
+	//related interact
+	UFUNCTION(BlueprintCallable)
+		void GetFruits();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		bool OverlapInteract;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+		int OverlapInteractId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
+		bool OverlapType;	//true == Tree , false == Punnet
+
+public:
+	//related network
+
+	bool ConnServer();
+	const char* SERVER_ADDR = "127.0.0.1";
+	const short SERVER_PORT = 4000;
+	SOCKET s_socket;
+	SOCKADDR_IN server_addr;
+	WSA_OVER_EX recv_expover;
+	int		_prev_size;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	int c_id; //received id from server
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	int overID;	//overlapped I/O use this
+	void recvPacket();
+public:
+	int hp;
+public:
+	//related inventory
+
+	int SelectedHotKeySlotNum; 
+	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+		class AInventory* mInventory;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	bool bAttacking;
@@ -52,6 +91,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 public:	
 	// Called every frame
