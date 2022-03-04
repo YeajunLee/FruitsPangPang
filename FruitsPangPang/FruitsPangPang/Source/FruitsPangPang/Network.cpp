@@ -182,12 +182,12 @@ void Network::send_anim_packet(AnimType type)
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
 
-void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale, const int& fruitType)
+void Network::send_spawnobj_packet(const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType)
 {
 	cs_packet_spawnobj packet;
 	packet.size = sizeof(cs_packet_spawnobj);
 	packet.type = CS_PACKET_SPAWNOBJ;
-	packet.rx = rotate.X, packet.ry = rotate.Y, packet.rz = rotate.Z, packet.rw = rotate.W;
+	packet.rx = rotate.Pitch, packet.ry = rotate.Yaw, packet.rz = rotate.Roll, packet.rw = 0.0f;
 	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
 	packet.fruitType = fruitType;

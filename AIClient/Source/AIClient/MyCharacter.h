@@ -36,6 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Throw();
 
+	void Throw(const FVector& location, FRotator rotation, const FName& path);
 	bool bLMBDown;
 	void LMBDown();
 
@@ -46,6 +47,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	int c_id;
+	bool s_connected;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	bool bAttacking;

@@ -9,6 +9,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
+#include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
@@ -17,9 +18,11 @@
 #include "Components/PrimitiveComponent.h"
 #include "Math/Quat.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Network.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
+	:s_connected(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -55,7 +58,17 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	auto p = GetController();
+	if (p != nullptr)
+	{
+		if (!p->IsPlayerController())
+		{
+			UE_LOG(LogTemp, Error, TEXT("WorldCnt : %d"), Network::GetNetwork()->WorldCharacterCnt);
+			Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
+			Network::GetNetwork()->WorldCharacterCnt++;
+		}
+	}
 
 }
 
@@ -196,4 +209,22 @@ void AMyCharacter::Throw()
 	//UPrimitiveComponent* PhysicsSetter = nullptr;
 	//SetPhysicsLinearVelocity(SocketForward);
 
+}
+
+
+
+void AMyCharacter::Throw(const FVector& location,FRotator rotation,const FName& path)
+{
+	rotation.Pitch += 18;
+	FTransform trans(rotation.Quaternion(), location);
+
+
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
+	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
+	//bomb->DetachFromActor(Detachrules);
+	bomb->ProjectileMovementComponent->Activate();
 }
