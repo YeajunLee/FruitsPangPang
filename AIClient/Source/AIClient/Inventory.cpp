@@ -143,11 +143,11 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	switch (itemCode)
 	{
 	case 1:
-		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
 	case 2:
-		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
 	case 5:

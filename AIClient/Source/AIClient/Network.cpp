@@ -6,20 +6,20 @@
 #include "AICharacter.h"
 #include "Tree.h"
 #include "Punnet.h"
+#include "Item.h"
+#include "Projectile.h"
+#include "Inventory.h"
 
 
 
 
-void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
-void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
 HANDLE hiocp;
 
 using namespace std;
 
 Network::Network()
-	: prev_size(0)
-	, mId(0)
+	: mGeneratedID(0)
 {
 	for (int i = 0; i < 8; ++i)
 	{
@@ -33,7 +33,6 @@ Network::Network()
 
 Network::~Network()
 {
-	closesocket(s_socket);
 	WSACleanup();
 }
 
@@ -53,10 +52,6 @@ bool Network::init()
 	isInit = true;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 
-	hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, NULL, 0);
-	//Make Thread
-
-	//
 
 
 
@@ -79,7 +74,6 @@ bool Network::init()
 	//	//exit(0);
 	//	return false;
 	//}
-	//return true;
 	return true;
 }
 
@@ -87,21 +81,33 @@ void Network::release()
 {
 	if (isInit)
 	{
-		prev_size = 0;
-		mId = 0;
+		mGeneratedID = 0;
+		WorldCharacterCnt = 0;
+		for (int i = 0; i < MAX_USER; ++i)
+			mAiCharacter[i] = nullptr;
+		for (int i = 0; i < MAX_USER; ++i)
+			mOtherCharacter[i] = nullptr;
 		/*
 		WorldCharacterCnt = 0;
 		mMyCharacter = nullptr;
 		for (int i = 0; i < MAX_USER; ++i)
 			mOtherCharacter[i] = nullptr;*/
 
-		closesocket(s_socket);
-		s_socket = NULL;
+		//closesocket(s_socket);
+		//s_socket = NULL;
 		WSACleanup();
 		isInit = false;
 	}
 
 
+}
+
+const int Network::getNewId()
+{
+	int Newid = mGeneratedID;
+	mGeneratedID++;
+
+	return Newid;
 }
 
 void Network::error_display(int err_no)
@@ -116,38 +122,37 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
+//void Network::C_Recv()
+//{
+//
+//	DWORD recv_flag = 0;
+//	ZeroMemory(&recv_expover.getWsaOver(), sizeof(recv_expover.getWsaOver()));
+//
+//	recv_expover.getWsaBuf().buf = reinterpret_cast<char*>(recv_expover.getBuf() + prev_size);
+//	recv_expover.getWsaBuf().len = sizeof(recv_expover.getBuf()) - prev_size;
+//	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, 0, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
+//	if (ret == SOCKET_ERROR) {
+//		int err_num = WSAGetLastError();
+//		if (WSA_IO_PENDING != err_num) {
+//			std::cout << "err_receive" << std::endl;
+//			error_display(err_num);
+//		}
+//	}
+//}
 
-void Network::C_Recv()
-{
 
-	DWORD recv_flag = 0;
-	ZeroMemory(&recv_expover.getWsaOver(), sizeof(recv_expover.getWsaOver()));
-
-	recv_expover.getWsaBuf().buf = reinterpret_cast<char*>(recv_expover.getBuf() + prev_size);
-	recv_expover.getWsaBuf().len = sizeof(recv_expover.getBuf()) - prev_size;
-	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, 0, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
-	if (ret == SOCKET_ERROR) {
-		int err_num = WSAGetLastError();
-		if (WSA_IO_PENDING != err_num) {
-			std::cout << "err_receive" << std::endl;
-			error_display(err_num);
-		}
-	}
-}
-
-
-void Network::send_login_packet()
+void Network::send_login_packet(SOCKET& sock)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_login), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
 
-void Network::send_move_packet(const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
+void Network::send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
 {
 	cs_packet_move packet;
 	packet.size = sizeof(cs_packet_move);
@@ -161,10 +166,10 @@ void Network::send_move_packet(const float& x, const float& y, const float& z, F
 	packet.rw = rotate.W;
 	packet.speed = value;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_move), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_anim_packet(AnimType type)
+void Network::send_anim_packet(SOCKET& sock, AnimType type)
 {
 	cs_packet_anim packet;
 	packet.size = sizeof(cs_packet_anim);
@@ -172,10 +177,10 @@ void Network::send_anim_packet(AnimType type)
 	packet.animtype = static_cast<char>(type);
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_anim), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, const FVector& scale, const int& fruitType)
+void Network::send_spawnobj_packet(SOCKET& sock, const FVector& locate, const FQuat& rotate, const FVector& scale, const int& fruitType)
 {
 	cs_packet_spawnobj packet;
 	packet.size = sizeof(cs_packet_spawnobj);
@@ -187,11 +192,11 @@ void Network::send_spawnobj_packet(const FVector& locate, const FQuat& rotate, c
 
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_spawnobj), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }
 
-void Network::send_getfruits_tree_packet(const int& treeId)
+void Network::send_getfruits_tree_packet(SOCKET& sock, const int& treeId)
 {
 	if (treeId == -1)
 	{
@@ -204,10 +209,10 @@ void Network::send_getfruits_tree_packet(const int& treeId)
 	packet.obj_id = treeId;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_getfruits_punnet_packet(const int& punnetId)
+void Network::send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId)
 {
 	if (punnetId == -1)
 	{
@@ -220,10 +225,10 @@ void Network::send_getfruits_punnet_packet(const int& punnetId)
 	packet.obj_id = punnetId;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_useitem_packet(const int& slotNum, const int& amount)
+void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount)
 {
 	cs_packet_useitem packet;
 	packet.size = sizeof(cs_packet_useitem);
@@ -232,10 +237,10 @@ void Network::send_useitem_packet(const int& slotNum, const int& amount)
 	packet.Amount = amount;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_hitmyself_packet(const int& FruitType)
+void Network::send_hitmyself_packet(SOCKET& sock, const int& FruitType)
 {
 	cs_packet_hit packet;
 	packet.size = sizeof(cs_packet_hit);
@@ -243,11 +248,11 @@ void Network::send_hitmyself_packet(const int& FruitType)
 	packet.fruitType = FruitType;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }
 
-void Network::send_change_hotkeyslot_packet(const int& slotNum)
+void Network::send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
 {
 
 	cs_packet_change_hotkeyslot packet;
@@ -256,10 +261,10 @@ void Network::send_change_hotkeyslot_packet(const int& slotNum)
 	packet.HotkeySlotNum = slotNum;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_pos_packet(const float& x, const float& y, const float& z, const char& type)
+void Network::send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type)
 {
 	cs_packet_pos packet;
 	packet.size = sizeof(cs_packet_pos);
@@ -270,7 +275,7 @@ void Network::send_pos_packet(const float& x, const float& y, const float& z, co
 	packet.z = z;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_pos), &packet);
-	int ret = WSASend(s_socket, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
 void Network::process_packet(unsigned char* p)
@@ -342,101 +347,225 @@ void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over
 void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
-	int to_process_data = num_bytes + Network::GetNetwork()->prev_size;
+	//UE_LOG(LogTemp, Log, TEXT("recv_callback called"));
+	if (0 > over->getId() || 8 < over->getId()) return;
+	if (nullptr == Network::GetNetwork()->mAiCharacter[over->getId()]) return;
+	int to_process_data = num_bytes + Network::GetNetwork()->mAiCharacter[over->getId()]->_prev_size;
 	unsigned char* packet = over->getBuf();
 	int packet_size = packet[0];
 	while (packet_size <= to_process_data) {
-		Network::GetNetwork()->process_packet(packet);
+		Network::GetNetwork()->process_packet2(static_cast<int>(over->getId()),packet);
 		to_process_data -= packet_size;
 		packet += packet_size;
 		if (to_process_data > 0) packet_size = packet[0];
 		else break;
 	}
-	Network::GetNetwork()->prev_size = to_process_data;
+	Network::GetNetwork()->mAiCharacter[over->getId()]->_prev_size = to_process_data;
 	if (to_process_data > 0)
 	{
 		memcpy(over->getBuf(), packet, to_process_data);
 	}
-	Network::GetNetwork()->C_Recv();
+	Network::GetNetwork()->mAiCharacter[over->getId()]->recvPacket();
 }
 
-
-
-void Worker_Thread()
-{
-	while (true) {
-		DWORD bytes;
-		LONG64 iocp_key;
-		WSAOVERLAPPED* overlapped;
-
-		BOOL ret = GetQueuedCompletionStatus(hiocp, &bytes, (PULONG_PTR)&iocp_key, &overlapped, INFINITE);
-		int client_id = static_cast<int>(iocp_key);
-		WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
-		if (FALSE == ret) {
-			int err_no = WSAGetLastError();
-			std::cout << "GQCS Error";
-			//error_display(err_no);
-			//Disconnect(client_id);
-			if (wsa_ex->getCmd() == CMD_SEND)
-				delete wsa_ex;
-			continue;
-		}
-
-
-		switch (wsa_ex->getCmd()) {
-		case CMD_RECV: {
-			if (bytes == 0) {
-				//Disconnect(client_id);
-				break;
-			}
-
-			auto player = Network::GetNetwork()->mAiCharacter[client_id];			
-			//Character* player = reinterpret_cast<Character*>(objects[client_id]);
-			int To_Process_Bytes = bytes + player->_prev_size;
-			unsigned char* packets = wsa_ex->getBuf();
-
-			while (To_Process_Bytes >= packets[0]) {
-				process_packet2(client_id, packets);
-				To_Process_Bytes -= packets[0];
-				packets += packets[0];
-				if (To_Process_Bytes <= 0)break;
-			}
-			player->_prev_size = 0;
-			ZeroMemory(wsa_ex->getBuf(), sizeof(wsa_ex->getBuf()));
-
-			if (To_Process_Bytes > 0) {
-
-				player->_prev_size = To_Process_Bytes;
-				memcpy(wsa_ex->getBuf(), packets, player->_prev_size);
-			}
-			player->recvPacket();
-			break;
-		}
-
-		case CMD_SEND: {
-			//if (num_byte != wsa_ex->_wsa_buf.len) {
-			//	Disconnect(client_id);
-			//}
-			delete wsa_ex;
-			break;
-		}
-	}
-	}
-}
-
-
-void process_packet2(int client_id, unsigned char* p)
+void Network::process_packet2(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
 	auto PacketOwner = Network::GetNetwork()->mAiCharacter[client_id];
 	auto Game = Network::GetNetwork();
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
+		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		PacketOwner->c_id = packet->id;
+		break;
+	}
+	case SC_PACKET_MOVE: {
+		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+		int move_id = packet->id;
+
+		//if Ai Move, dump packet
+		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
+		bool escape = false;
+		for (auto ai : mAiCharacter)
+		{
+			if (ai == nullptr) continue;
+			if (move_id == ai->c_id)
+			{ 
+				escape = true;
+				break;
+			}
+		}
+		if (escape) break;
+
+		UE_LOG(LogTemp, Log, TEXT("move called"));
+
+		if (move_id < MAX_USER)
+		{
+			if (mOtherCharacter[move_id] != nullptr)
+			{
+				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
+				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+				mOtherCharacter[move_id]->GroundSpeed = packet->speed;
+			}
+		}
+		break;
+	}
+	case SC_PACKET_ANIM: {
+		sc_packet_anim* packet = reinterpret_cast<sc_packet_anim*>(p);
+		int thrower_character_id = packet->id;
+
+		//if Ai Move, dump packet
+		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
+		bool escape = false;
+		for (auto ai : mAiCharacter)
+		{
+			if (ai == nullptr) continue;
+			if (thrower_character_id == ai->c_id)
+			{
+				escape = true;
+				break;
+			}
+		}
+		if (escape) break;
+
+		UE_LOG(LogTemp, Log, TEXT("Anim called"));
+		switch (packet->animtype)
+		{
+			case static_cast<char>(Network::AnimType::Throw) :
+			{
+				if (thrower_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+						if (AnimInstance && mOtherCharacter[packet->id]->AnimThrowMontage)
+						{
+							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->AnimThrowMontage, 2.f);
+							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->AnimThrowMontage);
+
+						}
+					}
+				}
+				break;
+			}
+
+		}
+		break;
+	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
+		int id = packet->id;
+
+		bool escape = false;
+		for (auto ai : mAiCharacter)
+		{
+			if (ai == nullptr) continue;
+			if (id == ai->c_id)
+			{
+				escape = true;
+				break;
+			}
+		}
+		if (escape) break;
+
+		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+		mOtherCharacter[id]->c_id = packet->id;
+		mOtherCharacter[id]->s_connected = true;
+		break;
+	}
+
+	case SC_PACKET_REMOVE_OBJECT: {
+		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
+		int other_id = packet->id;
+		break;
+	}
+	case SC_PACKET_SPAWNOBJ: {
+		sc_packet_spawnobj* packet = reinterpret_cast<sc_packet_spawnobj*>(p);
+		int other_id = packet->id;
+		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), AInventory::ItemCodeToItemBombPath(packet->fruitType));
+		
+		
+
+		//FTransform SocketTransform = FTransform(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->lx, packet->ly, packet->lz), FVector(packet->sx, packet->sy, packet->sz));
+		////FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
+		//FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
+		//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		//auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+		break;
+	}
+	case SC_PACKET_UPDATE_INVENTORY: {
+		sc_packet_update_inventory* packet = reinterpret_cast<sc_packet_update_inventory*>(p);
+
+		FItemInfo itemClass;
+		itemClass.ItemCode = packet->itemCode;
+		itemClass.IndexOfHotKeySlot = packet->slotNum;
+		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
+		PacketOwner->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+
+		break;
+	}
+	case SC_PACKET_UPDATE_USERSTATUS: {
+		sc_packet_update_userstatus* packet = reinterpret_cast<sc_packet_update_userstatus*>(p);
+		PacketOwner->hp = packet->hp;
+		//PacketOwner->mInventory->mMainWidget->UpdateHpBar();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+			FString::Printf(TEXT("My HP: %d "), PacketOwner->hp));
+		break;
+	}
+	case SC_PACKET_DIE: {
+		sc_packet_die* packet = reinterpret_cast<sc_packet_die*>(p);
+		//죽었을때 할 행동 ex) 죽은 ui, 죽은 Animation, 부활 ui
+		//현재는 그냥 꺾어놓기만 했음.
+		if (packet->id == PacketOwner->c_id) {
+
+			PacketOwner->SetActorRotation(FQuat(90, 0, 0, 1));
+			//PacketOwner->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+
+		}
+		else if (packet->id < MAX_USER)
+		{
+			if (mOtherCharacter[packet->id] != nullptr)
+			{
+				if (true == mOtherCharacter[packet->id]->s_connected)
+				{
+					mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
+				}
+			}
+		}
+		//
+
+		break;
+	}
+	case SC_PACKET_RESPAWN: {
+		sc_packet_respawn* packet = reinterpret_cast<sc_packet_respawn*>(p);
+
+		if (packet->id == PacketOwner->c_id) {
+
+			PacketOwner->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			PacketOwner->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+			PacketOwner->GroundSpeed_AI = 0;
+			//PacketOwner->EnableInput(PacketOwner->GetWorld()->GetFirstPlayerController());
+
+		}
+		else if (packet->id < MAX_USER)
+		{
+			if (mOtherCharacter[packet->id] != nullptr)
+			{
+				if (true == mOtherCharacter[packet->id]->s_connected)
+				{
+					mOtherCharacter[packet->id]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+					mOtherCharacter[packet->id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+					mOtherCharacter[packet->id]->GroundSpeed = 0;
+				}
+			}
+		}
 		break;
 	}
 	case SC_PACKET_UPDATE_INTERSTAT: {
 		sc_packet_update_interstat* packet = reinterpret_cast<sc_packet_update_interstat*>(p);
-
+		//BroadCast Packet just do once
+		//BroadCast Packet은 딱 한번만 실행돼야 함.
+		if (0 != PacketOwner->overID) break;
 		if (packet->canHarvest)	//생성 로직
 		{
 			if (packet->useType == INTERACT_TYPE_TREE)

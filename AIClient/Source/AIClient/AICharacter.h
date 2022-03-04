@@ -41,17 +41,21 @@ public:
 
 public:
 	//related network
-	int c_id;
 
-	void ConnServer();
+	bool ConnServer();
 	const char* SERVER_ADDR = "127.0.0.1";
 	const short SERVER_PORT = 4000;
 	SOCKET s_socket;
 	SOCKADDR_IN server_addr;
 	WSA_OVER_EX recv_expover;
 	int		_prev_size;
-	int mId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	int c_id; //received id from server
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	int overID;	//overlapped I/O use this
 	void recvPacket();
+public:
+	int hp;
 public:
 	//related inventory
 
@@ -87,6 +91,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 public:	
 	// Called every frame
