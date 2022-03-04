@@ -174,7 +174,7 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
 	case 5:
