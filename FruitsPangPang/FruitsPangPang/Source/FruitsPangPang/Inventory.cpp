@@ -198,6 +198,8 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
 	case 5:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/Fruit_Durian.Fruit_Durian_C'");
+	case 6:
+		return TEXT("Blueprint'/Game/Assets/MapObjects/FirstAidKit/FirstAidKit.FirstAidKit_C'");
 	default:
 		return TEXT("None");
 	}

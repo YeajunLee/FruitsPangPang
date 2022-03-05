@@ -42,7 +42,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void Throww();
-
+	void Throw(const FVector& location, FRotator rotation, const FName& path);
 	bool bLMBDown;
 	void LMBDown();
 

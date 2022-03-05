@@ -98,3 +98,11 @@ void Character::Hurt(const int& damage)
 		Die();
 	}
 }
+
+
+void Character::Heal(const int& amount)
+{
+	hp = min(hp + amount, maxhp);
+	send_update_userstatus_packet(_id);
+	cout << _id << "ÀÇ ÀÌÈÄ hp : " << hp << endl;
+}

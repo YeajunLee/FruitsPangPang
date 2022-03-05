@@ -419,9 +419,15 @@ void process_packet(int client_id, unsigned char* p)
 			break;
 
 		cout << "과일 받았습니다(과일상자)" << endl;
+		if (punnet->_ftype == FRUITTYPE::T_HEAL)
+		{
+			character->Heal(10);
+		}
+		else {
+			character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
+			send_update_inventory_packet(client_id, 3);
+		}
 
-		character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
-		send_update_inventory_packet(client_id, 3);
 		punnet->interact();
 
 		for (auto& other : objects)
