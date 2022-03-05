@@ -384,6 +384,21 @@ void AMyCharacter::Throww()
 
 }
 
+void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName& path)
+{
+	rotation.Pitch += 18;
+	FTransform trans(rotation.Quaternion(), location);
+
+
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
+	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
+	//bomb->DetachFromActor(Detachrules);
+	bomb->ProjectileMovementComponent->Activate();
+}
 
 void AMyCharacter::GetFruits()
 {
