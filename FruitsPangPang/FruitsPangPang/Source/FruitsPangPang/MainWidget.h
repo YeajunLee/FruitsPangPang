@@ -26,6 +26,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UHorizontalBox* InventoryBar;
 
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* MinimapBox;
+
 	TArray<class UInventorySlotWidget*> minventorySlot;
 
 	class AInventory* mInventory;
