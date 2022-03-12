@@ -197,15 +197,26 @@ void AMyCharacter::Throw()
 	FVector SocketLocation = GetMesh()->GetSocketLocation("BombSocket");
 
 	FRotator SpawnActorRotation = FollowCamera->GetComponentRotation();
+	SpawnActorRotation.Pitch += 18;
 
-
+	FTransform trans(SpawnActorRotation.Quaternion(), SocketLocation);
 	FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
-	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
-	GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketLocation, SpawnActorRotation);
 
-	FVector FowardVector = UKismetMathLibrary::GetForwardVector(SpawnActorRotation) * 1000.f;
-	
+
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
+	FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
+	bomb->DetachFromActor(Detachrules);
+	bomb->ProjectileMovementComponent->Activate();
+
+	//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	////GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	//
+	//FVector FowardVector = UKismetMathLibrary::GetForwardVector(SpawnActorRotation) * 1000.f;
+	//
 	//UPrimitiveComponent* PhysicsSetter = nullptr;
 	//SetPhysicsLinearVelocity(SocketForward);
 
@@ -220,7 +231,6 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation,const FName& 
 
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	//GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");

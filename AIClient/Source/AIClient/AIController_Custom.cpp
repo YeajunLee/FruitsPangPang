@@ -10,6 +10,9 @@ const FName AAIController_Custom::HomePosKey(TEXT("HomePos"));
 const FName AAIController_Custom::PatrolPosKey(TEXT("PatrolPos"));
 const FName AAIController_Custom::TargetKey(TEXT("Target"));
 
+const FName AAIController_Custom::TreeKey(TEXT("Tree"));
+const FName AAIController_Custom::AmountKey(TEXT("Amount"));
+
 AAIController_Custom::AAIController_Custom()
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("BlackboardData'/Game/Character/AICharacter/BB_AICharacter.BB_AICharacter'"));

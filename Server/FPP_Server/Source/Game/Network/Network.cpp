@@ -369,17 +369,21 @@ void process_packet(int client_id, unsigned char* p)
 		Tree* tree = reinterpret_cast<Tree*>(objects[packet->obj_id + TREEID_START]);
 		
 		if (!tree->canHarvest)
+		{
+			cout << " 수확할 수 없습니다!" << endl;
 			break;
+
+		}
 		
 		cout << "과일 받았습니다(나무)" << endl;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
-			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 1);
+			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 5);
 			send_update_inventory_packet(client_id, 0);
 			break;
 		case TREETYPE::ORANGE:
-			character->UpdateInventorySlotAtIndex(1, tree->_ftype, 1);
+			character->UpdateInventorySlotAtIndex(1, tree->_ftype, 5);
 			send_update_inventory_packet(client_id, 1);
 			break;
 		}

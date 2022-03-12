@@ -5,6 +5,7 @@
 #include "Inventory.h"
 #include "Network.h"
 #include "AICharacter.h"
+#include "Fruit.h"
 
 
 APunnet::APunnet()
@@ -19,13 +20,13 @@ void APunnet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
     if (OtherActor)
     {
-        AAICharacter* player = Cast<AAICharacter>(OtherActor);
+        /*AAICharacter* player = Cast<AAICharacter>(OtherActor);
         if (player)
         {
             player->OverlapInteract = true;
             player->OverlapInteractId = PunnetId;
             player->OverlapType = false;
-        }
+        }*/
     }
 }
 
@@ -54,29 +55,29 @@ void APunnet::GenerateFruit(int _FruitType)
     {
         //비주얼 요소 제거
 
-        //switch (_FruitType)
-        //{
-        //case 0:
-        //{
-        //
-        //
-        //    break;
-        //}
-        //}
-        //// 일단 임시로 모든 과일 다 토마토로 작업.
+        switch (_FruitType)
+        {
+        case 0:
+        {
+        
+        
+            break;
+        }
+        }
+        // 일단 임시로 모든 과일 다 토마토로 작업.
         //FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
-        ////FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
-        //UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-        //FActorSpawnParameters SpawnParams;
-        //SpawnParams.Owner = this;
-        //FRotator rotator;
-        //FVector  SpawnLocation = GetActorLocation();
-        //SpawnLocation.Z += 10.0f;
-        //mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        //SpawnLocation.X -= 20.0f;
-        //mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        //SpawnLocation.X += 20.0f;
-        //mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+        FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/FallinTomato.FallinTomato_C'");
+        UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        FRotator rotator;
+        FVector  SpawnLocation = GetActorLocation();
+        SpawnLocation.Z += 10.0f;
+        mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+        SpawnLocation.X -= 20.0f;
+        mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+        SpawnLocation.X += 20.0f;
+        mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
 
         CanHarvest = true;
     }
@@ -111,18 +112,18 @@ void APunnet::BeginPlay()
         if (world)
         {
             //비주얼 요소 제거 
-            //FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
-            //UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-            //FActorSpawnParameters SpawnParams;
-            //SpawnParams.Owner = this;
-            //FRotator rotator;
-            //FVector  SpawnLocation = GetActorLocation();
-            //SpawnLocation.Z += 10.0f;
-            //mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            //SpawnLocation.X -= 20.0f;
-            //mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            //SpawnLocation.X += 20.0f;
-            //mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+            FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/FallinTomato.FallinTomato_C'");
+            UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.Owner = this;
+            FRotator rotator;
+            FVector  SpawnLocation = GetActorLocation();
+            SpawnLocation.Z += 10.0f;
+            mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+            SpawnLocation.X -= 20.0f;
+            mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+            SpawnLocation.X += 20.0f;
+            mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
         }
     }
 }
