@@ -80,7 +80,7 @@ void AMyCharacter::BeginPlay()
 		FSoftClassPath my(TEXT("Blueprint'/Game/Widget/MRespawnWidget.MRespawnWidget_C'"));
 		auto p = my.TryLoadClass<UUserWidget>();
 		mInventory->mMainWidget->MinimapBox->AddChildToHorizontalBox(CreateWidget<UUserWidget>(GetWorld(), p));
-		mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
+		//mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
 
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성

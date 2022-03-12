@@ -28,6 +28,7 @@ const char CS_PACKET_USEITEM = 7;
 const char CS_PACKET_HIT = 8;
 const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
 const char CS_PACKET_POS = 10;
+const char CS_PACKET_SELECT_RESPAWN = 11;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -101,6 +102,12 @@ struct cs_packet_pos {
 	char type;
 	char useType;
 	float x, y, z;	//pos
+};
+
+struct cs_packet_select_respawn {
+	unsigned char size;
+	char type;
+	char numbering;
 };
 //-------------------- server to client
 struct sc_packet_login_ok {

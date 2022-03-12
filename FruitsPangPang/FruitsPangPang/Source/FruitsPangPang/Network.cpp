@@ -279,6 +279,18 @@ void Network::send_pos_packet(const float& x, const float& y, const float& z, co
 	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_pos), &packet);
 	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
 }
+
+void Network::send_respawn_packet(const char& WannaRespawn)
+{
+	cs_packet_select_respawn packet;
+	packet.size = sizeof(cs_packet_select_respawn);
+	packet.type = CS_PACKET_SELECT_RESPAWN;
+	packet.numbering = WannaRespawn;
+
+
+	EXP_OVER* once_exp = new EXP_OVER(sizeof(cs_packet_select_respawn), &packet);
+	int ret = WSASend(s_socket, &once_exp->_wsa_buf, 1, 0, 0, &once_exp->_wsa_over, send_callback);
+}
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
