@@ -5,9 +5,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/HorizontalBox.h"
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
@@ -74,6 +76,11 @@ void AMyCharacter::BeginPlay()
 		mInventory->mCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
+
+		FSoftClassPath my(TEXT("Blueprint'/Game/Widget/MRespawnWidget.MRespawnWidget_C'"));
+		auto p = my.TryLoadClass<UUserWidget>();
+		mInventory->mMainWidget->MinimapBox->AddChildToHorizontalBox(CreateWidget<UUserWidget>(GetWorld(), p));
+		mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
 
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성
@@ -362,28 +369,44 @@ void AMyCharacter::Jump()
 
 void AMyCharacter::Throww()
 {
-	//Blueprint'/Game/Assets/tomato/Bomb.Bomb'
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
-	SocketTransform.GetRotation();
-	SocketTransform.GetLocation();
-	SocketTransform.GetScale3D();
-	
-	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'");
+	FRotator CameraRotate = FollowCamera->GetComponentRotation();
+	CameraRotate.Pitch += 18;
+	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
-
+	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	bomb->BombOwner = this;
-	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), FollowCamera->GetComponentRotation() , SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
+	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
+	//bomb->DetachFromActor(Detachrules);
+	bomb->ProjectileMovementComponent->Activate();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//	FString::Printf(TEXT("My pos: ")));
+
+	//
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+	////	FString::Printf(TEXT("My pos: ")));
 
 
 }
 
+void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName& path)
+{
+	rotation.Pitch += 18;
+	FTransform trans(rotation.Quaternion(), location);
+
+
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
+	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
+	//bomb->DetachFromActor(Detachrules);
+	bomb->ProjectileMovementComponent->Activate();
+}
 
 void AMyCharacter::GetFruits()
 {

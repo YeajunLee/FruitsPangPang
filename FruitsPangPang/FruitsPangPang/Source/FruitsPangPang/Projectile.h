@@ -29,4 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class AMyCharacter* BombOwner;
 
+	UPROPERTY(VisibleAnywhere, Category = "default")
+		class UProjectileMovementComponent* ProjectileMovementComponent;
 };
