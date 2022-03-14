@@ -56,6 +56,8 @@ public:
 
 
 	void AddItem(const FItemInfo& item, const int& amount);
+
+	UFUNCTION(BlueprintCallable)
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);
 	void GetItemInfoAtSlotIndex(__in const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
 	void RemoveItemAtSlotIndex(const int& index, const int& amount);

@@ -498,6 +498,7 @@ void Network::process_packet2(int client_id, unsigned char* p)
 		FItemInfo itemClass;
 		itemClass.ItemCode = packet->itemCode;
 		itemClass.IndexOfHotKeySlot = packet->slotNum;
+		UE_LOG(LogTemp, Error, TEXT("slot Num : %d"), packet->slotNum);
 		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		PacketOwner->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);

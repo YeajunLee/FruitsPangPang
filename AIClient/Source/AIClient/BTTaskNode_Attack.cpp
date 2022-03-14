@@ -4,6 +4,7 @@
 #include "BTTaskNode_Attack.h"
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "Inventory.h"
 
 UBTTaskNode_Attack::UBTTaskNode_Attack()
 {
@@ -22,8 +23,9 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
 
     AICharacter->Attack();
     IsAttacking = true;
-
     AICharacter->OnAttackEnd.AddLambda([this]()->void { IsAttacking = false; });
+
+
 
     return EBTNodeResult::InProgress;
     // 공격 task는 공격 애니메이션이 끝날 때까지 대기해야 하는 지연 task이므로
@@ -35,6 +37,16 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
 void UBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
+    auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
+    if (nullptr == AICharacter)
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+    if (0 == AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount)
+    {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+    }
+
     if (!IsAttacking)
     {
         UE_LOG(LogTemp, Warning, TEXT("Finish!"));

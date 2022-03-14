@@ -35,6 +35,17 @@ void AAICharacter::BeginPlay()
 	mInventory->mAmountOfSlots = 5;
 	mInventory->FinishSpawning(spawnLocAndRot);
 
+	/*
+	* 토마토 5개 들고 시작
+	*/
+	//FItemInfo itemClass;
+	//itemClass.ItemCode = 1;
+	//itemClass.IndexOfHotKeySlot = 0;
+	//itemClass.Name = AInventory::ItemCodeToItemName(1);
+	//itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
+	//mInventory->UpdateInventorySlot(itemClass, 5);
+	SelectedHotKeySlotNum = 0;
+
 	overID = Network::GetNetwork()->getNewId();
 	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
 	Network::GetNetwork()->mAiCharacter[overID] = this;
@@ -71,9 +82,7 @@ void AAICharacter::Attack()
 		bAttacking = true;	
 	}*/
 
-	//Play Throw Montage
-
-
+	//Play Throw Montage	
 	if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 	{
 		SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
@@ -86,7 +95,8 @@ void AAICharacter::Attack()
 		AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && ThrowMontage_AI)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Attack!"));
+			//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
+			UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
 			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
 			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
@@ -140,9 +150,9 @@ void AAICharacter::GetFruits()
 		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 	}
 	else {
-		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		//Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+		//Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
+		//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 	}
 }
 

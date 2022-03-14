@@ -22,6 +22,10 @@ public:
 	static const FName PatrolPosKey;
 	static const FName TargetKey;
 
+	static const FName TreeKey;
+
+	static const FName AmountKey;
+
 private:
 	UPROPERTY();
 	class UBehaviorTree* BTAsset;
