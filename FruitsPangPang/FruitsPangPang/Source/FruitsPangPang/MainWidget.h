@@ -30,9 +30,12 @@ public:
 		class UHorizontalBox* MinimapBox;
 
 	TArray<class UInventorySlotWidget*> minventorySlot;
+	class URespawnWindowWidget* mRespawnWindowWidget;
 
 	class AInventory* mInventory;
 
 	class AMyCharacter* mCharacter;
 	void UpdateHpBar();
+	void ShowRespawnWidget();
+	void HideRespawnWidget();
 };

@@ -438,6 +438,8 @@ void Network::process_packet(unsigned char* p)
 
 			mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
+			UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
 
 		}
 		else if (packet->id < MAX_USER)
@@ -460,6 +462,7 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 			mMyCharacter->GroundSpeedd = 0;
 			mMyCharacter->EnableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+			mMyCharacter->mInventory->mMainWidget->HideRespawnWidget();
 			
 		}
 		else if (packet->id < MAX_USER)
