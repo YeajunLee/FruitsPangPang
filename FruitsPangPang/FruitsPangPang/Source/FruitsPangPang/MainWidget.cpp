@@ -36,6 +36,11 @@ void UMainWidget::UpdateHpBar()
 
 void UMainWidget::ShowRespawnWidget()
 {
+	
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->SetInputMode(gamemode);
+	controller->SetShowMouseCursor(true);
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Visible);
 	mRespawnWindowWidget->RemainTime = mRespawnWindowWidget->RespawnTime;
 	mRespawnWindowWidget->Activate = true;
@@ -43,6 +48,10 @@ void UMainWidget::ShowRespawnWidget()
 
 void UMainWidget::HideRespawnWidget()
 {
+	FInputModeGameOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->SetInputMode(gamemode);
+	controller->SetShowMouseCursor(false);
 	mRespawnWindowWidget->Activate = false;
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Hidden);
 }

@@ -428,6 +428,7 @@ void process_packet(int client_id, unsigned char* p)
 			send_update_inventory_packet(client_id, 3);
 		}
 
+		
 		punnet->interact();
 
 		for (auto& other : objects)
