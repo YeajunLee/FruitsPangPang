@@ -214,19 +214,19 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 	switch (itemCode)
 	{
 	case 1:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/tomato/Icon_tomato.Icon_tomato"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/tomato/Textures/Tomato_slot.Tomato_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 2:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Icon_kiwi.Icon_kiwi"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Kiwi_slot.Kiwi_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Icon_watermelon.Icon_watermelon"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Watermelon_slot.Watermelon_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Icon_nut.Icon_nut"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Bam_slot.Bam_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 5:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Icon_durian.Icon_durian"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Doorian_slot.Doorian_slot"), NULL, LOAD_None, NULL);
 		break;
 	default:
 		break;

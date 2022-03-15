@@ -59,12 +59,24 @@ public:
 public:
 	//related inventory
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	int SelectedHotKeySlotNum; 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-		class AInventory* mInventory;
+	class AInventory* mInventory;
+
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "tree")
+	class ATree* mTree;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Farming")
+	//bool bIsUndertheTree;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	bool bAttacking;

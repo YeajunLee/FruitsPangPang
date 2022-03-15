@@ -19,5 +19,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void ConnAi();
 };
