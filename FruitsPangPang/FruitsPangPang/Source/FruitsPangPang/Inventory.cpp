@@ -154,10 +154,13 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 		break;
 	case 3:
 		res = FText::FromString(FString("Watermelon"));
+		break;
 	case 4:
 		res = FText::FromString(FString("Nut"));
+		break;
 	case 5:
 		res = FText::FromString(FString("Durian"));
+		break;
 	default:
 		break;
 	}
@@ -224,6 +227,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		break;
 	case 5:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Doorian_slot.Doorian_slot"), NULL, LOAD_None, NULL);
+		break;
 	default:
 		break;
 	}

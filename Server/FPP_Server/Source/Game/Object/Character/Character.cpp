@@ -90,6 +90,7 @@ void Character::Die()
 
 void Character::Hurt(const int& damage)
 {
+	if (hp <= 0) return;	//0일때 다치면 안됨.
 	hp = max(hp - damage, 0);
 	send_update_userstatus_packet(_id);
 	cout << _id << "의 이후 hp : " << hp << endl;

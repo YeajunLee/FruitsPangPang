@@ -432,6 +432,7 @@ void process_packet(int client_id, unsigned char* p)
 			send_update_inventory_packet(client_id, 3);
 		}
 
+		
 		punnet->interact();
 
 		for (auto& other : objects)
@@ -460,6 +461,7 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
+
 		character->Hurt(10);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
 		break;
@@ -490,6 +492,67 @@ void process_packet(int client_id, unsigned char* p)
 			timer_queue.push(instq);
 			break;
 		}
+		}
+		break;
+	}
+	case CS_PACKET_SELECT_RESPAWN: {
+		cs_packet_select_respawn* packet = reinterpret_cast<cs_packet_select_respawn*>(p);
+
+		Character* RespawnPlayer = reinterpret_cast<Character*>(objects[client_id]);
+		if (RespawnPlayer->hp > 0)
+		{
+			//break;
+		}
+		RespawnPlayer->hp = RespawnPlayer->maxhp;
+		RespawnPlayer->rx = 0, RespawnPlayer->ry = 0, RespawnPlayer->rz = 0, RespawnPlayer->rw = 1;
+		switch (packet->numbering)
+		{
+		case 0:
+			RespawnPlayer->x = 18090, RespawnPlayer->y = 17480, RespawnPlayer->z = 100;
+			break;
+		case 1:
+			RespawnPlayer->x = 9880, RespawnPlayer->y = 18390, RespawnPlayer->z = 100;
+			break;
+		case 2:
+			RespawnPlayer->x = 2200, RespawnPlayer->y = 18140, RespawnPlayer->z = 100;
+			break;
+		case 3:
+			RespawnPlayer->x = 18350, RespawnPlayer->y = 9610, RespawnPlayer->z = 100;
+			break;
+		case 4:
+			RespawnPlayer->x =1750, RespawnPlayer->y =10220, RespawnPlayer->z = 100;
+			break;
+		case 5:
+			RespawnPlayer->x =17980, RespawnPlayer->y = 1780, RespawnPlayer->z = 100;
+			break;
+		case 6:
+			RespawnPlayer->x = 9730, RespawnPlayer->y = 1620, RespawnPlayer->z = 100;
+			break;
+		case 7:
+			RespawnPlayer->x = 1990, RespawnPlayer->y = 1740, RespawnPlayer->z = 100;
+			break;
+		case 8:
+			RespawnPlayer->x = 32030, RespawnPlayer->y = 24480, RespawnPlayer->z = 398;
+			break;
+		}
+
+		cout << "플레이어 " << client_id << "리스폰\n";
+
+		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
+			auto character = reinterpret_cast<Character*>(other);
+
+			character->state_lock.lock();
+			if (Character::STATE::ST_INGAME == character->_state)
+			{
+				character->state_lock.unlock();
+				send_respawn_packet(character->_id, RespawnPlayer->_id);
+				if (character->_id == RespawnPlayer->_id)
+				{
+					send_update_userstatus_packet(RespawnPlayer->_id);
+				}
+			}
+			else character->state_lock.unlock();
 		}
 		break;
 	}

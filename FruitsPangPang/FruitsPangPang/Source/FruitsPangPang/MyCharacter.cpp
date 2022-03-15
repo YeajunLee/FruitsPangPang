@@ -10,6 +10,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/HorizontalBox.h"
+#include "Components/VerticalBox.h"
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
@@ -20,6 +21,8 @@
 #include "InventorySlotWidget.h"
 #include "MainWidget.h"
 #include "Projectile.h"
+#include "RespawnWindowWidget.h"
+#include "RespawnWidget.h"
 
 
 // Sets default values
@@ -77,10 +80,9 @@ void AMyCharacter::BeginPlay()
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
 
-		FSoftClassPath my(TEXT("Blueprint'/Game/Widget/MRespawnWidget.MRespawnWidget_C'"));
-		auto p = my.TryLoadClass<UUserWidget>();
-		mInventory->mMainWidget->MinimapBox->AddChildToHorizontalBox(CreateWidget<UUserWidget>(GetWorld(), p));
-		mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
+		//mInventory->mMainWidget->MinimapBox->AddChildToHorizontalBox(CreateWidget<UUserWidget>(GetWorld(), p));
+		//mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
+
 
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성
