@@ -28,7 +28,7 @@ Tree::Tree(TREETYPE ttype)
 	}
 	else if (ttype == TREETYPE::ORANGE)
 	{
-		_ftype = FRUITTYPE::T_SUBACK;
+		_ftype = FRUITTYPE::T_WATERMELON;
 	}
 }
 

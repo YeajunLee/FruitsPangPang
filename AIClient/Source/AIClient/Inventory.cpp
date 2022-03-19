@@ -126,15 +126,38 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 		res = FText::FromString(FString("Kiwi"));
 		break;
 	case 3:
-		res = FText::FromString(FString("Watermelon"));
+		res = FText::FromString(FString("Apple"));
+		break;
 	case 4:
-		res = FText::FromString(FString("Nut"));
+		res = FText::FromString(FString("Watermelon"));
+		break;
 	case 5:
+		res = FText::FromString(FString("PineApple"));
+		break;
+	case 6:
+		res = FText::FromString(FString("Pumpkin"));
+		break;
+	case 7:
+		res = FText::FromString(FString("GreenOnion"));
+		break;
+	case 8:
+		res = FText::FromString(FString("Carrot"));
+		break;
+	case 9:
 		res = FText::FromString(FString("Durian"));
+		break;
+	case 10:
+		res = FText::FromString(FString("Nut"));
+		break;
+	case 11:
+		res = FText::FromString(FString("Banana"));
+		break;
+	case 12:
+		res = FText::FromString(FString("FirstAidKit"));
+		break;
 	default:
 		break;
 	}
-
 	return res;
 }
 
@@ -147,14 +170,29 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
+		return TEXT("None");
 	case 4:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/TomatoBomb.TomatoBomb_C'");
 	case 5:
+		return TEXT("None");
+	case 6:
+		return TEXT("None");
+	case 7:
+		return TEXT("None");
+	case 8:
+		return TEXT("None");
+	case 9:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb.DurianBomb_C'");
+	case 10:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
+	case 11:
+		return TEXT("None");
+	case 12:
+		return TEXT("None");
 	default:
 		return TEXT("None");
 	}
+
 }
 
 const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
@@ -166,19 +204,36 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
+		return TEXT("None");
 	case 4:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
 	case 5:
+		return TEXT("None");
+	case 6:
+		return TEXT("None");
+	case 7:
+		return TEXT("None");
+	case 8:
+		return TEXT("None");
+	case 9:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/Fruit_Durian.Fruit_Durian_C'");
+	case 10:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
+	case 11:
+		return TEXT("None");
+	case 12:
+		return TEXT("Blueprint'/Game/Assets/MapObjects/FirstAidKit/FirstAidKit.FirstAidKit_C'");
 	default:
 		return TEXT("None");
 	}
+
 }
 
 UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 {
 	UTexture2D* res = nullptr;
+
+
 	switch (itemCode)
 	{
 	case 1:
@@ -188,15 +243,31 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Icon_kiwi.Icon_kiwi"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Icon_watermelon.Icon_watermelon"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Icon_nut.Icon_nut"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Icon_watermelon.Icon_watermelon"), NULL, LOAD_None, NULL);
 		break;
 	case 5:
+		break;
+	case 6:
+		break;
+	case 7:
+		break;
+	case 8:
+		break;
+	case 9:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Icon_durian.Icon_durian"), NULL, LOAD_None, NULL);
+		break;
+	case 10:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Icon_nut.Icon_nut"), NULL, LOAD_None, NULL);
+		break;
+	case 11:
+		break;
+	case 12:
+		break;
 	default:
 		break;
 	}
+
 	return res;
 }
