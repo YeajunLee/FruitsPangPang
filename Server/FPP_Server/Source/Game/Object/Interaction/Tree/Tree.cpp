@@ -53,8 +53,8 @@ void Tree::GenerateFruit()
 {
 	random_device rd;
 	mt19937 rng(rd());
-	uniform_int_distribution<int> GreenFruit(1, 2);
-	uniform_int_distribution<int> OrangeFruit(3, 3);
+	uniform_int_distribution<int> GreenFruit(static_cast<int>(FRUITTYPE::T_TOMATO, static_cast<int>(FRUITTYPE::T_QUIUI)));
+	uniform_int_distribution<int> OrangeFruit(static_cast<int>(FRUITTYPE::T_WATERMELON, static_cast<int>(FRUITTYPE::T_WATERMELON)));
 
 	if (_ttype == TREETYPE::GREEN)
 	{

@@ -16,9 +16,14 @@ Punnet::Punnet()
 
 	random_device rd;
 	mt19937 rng(rd());
-	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_NUT), static_cast<int>(FRUITTYPE::T_HEAL));
-
-	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
+	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_DURIAN), static_cast<int>(FRUITTYPE::T_HEAL));
+	
+	while (1)
+	{
+		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
+		if (FRUITTYPE::T_BANANA != _ftype)
+			break;
+	}
 }
 
 Punnet::~Punnet()
@@ -45,8 +50,13 @@ void Punnet::GenerateFruit()
 
 	random_device rd;
 	mt19937 rng(rd());
-	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_NUT), static_cast<int>(FRUITTYPE::T_HEAL));
+	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_DURIAN), static_cast<int>(FRUITTYPE::T_HEAL));
 
-	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
+	while (1)
+	{
+		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
+		if (FRUITTYPE::T_BANANA != _ftype)
+			break;
+	}
 	cout << "_ftype : " << (int)_ftype << endl;
 }
