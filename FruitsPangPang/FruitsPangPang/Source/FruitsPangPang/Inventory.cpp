@@ -198,23 +198,23 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/KiwiBomb.KiwiBomb_C'");
 	case 3:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/AppleBomb.AppleBomb_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
 	case 5:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pineapple/PineappleBomb.PineappleBomb_C'");
 	case 6:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/PumpkinBomb.PumpkinBomb_C'");
 	case 7:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/GreenOnionSword.GreenOnionSword_C'");
 	case 8:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Carrot/CarrotSword.CarrotSword_C'");
 	case 9:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb.DurianBomb_C'");
 	case 10:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb.NutBomb_C'");
 	case 11:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Banana/BananaBomb.BananaBomb_C'");
 	case 12:
 		return TEXT("None");
 	default:
@@ -231,23 +231,23 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
 	case 3:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/Fruit_Apple.Fruit_Apple_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
 	case 5:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pineapple/Fruit_Pineapple.Fruit_Pineapple_C'");
 	case 6:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/Fruit_Pumpkin.Fruit_Pumpkin_C'");
 	case 7:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/Fruit_GreenOnion.Fruit_GreenOnion_C'");
 	case 8:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Carrot/Fruit_Carrot.Fruit_Carrot_C'");
 	case 9:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/Fruit_Durian.Fruit_Durian_C'");
 	case 10:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/Fruit_Nut.Fruit_Nut_C'");
 	case 11:
-		return TEXT("None");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Banana/Fruit_Banana.Fruit_Banana_C'");
 	case 12:
 		return TEXT("Blueprint'/Game/Assets/MapObjects/FirstAidKit/FirstAidKit.FirstAidKit_C'");
 	default:
@@ -267,17 +267,22 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Kiwi_slot.Kiwi_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Apple/Apple_slot.Apple_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Watermelon_slot.Watermelon_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 5:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Pineapple/Pineapple_slot.Pineapple_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 6:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Pumkin/Pumpkin_slot.Pumpkin_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 7:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/BigGreenOnion/Leek_slot.Leek_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 8:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Carrot/Carrot_slot.Carrot_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 9:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Durian/Doorian_slot.Doorian_slot"), NULL, LOAD_None, NULL);
@@ -286,6 +291,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Bam_slot.Bam_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 11:
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Banana/Banana_slot.Banana_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 12:
 		break;

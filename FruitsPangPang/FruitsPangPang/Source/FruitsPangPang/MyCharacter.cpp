@@ -25,6 +25,8 @@
 #include "RespawnWidget.h"
 
 
+
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 	:SelectedHotKeySlotNum(0)
@@ -92,19 +94,32 @@ void AMyCharacter::BeginPlay()
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 3;	//수박 30개 생성
+		itemClass.ItemCode = 4;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = AInventory::ItemCodeToItemName(3);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(4);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
+		itemClass.ItemCode = 7; //대파 1개 생성
+		itemClass.IndexOfHotKeySlot = 2;
+		itemClass.Name = AInventory::ItemCodeToItemName(7);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		mInventory->UpdateInventorySlot(itemClass, 1);
 
-		itemClass.ItemCode = 5;	//두리안 30개 생성
+
+		itemClass.ItemCode = 10;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(5);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
+		itemClass.Name = AInventory::ItemCodeToItemName(10);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(10);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
+		itemClass.ItemCode = 11; //바나나 1개 생성
+		itemClass.IndexOfHotKeySlot = 4;
+		itemClass.Name = AInventory::ItemCodeToItemName(11);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
+		mInventory->UpdateInventorySlot(itemClass, 1);
+
+		
 		Network::GetNetwork()->mMyCharacter = this;
 		if (Network::GetNetwork()->init())
 		{
@@ -162,7 +177,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		}
 	}
 
-
+	
 
 }
 
@@ -327,6 +342,8 @@ void AMyCharacter::LMBUp()
 
 void AMyCharacter::Attack()
 {
+	
+	
 	if (!bAttacking)
 	{
 		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
@@ -335,7 +352,10 @@ void AMyCharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+
+			if(SavedHotKeyItemCode != 7 )
+				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+
 			if (c_id == Network::GetNetwork()->mId) {
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 				Network::GetNetwork()->send_useitem_packet(SelectedHotKeySlotNum, 1);
@@ -343,14 +363,38 @@ void AMyCharacter::Attack()
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			if (AnimInstance && ThrowMontage)
+			UAnimInstance* AnimInstance1 = GetMesh()->GetAnimInstance();
+			
+			if (SavedHotKeyItemCode == 7)
+			{
+				if (AnimInstance && SlashMontage)
+				{
+					AnimInstance->Montage_Play(SlashMontage, 1.5f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
+
+					
+				}
+			}
+
+			else if (SavedHotKeyItemCode == 8)
+			{
+				if (AnimInstance && StabbingMontage)
+				{
+					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
+					//UGameplayStatics::PlaySoundAtLocation(this, TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/pa.pa'"), GetActorLocation());
+				}
+			}
+
+			 else if (AnimInstance && ThrowMontage)
 			{
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 
 			}
-
+			
 		}
+		
 	}
 }
 
@@ -412,6 +456,7 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 
 void AMyCharacter::GetFruits()
 {
+	
 	if (OverlapType)
 	{
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;

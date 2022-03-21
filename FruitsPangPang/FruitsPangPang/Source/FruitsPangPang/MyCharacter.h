@@ -2,7 +2,9 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
+#include "Components/StaticMeshComponent.h"
 #include "Network.h"
 #include <memory>
 #include "../../../Protocol/protocol.h"
@@ -16,6 +18,8 @@ class FRUITSPANGPANG_API AMyCharacter : public ACharacter, public std::enable_sh
 {
 	GENERATED_BODY()
 
+	
+
 public:
 
 
@@ -27,6 +31,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
+
+	//UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"));
+	//GreenOnionComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	/** Base turn rates to scale turning functions for the camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -98,6 +105,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* SlashMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* StabbingMontage;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 		class AInventory* mInventory;
 
@@ -130,4 +143,6 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
 };
