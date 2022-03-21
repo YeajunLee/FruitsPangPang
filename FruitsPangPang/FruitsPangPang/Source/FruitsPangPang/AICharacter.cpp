@@ -51,6 +51,14 @@ void AAICharacter::BeginPlay()
 	//ConnServer();
 }
 
+void AAICharacter::EndPlay(EEndPlayReason::Type Reason)
+{
+	closesocket(s_socket);
+	Network::GetNetwork()->release();
+	//Network::GetNetwork().reset();
+	UE_LOG(LogTemp, Log, TEXT("ENd Played"));
+}
+
 // Called every frame
 void AAICharacter::Tick(float DeltaTime)
 {

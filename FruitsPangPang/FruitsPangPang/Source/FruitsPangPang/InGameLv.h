@@ -13,5 +13,11 @@ UCLASS()
 class FRUITSPANGPANG_API AInGameLv : public ALevelScriptActor
 {
 	GENERATED_BODY()
-	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	//UFUNCTION(BlueprintCallable)
+	void Conn();
 };

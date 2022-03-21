@@ -49,13 +49,9 @@ public:
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {
-	//const char* SERVER_ADDR = "127.0.0.1";
-	//const short SERVER_PORT = 4000;
-	//SOCKET s_socket;
-	//SOCKADDR_IN server_addr;
+private:
 	WSADATA WSAData;
 	void error_display(int err_no);
-
 public:
 	enum class AnimType
 	{
@@ -67,13 +63,7 @@ public:
 	class ATree* mTree[10];
 	class APunnet* mPunnet[10];
 	int WorldCharacterCnt;
-	//int mId;
 	static std::shared_ptr<class Network> GetNetwork();
-	//unsigned char buf[BUFSIZE];
-	//char recv_buf[BUFSIZE];
-	//WSA_OVER_EX recv_expover;
-	//int prev_size;
-	//WSABUF mybuf_r;
 	int mGeneratedID;
 	Network();
 	~Network();

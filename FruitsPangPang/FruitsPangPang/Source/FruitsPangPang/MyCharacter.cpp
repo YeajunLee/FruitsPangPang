@@ -27,6 +27,8 @@
 
 // Sets default values
 AMyCharacter::AMyCharacter()
+	:s_connected(false)
+	, bInteractDown(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -90,28 +92,28 @@ void AMyCharacter::BeginPlay()
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 3;	//수박 30개 생성
+		itemClass.ItemCode = 4;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
 		itemClass.Name = AInventory::ItemCodeToItemName(3);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 
-		itemClass.ItemCode = 5;	//두리안 30개 생성
+		itemClass.ItemCode = 9;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
 		itemClass.Name = AInventory::ItemCodeToItemName(5);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		//overID = Network::GetNetwork()->getNewId();
-		UE_LOG(LogTemp, Log, TEXT("Character :%d Genereate"), overID);
+		//UE_LOG(LogTemp, Log, TEXT("Character :%d Genereate"), overID);
 		Network::GetNetwork()->mMyCharacter = this;
 
-		if (Network::GetNetwork()->init())
-		{
-			//Network::GetNetwork()->C_Recv();
-			Network::GetNetwork()->send_login_packet(s_socket);
-		}
+		//if (Network::GetNetwork()->init())
+		//{
+		//	//Network::GetNetwork()->C_Recv();
+		//	Network::GetNetwork()->send_login_packet(s_socket);
+		//}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
@@ -128,6 +130,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory = nullptr;
 	}
 
+	closesocket(s_socket);
 	Network::GetNetwork()->release();
 	//Network::GetNetwork().reset();
 }
