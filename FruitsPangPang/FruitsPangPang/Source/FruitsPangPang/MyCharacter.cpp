@@ -27,8 +27,8 @@
 
 // Sets default values
 AMyCharacter::AMyCharacter()
-	:SelectedHotKeySlotNum(0)
-	,SavedHotKeyItemCode(0)
+	:s_connected(false)
+	, bInteractDown(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -76,7 +76,7 @@ void AMyCharacter::BeginPlay()
 		UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		FTransform spawnLocAndRot{ GetActorLocation() };
 		mInventory = GetWorld()->SpawnActorDeferred<AInventory>(GeneratedInventoryBP, spawnLocAndRot);
-		mInventory->mCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
+		mInventory->mOwnerCharacter = this;	// ExposeOnSpawn하고 SpawnActor에서 값 넣어주는게 C++로 짜면 이런식 인듯
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
 
@@ -92,25 +92,28 @@ void AMyCharacter::BeginPlay()
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 3;	//수박 30개 생성
+		itemClass.ItemCode = 4;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
 		itemClass.Name = AInventory::ItemCodeToItemName(3);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 
-		itemClass.ItemCode = 5;	//두리안 30개 생성
+		itemClass.ItemCode = 9;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
 		itemClass.Name = AInventory::ItemCodeToItemName(5);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
+		//overID = Network::GetNetwork()->getNewId();
+		//UE_LOG(LogTemp, Log, TEXT("Character :%d Genereate"), overID);
 		Network::GetNetwork()->mMyCharacter = this;
-		if (Network::GetNetwork()->init())
-		{
-			Network::GetNetwork()->C_Recv();
-			Network::GetNetwork()->send_login_packet();
-		}
+
+		//if (Network::GetNetwork()->init())
+		//{
+		//	//Network::GetNetwork()->C_Recv();
+		//	Network::GetNetwork()->send_login_packet(s_socket);
+		//}
 	}
 	else {
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
@@ -127,6 +130,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory = nullptr;
 	}
 
+	closesocket(s_socket);
 	Network::GetNetwork()->release();
 	//Network::GetNetwork().reset();
 }
@@ -146,7 +150,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		if (GetController()->IsPlayerController()) {
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
-			Network::GetNetwork()->send_move_packet(pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
+			Network::GetNetwork()->send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 		}
@@ -204,7 +208,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 	}
 	else if (Key == EKeys::Two)
@@ -216,7 +220,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 	}
 	else if (Key == EKeys::MouseScrollDown)
@@ -228,7 +232,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 	}
 	else if (Key == EKeys::MouseScrollUp)
@@ -240,7 +244,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(SelectedHotKeySlotNum);
+			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 	}
 }
@@ -336,9 +340,10 @@ void AMyCharacter::Attack()
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-			if (c_id == Network::GetNetwork()->mId) {
-				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(SelectedHotKeySlotNum, 1);
+			//if (c_id == Network::GetNetwork()->mId) 
+			{
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			bAttacking = true;
 
@@ -377,7 +382,7 @@ void AMyCharacter::Throww()
 	CameraRotate.Pitch += 18;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	bomb->BombOwner = this;
@@ -412,15 +417,16 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 
 void AMyCharacter::GetFruits()
 {
+	Super::GetFruits();
 	if (OverlapType)
 	{
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_tree_packet(OverlapInteractId);
+		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
 		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 	}
 	else{
 		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_punnet_packet(OverlapInteractId);
+		Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
 		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 	}
 }
@@ -439,7 +445,7 @@ void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimit
 		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet();
+			Network::GetNetwork()->send_hitmyself_packet(s_socket);
 			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
 		}
 	}
@@ -474,10 +480,74 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet();
+			Network::GetNetwork()->send_hitmyself_packet(s_socket);
 			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
 		}
 	}
 
 	return Damage;
+}
+
+
+
+
+
+
+bool AMyCharacter::ConnServer()
+{
+	Super::ConnServer();
+	s_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	ZeroMemory(&server_addr, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+
+	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
+	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		//error_display(err_num);
+		//system("pause");
+		UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//exit(0);
+		closesocket(s_socket);
+		return false;
+	}
+
+	recv_expover.setId(static_cast<unsigned char>(overID));
+
+	DWORD recv_flag = 0;
+	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			return false;
+		}
+	}
+	return true;
+}
+
+void AMyCharacter::recvPacket()
+{
+	Super::recvPacket();
+	DWORD recv_flag = 0;
+	ZeroMemory(&recv_expover.getWsaOver(), sizeof(recv_expover.getWsaOver()));
+
+	recv_expover.getWsaBuf().buf = reinterpret_cast<char*>(recv_expover.getBuf() + _prev_size);
+	recv_expover.getWsaBuf().len = BUFSIZE - _prev_size;
+
+	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Network.h"
+#include "BaseCharacter.h"
 #include <memory>
 #include "../../../Protocol/protocol.h"
 #include "GameFramework/Character.h"
@@ -12,7 +13,7 @@
 
 
 UCLASS()
-class FRUITSPANGPANG_API AMyCharacter : public ACharacter, public std::enable_shared_from_this<AMyCharacter>
+class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -48,8 +49,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
+public:
+	//related Network
+	bool s_connected;	//server_connected;
+	virtual bool ConnServer() override;	
+	virtual void recvPacket() override;
 
-	// -- interact
+public:
+	// related interact
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 		bool bInteractDown;
 
@@ -57,18 +64,7 @@ public:
 
 	void InteractUp();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		bool OverlapInteract;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		int OverlapInteractId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
-		bool OverlapType;	//true == Tree , false == Punnet
-
-	UFUNCTION(BlueprintCallable)
-	void GetFruits();
-
-	// -- interact
-
+	virtual void GetFruits() override;
 
 protected:
 	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
@@ -80,7 +76,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SendHitPacket();
 
-	short hp;
+	//short hp;
 	// -- hit event
 
 
@@ -98,10 +94,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-		class AInventory* mInventory;
 
-	int c_id;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -125,8 +118,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AnyKeyPressed(FKey Key);
 
-	int SelectedHotKeySlotNum;
-	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
