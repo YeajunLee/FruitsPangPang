@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Network.h"
+#include "BaseCharacter.h"
 #include <memory>
 #include "../../../Protocol/protocol.h"
 #include "GameFramework/Character.h"
@@ -12,7 +13,7 @@
 
 
 UCLASS()
-class FRUITSPANGPANG_API AMyCharacter : public ACharacter, public std::enable_shared_from_this<AMyCharacter>
+class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -48,7 +49,21 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
+public:
+	virtual bool ConnServer() override;
+	//const char* SERVER_ADDR = "127.0.0.1";
+	//const short SERVER_PORT = 4000;
+	//SOCKET s_socket;
+	//SOCKADDR_IN server_addr;
+	//WSA_OVER_EX recv_expover;
+	//int		_prev_size;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	//	int c_id; //received id from server
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+	//	int overID;	//overlapped I/O use this
+	virtual void recvPacket() override;
 
+public:
 	// -- interact
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 		bool bInteractDown;
@@ -57,15 +72,14 @@ public:
 
 	void InteractUp();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		bool OverlapInteract;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
-		int OverlapInteractId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
-		bool OverlapType;	//true == Tree , false == Punnet
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+	//	bool OverlapInteract;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
+	//	int OverlapInteractId;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
+	//	bool OverlapType;	//true == Tree , false == Punnet
 
-	UFUNCTION(BlueprintCallable)
-	void GetFruits();
+	virtual void GetFruits() override;
 
 	// -- interact
 
@@ -80,7 +94,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SendHitPacket();
 
-	short hp;
+	//short hp;
 	// -- hit event
 
 
@@ -98,10 +112,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-		class AInventory* mInventory;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	//	class AInventory* mInventory;
 
-	int c_id;
+	//int c_id;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -125,8 +139,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AnyKeyPressed(FKey Key);
 
-	int SelectedHotKeySlotNum;
-	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
+	//int SelectedHotKeySlotNum;
+	//int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

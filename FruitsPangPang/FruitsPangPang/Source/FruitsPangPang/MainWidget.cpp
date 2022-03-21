@@ -4,6 +4,7 @@
 #include "MainWidget.h"
 #include "Components/ProgressBar.h"
 #include "MyCharacter.h"
+#include "BaseCharacter.h"
 #include "Network.h"
 #include "RespawnWindowWidget.h"
 #include "Components/HorizontalBox.h"
@@ -31,7 +32,7 @@ void UMainWidget::NativeDestruct()
 
 void UMainWidget::UpdateHpBar()
 {
-	HPBar->SetPercent(static_cast<float>(mCharacter->hp) / static_cast<float>(PLAYER_HP));
+	HPBar->SetPercent(static_cast<float>(mOwnerCharacter->hp) / static_cast<float>(PLAYER_HP));
 }
 
 void UMainWidget::ShowRespawnWidget()

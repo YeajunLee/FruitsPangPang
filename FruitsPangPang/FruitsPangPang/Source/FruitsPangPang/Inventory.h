@@ -44,7 +44,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn = "true"))
-		class AMyCharacter* mCharacter;
+		class ABaseCharacter* mOwnerCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
 		TArray<FInventorySlot> mSlots;

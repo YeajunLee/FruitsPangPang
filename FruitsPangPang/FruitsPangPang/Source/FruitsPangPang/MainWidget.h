@@ -34,7 +34,7 @@ public:
 
 	class AInventory* mInventory;
 
-	class AMyCharacter* mCharacter;
+	class ABaseCharacter* mOwnerCharacter;
 	void UpdateHpBar();
 	void ShowRespawnWidget();
 	void HideRespawnWidget();
