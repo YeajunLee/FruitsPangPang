@@ -3,6 +3,7 @@
 
 #include "Projectile.h"
 #include "MyCharacter.h"
+#include "BaseCharacter.h"
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 
@@ -41,8 +42,9 @@ void AProjectile::durianPacket(const FVector& pos)
 	{
 		if (BombOwner->GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_pos_packet(pos.X, pos.Y, pos.Z, POS_TYPE_DURIAN);
+			Network::GetNetwork()->send_pos_packet(BombOwner->s_socket,pos.X, pos.Y, pos.Z, POS_TYPE_DURIAN);
 			//send packet
 		}
+		//Ai전용 패킷이 없음.
 	}
 }

@@ -27,7 +27,7 @@ public:
 		void durianPacket(const FVector& pos);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-		class AMyCharacter* BombOwner;
+		class ABaseCharacter* BombOwner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		int _fType;

@@ -19,6 +19,7 @@ public:
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
 
+	class ABaseCharacter* mOwnerCharacter;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button0_0;
 	UPROPERTY(meta = (BindWidget))

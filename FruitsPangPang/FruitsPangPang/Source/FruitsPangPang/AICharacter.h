@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "Network.h"
+#include "BaseCharacter.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AICharacter.generated.h"
 
 UCLASS()
-class FRUITSPANGPANG_API AAICharacter : public ACharacter
+class FRUITSPANGPANG_API AAICharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -22,7 +24,16 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
+public:
+	//related interact
+	virtual void GetFruits() override;
+
+public:
+	//related network
+	virtual bool ConnServer() override;
+	virtual void recvPacket() override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

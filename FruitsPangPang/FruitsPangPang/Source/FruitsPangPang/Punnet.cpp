@@ -4,6 +4,7 @@
 #include "Punnet.h"
 #include "Fruit.h"
 #include "MyCharacter.h"
+#include "BaseCharacter.h"
 #include "Inventory.h"
 
 APunnet::APunnet()
@@ -18,7 +19,7 @@ void APunnet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
     if (OtherActor)
     {
-        AMyCharacter* player = Cast<AMyCharacter>(OtherActor);
+        ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
         if (player)
         {
             player->OverlapInteract = true;
@@ -34,7 +35,7 @@ void APunnet::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
     if (OtherActor)
     {
-        AMyCharacter* player = Cast<AMyCharacter>(OtherActor);
+        ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
         if (player)
         {
             player->OverlapInteract = false;
