@@ -61,6 +61,17 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
+	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
+	GreenOnionComponent->SetupAttachment(GetMesh());
+	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
+	
+	if (GreenOnionAsset.Succeeded())
+		GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
+
+	GreenOnionComponent->SetHiddenInGame(true, false);
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -132,7 +143,8 @@ void AMyCharacter::BeginPlay()
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
 		Network::GetNetwork()->WorldCharacterCnt++;
 	}
-	
+
+
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -247,6 +259,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
+		if (SelectedHotKeySlotNum == 2)
+			GreenOnionComponent->SetHiddenInGame(false, false);
+		else
+			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
@@ -259,6 +275,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
+		if (SelectedHotKeySlotNum == 2)
+			GreenOnionComponent->SetHiddenInGame(false, false);
+		else
+			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 }
 
@@ -358,7 +378,8 @@ void AMyCharacter::Attack()
 			if(SavedHotKeyItemCode != 7 )
 				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 
-			if (c_id == Network::GetNetwork()->mId) {
+			//if (c_id == Network::GetNetwork()->mId) 
+			{
 				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
 				Network::GetNetwork()->send_useitem_packet(SelectedHotKeySlotNum, 1);
 			}
@@ -367,16 +388,19 @@ void AMyCharacter::Attack()
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			UAnimInstance* AnimInstance1 = GetMesh()->GetAnimInstance();
 			
+			
 			if (SavedHotKeyItemCode == 7)
-			{
+			{		
+				//GreenOnionComponent->SetHiddenInGame(false, false);
+				
 				if (AnimInstance && SlashMontage)
 				{
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
 
-					
 				}
 			}
+			
 
 			else if (SavedHotKeyItemCode == 8)
 			{
@@ -388,7 +412,7 @@ void AMyCharacter::Attack()
 				}
 			}
 
-			 else if (AnimInstance && ThrowMontage)
+			else if (AnimInstance && ThrowMontage)
 			{
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);

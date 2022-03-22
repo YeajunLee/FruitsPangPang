@@ -19,7 +19,6 @@ class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
-	
 
 public:
 
@@ -33,14 +32,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
-	//UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"));
-	//GreenOnionComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
 	/** Base turn rates to scale turning functions for the camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
+
+	//대파 staticmesh component 추가
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		class UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"),true);
+	
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
@@ -137,5 +138,5 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-
+	
 };
