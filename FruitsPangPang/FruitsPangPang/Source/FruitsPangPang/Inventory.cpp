@@ -3,6 +3,7 @@
 
 #include "Inventory.h"
 #include "MainWidget.h"
+#include "BaseCharacter.h"
 #include "InventorySlotWidget.h"
 #include "Components/HorizontalBox.h"
 
@@ -30,7 +31,7 @@ void AInventory::BeginPlay()
 		{
 			//... Do Something
 			mMainWidget->mInventory = this;
-			mMainWidget->mCharacter = mCharacter;
+			mMainWidget->mOwnerCharacter = mOwnerCharacter;
 			for (int i = 0; i < 5; ++i)
 			{
 				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);

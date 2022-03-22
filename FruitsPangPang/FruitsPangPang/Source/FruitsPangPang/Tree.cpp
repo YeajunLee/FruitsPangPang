@@ -4,6 +4,7 @@
 #include "Tree.h"
 #include "Fruit.h"
 #include "MyCharacter.h"
+#include "BaseCharacter.h"
 #include "Inventory.h"
 ATree::ATree()
     : CanHarvest(true)
@@ -18,7 +19,7 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
     if (OtherActor)
     {
-        AMyCharacter* player = Cast<AMyCharacter>(OtherActor);
+        ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
         if (player)
         {
             player->OverlapInteract = true;
@@ -34,7 +35,7 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
     if (OtherActor)
     {
-        AMyCharacter* player = Cast<AMyCharacter>(OtherActor);
+        ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
         if (player)
         {
             player->OverlapInteract = false;

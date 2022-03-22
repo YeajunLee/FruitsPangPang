@@ -40,7 +40,7 @@ public:
 		int IndexOfHotKeySlot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
-		int ItemCode;
+		int ItemCode;	//0:None, 1:tomato, 2:kiwi, 3:apple, 4:subak, 5:pineapple, 6:pumpkin, 7:greenonion, 8:carrot, 9:durian, 10:nut, 11:banana, 12:heal
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
 		int MaxStackAmount;
