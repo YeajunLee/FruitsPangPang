@@ -250,6 +250,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::MouseScrollDown)
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
@@ -260,12 +261,22 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 		if (SelectedHotKeySlotNum == 2)
+		{
 			GreenOnionComponent->SetHiddenInGame(false, false);
+		
+			if (AnimInstance && PickSwordMontage)
+			{
+				AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
+
+			}
+		}
 		else
 			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
@@ -276,7 +287,16 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
 		if (SelectedHotKeySlotNum == 2)
+		{
+			
 			GreenOnionComponent->SetHiddenInGame(false, false);
+			if (AnimInstance && PickSwordMontage)
+			{
+				AnimInstance->Montage_Play(PickSwordMontage, 1.f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
+
+			}
+		}
 		else
 			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
@@ -386,12 +406,10 @@ void AMyCharacter::Attack()
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			UAnimInstance* AnimInstance1 = GetMesh()->GetAnimInstance();
 			
 			
 			if (SavedHotKeyItemCode == 7)
 			{		
-				//GreenOnionComponent->SetHiddenInGame(false, false);
 				
 				if (AnimInstance && SlashMontage)
 				{

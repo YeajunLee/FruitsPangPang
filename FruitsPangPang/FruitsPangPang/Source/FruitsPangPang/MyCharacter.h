@@ -108,6 +108,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* StabbingMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* PickSwordMontage;
 
 protected:
 	// Called when the game starts or when spawned
@@ -136,5 +138,4 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	
 };
