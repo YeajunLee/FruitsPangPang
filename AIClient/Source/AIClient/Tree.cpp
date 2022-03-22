@@ -26,6 +26,8 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
             player->OverlapInteract = true;
             player->OverlapType = true;
             player->OverlapInteractId = 0;
+
+            player->bIsUndertheTree = true;
         }
     }
 }
@@ -42,6 +44,8 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
             player->OverlapInteract = false;
             player->OverlapType = true;
             player->OverlapInteractId = 0;
+
+            player->bIsUndertheTree = false;
         }
     }
 }

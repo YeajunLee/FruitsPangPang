@@ -22,9 +22,9 @@ public:
 	static const FName PatrolPosKey;
 	static const FName TargetKey;
 
-	static const FName TreeKey;
+	static FName TreePosKey;
 
-	static const FName AmountKey;
+	static FName AmountKey;
 
 private:
 	UPROPERTY();

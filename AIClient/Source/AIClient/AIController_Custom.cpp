@@ -10,8 +10,8 @@ const FName AAIController_Custom::HomePosKey(TEXT("HomePos"));
 const FName AAIController_Custom::PatrolPosKey(TEXT("PatrolPos"));
 const FName AAIController_Custom::TargetKey(TEXT("Target"));
 
-const FName AAIController_Custom::TreeKey(TEXT("Tree"));
-const FName AAIController_Custom::AmountKey(TEXT("Amount"));
+FName AAIController_Custom::TreePosKey(TEXT("TreePos"));
+FName AAIController_Custom::AmountKey(TEXT("Amount"));
 
 AAIController_Custom::AAIController_Custom()
 {
