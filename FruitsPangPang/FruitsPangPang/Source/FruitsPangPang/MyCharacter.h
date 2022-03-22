@@ -2,7 +2,9 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
+#include "Components/StaticMeshComponent.h"
 #include "Network.h"
 #include "BaseCharacter.h"
 #include <memory>
@@ -16,6 +18,7 @@ UCLASS()
 class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
+
 
 public:
 
@@ -34,6 +37,11 @@ public:
 		float BaseTurnRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
+
+	//대파 staticmesh component 추가
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		class UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"),true);
+	
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
@@ -94,6 +102,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* SlashMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* StabbingMontage;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -121,4 +135,6 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	
 };

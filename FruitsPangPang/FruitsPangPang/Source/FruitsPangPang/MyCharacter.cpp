@@ -25,6 +25,8 @@
 #include "RespawnWidget.h"
 
 
+
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 	:s_connected(false)
@@ -59,6 +61,17 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
+	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
+	GreenOnionComponent->SetupAttachment(GetMesh());
+	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
+	
+	if (GreenOnionAsset.Succeeded())
+		GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
+
+	GreenOnionComponent->SetHiddenInGame(true, false);
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -94,19 +107,30 @@ void AMyCharacter::BeginPlay()
 
 		itemClass.ItemCode = 4;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = AInventory::ItemCodeToItemName(3);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(4);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
+		itemClass.ItemCode = 7; //대파 1개 생성
+		itemClass.IndexOfHotKeySlot = 2;
+		itemClass.Name = AInventory::ItemCodeToItemName(7);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		mInventory->UpdateInventorySlot(itemClass, 1);
 
-		itemClass.ItemCode = 9;	//두리안 30개 생성
+
+		itemClass.ItemCode = 10;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(5);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(5);
+		itemClass.Name = AInventory::ItemCodeToItemName(10);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(10);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		//overID = Network::GetNetwork()->getNewId();
-		//UE_LOG(LogTemp, Log, TEXT("Character :%d Genereate"), overID);
+		itemClass.ItemCode = 11; //바나나 1개 생성
+		itemClass.IndexOfHotKeySlot = 4;
+		itemClass.Name = AInventory::ItemCodeToItemName(11);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
+		mInventory->UpdateInventorySlot(itemClass, 1);
+
+		
 		Network::GetNetwork()->mMyCharacter = this;
 
 		//if (Network::GetNetwork()->init())
@@ -119,7 +143,8 @@ void AMyCharacter::BeginPlay()
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
 		Network::GetNetwork()->WorldCharacterCnt++;
 	}
-	
+
+
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -166,7 +191,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		}
 	}
 
-
+	
 
 }
 
@@ -234,6 +259,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
+		if (SelectedHotKeySlotNum == 2)
+			GreenOnionComponent->SetHiddenInGame(false, false);
+		else
+			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
@@ -246,6 +275,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
+		if (SelectedHotKeySlotNum == 2)
+			GreenOnionComponent->SetHiddenInGame(false, false);
+		else
+			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 }
 
@@ -331,6 +364,8 @@ void AMyCharacter::LMBUp()
 
 void AMyCharacter::Attack()
 {
+	
+	
 	if (!bAttacking)
 	{
 		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
@@ -339,7 +374,10 @@ void AMyCharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+
+			if(SavedHotKeyItemCode != 7 )
+				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
@@ -348,14 +386,41 @@ void AMyCharacter::Attack()
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			if (AnimInstance && ThrowMontage)
+			UAnimInstance* AnimInstance1 = GetMesh()->GetAnimInstance();
+			
+			
+			if (SavedHotKeyItemCode == 7)
+			{		
+				//GreenOnionComponent->SetHiddenInGame(false, false);
+				
+				if (AnimInstance && SlashMontage)
+				{
+					AnimInstance->Montage_Play(SlashMontage, 1.5f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
+
+				}
+			}
+			
+
+			else if (SavedHotKeyItemCode == 8)
+			{
+				if (AnimInstance && StabbingMontage)
+				{
+					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
+					//UGameplayStatics::PlaySoundAtLocation(this, TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/pa.pa'"), GetActorLocation());
+				}
+			}
+
+			else if (AnimInstance && ThrowMontage)
 			{
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 
 			}
-
+			
 		}
+		
 	}
 }
 
