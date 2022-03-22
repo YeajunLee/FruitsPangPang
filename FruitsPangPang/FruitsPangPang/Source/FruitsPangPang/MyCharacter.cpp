@@ -380,8 +380,8 @@ void AMyCharacter::Attack()
 
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
-				Network::GetNetwork()->send_anim_packet(Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(SelectedHotKeySlotNum, 1);
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			bAttacking = true;
 

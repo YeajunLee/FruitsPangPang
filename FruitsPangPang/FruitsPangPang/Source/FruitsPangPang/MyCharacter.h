@@ -108,8 +108,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* StabbingMontage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-		class AInventory* mInventory;
 
 protected:
 	// Called when the game starts or when spawned
