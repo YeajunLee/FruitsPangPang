@@ -50,6 +50,8 @@ void AAICharacter::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
 	Network::GetNetwork()->mAiCharacter[overID] = this;
 	//ConnServer();
+
+	bIsUndertheTree = false;
 }
 
 void AAICharacter::EndPlay(EEndPlayReason::Type Reason)

@@ -9,7 +9,7 @@
 
 UBTTaskNode_FindPatrolPos::UBTTaskNode_FindPatrolPos()
 {
-	NodeName = TEXT("Tomato_FindPatrolPos");
+	NodeName = TEXT("CPP_BTTFindPatrolPos");
 }
 
 EBTNodeResult::Type UBTTaskNode_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
