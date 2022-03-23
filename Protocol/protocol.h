@@ -6,10 +6,12 @@ const int WORLD_WIDTH = 8;
 const int BUFSIZE = 256;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 8;
+const int TREE_CNT = 3;
+const int PUNNET_CNT = 3;
 const int  TREEID_START = MAX_USER;
-const int  TREEID_END = TREEID_START + 3;
+const int  TREEID_END = TREEID_START + TREE_CNT;
 const int PUNNETID_START = TREEID_END;
-const int PUNNETID_END = PUNNETID_START + 3;
+const int PUNNETID_END = PUNNETID_START + PUNNET_CNT;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
 
@@ -114,7 +116,8 @@ struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
-	short	x, y;
+	char TreeFruits[TREE_CNT];
+	char PunnetFruits[PUNNET_CNT];
 };
 
 struct sc_packet_move {
