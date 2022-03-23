@@ -10,7 +10,7 @@
 
 UBTTaskNode_TurnToTarget::UBTTaskNode_TurnToTarget()
 {
-	NodeName = TEXT("Turn");
+	NodeName = TEXT("CPP_BTTTurn");
 }
 
 EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
