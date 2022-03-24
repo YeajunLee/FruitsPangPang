@@ -40,8 +40,10 @@ public:
 
 	//대파 staticmesh component 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"),true);
-	
+		class UStaticMeshComponent* GreenOnionComponent;
+	//당근 staticmesh component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		class UStaticMeshComponent* CarrotComponent;
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
@@ -95,6 +97,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void AttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void SwordAttackStart();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;

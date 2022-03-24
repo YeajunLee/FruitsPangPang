@@ -61,16 +61,28 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
+	//대파를 캐릭터에 부착
+	GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
 	GreenOnionComponent->SetupAttachment(GetMesh());
 	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	
 	if (GreenOnionAsset.Succeeded())
 		GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
 
 	GreenOnionComponent->SetHiddenInGame(true, false);
+
+	//당근을 캐릭터에 부착
+	CarrotComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<Carrot>"), true);
+	CarrotComponent->SetupAttachment(GetMesh());
+	CarrotComponent->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
+	if (CarrotAsset.Succeeded())
+		CarrotComponent->SetStaticMesh(CarrotAsset.Object);
+
+	CarrotComponent->SetHiddenInGame(true, false);
 	
+
+	// 추후에 당근이나 대파를 들고 있지 않는데 상대 캐릭터와 충돌했을 경우 상대의 체력이 깎이면 set collision enabled 를 해줘서 충돌되지 않게 하자
 	
 }
 
@@ -251,6 +263,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		//SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+
 		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
@@ -260,9 +274,12 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
-		if (SelectedHotKeySlotNum == 2)
+		if (SelectedHotKeySlotNum == 2 && mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			GreenOnionComponent->SetHiddenInGame(false, false);
+			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 7)
+				GreenOnionComponent->SetHiddenInGame(false, false);
+			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 8)
+				CarrotComponent->SetHiddenInGame(false, false);
 		
 			if (AnimInstance && PickSwordMontage)
 			{
@@ -272,7 +289,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 		}
 		else
+		{
 			GreenOnionComponent->SetHiddenInGame(true, false);
+			CarrotComponent->SetHiddenInGame(true, false);
+		}
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
@@ -286,19 +306,25 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 		}
-		if (SelectedHotKeySlotNum == 2)
+		if (SelectedHotKeySlotNum == 2 && mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			
-			GreenOnionComponent->SetHiddenInGame(false, false);
+			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 7)
+				GreenOnionComponent->SetHiddenInGame(false, false);
+			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 8)
+			    CarrotComponent->SetHiddenInGame(false, false);
+
 			if (AnimInstance && PickSwordMontage)
 			{
-				AnimInstance->Montage_Play(PickSwordMontage, 1.f);
+				AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
 
 			}
 		}
 		else
+		{
 			GreenOnionComponent->SetHiddenInGame(true, false);
+			CarrotComponent->SetHiddenInGame(true, false);
+		}
 	}
 }
 
@@ -395,8 +421,10 @@ void AMyCharacter::Attack()
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 
-			if(SavedHotKeyItemCode != 7 )
+			if(SavedHotKeyItemCode != 7 && SavedHotKeyItemCode != 8)
 				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+			//if (SavedHotKeyItemCode != 8)
+				//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
@@ -426,7 +454,7 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
-					//UGameplayStatics::PlaySoundAtLocation(this, TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/pa.pa'"), GetActorLocation());
+					
 				}
 			}
 
@@ -451,6 +479,10 @@ void AMyCharacter::AttackEnd()
 	}
 }
 
+void AMyCharacter::SwordAttackStart()
+{
+
+}
 
 void AMyCharacter::Jump()
 {
