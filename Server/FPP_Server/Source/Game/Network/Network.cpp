@@ -88,11 +88,21 @@ void send_login_ok_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_login_ok packet;
+	memset(&packet, 0, sizeof(sc_packet_login_ok));
+
+	for (int i = TREEID_START,tree = 0; i < TREEID_END; ++i,++tree)
+	{		
+		packet.TreeFruits[tree] = static_cast<char>(reinterpret_cast<Tree*>(objects[i])->_ftype);
+	}
+
+	for (int i = PUNNETID_START,punnet = 0; i < PUNNETID_END; ++i,++punnet)
+	{
+		packet.PunnetFruits[punnet] = static_cast<char>(reinterpret_cast<Punnet*>(objects[i])->_ftype);
+	}
+
 	packet.id = player_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_LOGIN_OK;
-	packet.x = player->x;
-	packet.y = player->y;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -461,8 +471,8 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
-
-		character->Hurt(10);
+		character->HurtBy(packet->fruitType);
+		//character->Hurt(10);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
 		break;
 	}

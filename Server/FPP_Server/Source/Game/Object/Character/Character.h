@@ -41,6 +41,7 @@ public:
 	std::atomic_int mActivationSlot;
 	void UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount);
 	void Die();
+	void HurtBy(const int& damageCauserType);
 	void Hurt(const int& damage);
 	void Heal(const int& amount);
 };

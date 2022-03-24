@@ -520,21 +520,6 @@ void AMyCharacter::SendHitPacket()
 
 }
 
-void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
-{
-	auto other = Cast<AProjectile>(Other);
-	
-	if (other != nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
-		if (GetController()->IsPlayerController())
-		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket);
-			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
-		}
-	}
-}
-
 float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -561,11 +546,11 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (other != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket);
-			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+			Network::GetNetwork()->send_hitmyself_packet(s_socket,other->_fType);
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 		}
 	}
 

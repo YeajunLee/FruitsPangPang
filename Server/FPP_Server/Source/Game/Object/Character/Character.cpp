@@ -88,6 +88,59 @@ void Character::Die()
 
 }
 
+void Character::HurtBy(const int& damageCauserType)
+{
+	switch (damageCauserType)
+	{
+
+	case static_cast<int>(FRUITTYPE::T_TOMATO) : {
+		Hurt(3);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_QUIUI) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_APPLE) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_WATERMELON) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_PINEAPPLE) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_PUMPKIN) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_CARROT) : {
+		Hurt(10);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_NUT) : {
+		Hurt(7);
+		break;
+	}
+	case static_cast<int>(FRUITTYPE::T_BANANA) : {
+		Hurt(10);
+		break;
+	}
+	default: {
+		cout << "HurtBy : Unknown Damage Type\n";
+		break;
+	}
+
+	}
+}
+
 void Character::Hurt(const int& damage)
 {
 	if (hp <= 0) return;	//0일때 다치면 안됨.
