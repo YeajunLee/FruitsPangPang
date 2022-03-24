@@ -8,7 +8,7 @@
 #include "Inventory.h"
 
 APunnet::APunnet()
-    : CanHarvest(true)
+    : CanHarvest(false)
 {
 }
 

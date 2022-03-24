@@ -7,7 +7,7 @@
 #include "BaseCharacter.h"
 #include "Inventory.h"
 ATree::ATree()
-    : CanHarvest(true)
+    : CanHarvest(false)
 {
 }
 
