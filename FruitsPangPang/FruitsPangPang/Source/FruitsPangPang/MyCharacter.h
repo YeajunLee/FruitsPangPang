@@ -40,7 +40,7 @@ public:
 
 	//대파 staticmesh component 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"),true);
+		class UStaticMeshComponent* GreenOnionComponent;
 	
 
 	//speed에 따른 애니메이션을 위해
@@ -75,8 +75,6 @@ public:
 	virtual void GetFruits() override;
 
 protected:
-	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
-		FVector HitLocation, FVector HitNormal,FVector NormalImpulse, const FHitResult& Hit) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
