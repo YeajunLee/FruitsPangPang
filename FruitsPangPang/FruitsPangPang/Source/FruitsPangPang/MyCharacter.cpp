@@ -61,7 +61,7 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	//대파를 캐릭터에 부착
+	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
 	GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
 	GreenOnionComponent->SetupAttachment(GetMesh());
 	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
@@ -551,21 +551,6 @@ void AMyCharacter::SendHitPacket()
 
 }
 
-void AMyCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
-{
-	auto other = Cast<AProjectile>(Other);
-	
-	if (other != nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
-		if (GetController()->IsPlayerController())
-		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket);
-			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
-		}
-	}
-}
-
 float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -592,11 +577,11 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (other != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Not Me Hit"));
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
 			Network::GetNetwork()->send_hitmyself_packet(s_socket);
-			UE_LOG(LogTemp, Log, TEXT("NotifyHit"));
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 		}
 	}
 

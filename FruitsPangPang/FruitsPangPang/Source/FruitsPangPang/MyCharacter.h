@@ -77,8 +77,6 @@ public:
 	virtual void GetFruits() override;
 
 protected:
-	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
-		FVector HitLocation, FVector HitNormal,FVector NormalImpulse, const FHitResult& Hit) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 

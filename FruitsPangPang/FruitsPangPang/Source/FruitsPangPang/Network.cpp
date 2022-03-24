@@ -28,6 +28,10 @@ Network::Network()
 	, mGeneratedID(0)
 	,isInit(false)
 {
+	for (auto& p : mTree)
+		p = nullptr;
+	for (auto& p : mPunnet)
+		p = nullptr;
 	for (auto& p : mAiCharacter)
 		p = nullptr;
 	for (int i = 0; i < MAX_USER; ++i)
@@ -255,7 +259,22 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mMyCharacter->c_id = packet->id;
 		//mId = packet->id;
+		for (int i = 0; i < TREE_CNT; ++i)
+		{
+			if (nullptr != mTree[i])
+			{
+				mTree[i]->GenerateFruit(packet->TreeFruits[i]);
+			}
+		}
+		for (int i = 0; i < PUNNET_CNT; ++i)
+		{
+			if (nullptr != mPunnet[i])
+			{
+				mPunnet[i]->GenerateFruit(packet->PunnetFruits[i]);
+			}
+		}
 		mMyCharacter->mInventory->ClearInventory();
+		
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -496,6 +515,20 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		PacketOwner->c_id = packet->id;
+		for (int i = 0; i < TREE_CNT; ++i)
+		{
+			if (nullptr != mTree[i])
+			{
+				mTree[i]->GenerateFruit(packet->TreeFruits[i]);
+			}
+		}
+		for (int i = 0; i < PUNNET_CNT; ++i)
+		{
+			if (nullptr != mPunnet[i])
+			{
+				mPunnet[i]->GenerateFruit(packet->PunnetFruits[i]);
+			}
+		}
 		break;
 	}
 	case SC_PACKET_MOVE: {

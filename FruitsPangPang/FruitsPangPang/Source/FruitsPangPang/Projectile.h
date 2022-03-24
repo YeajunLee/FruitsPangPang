@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void durianPacket(const FVector& pos);
 
+	UFUNCTION(BlueprintCallable)
+		void ApplyDamageCPP(AActor* otherActor);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class ABaseCharacter* BombOwner;
 

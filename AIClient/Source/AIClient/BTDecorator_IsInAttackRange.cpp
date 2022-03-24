@@ -9,7 +9,7 @@
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
 {
-	NodeName = TEXT("CanAttack");
+	NodeName = TEXT("CPP_BTTCanAttack");
 }
 
 

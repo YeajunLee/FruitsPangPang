@@ -6,6 +6,7 @@
 #include "BaseCharacter.h"
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -46,5 +47,19 @@ void AProjectile::durianPacket(const FVector& pos)
 			//send packet
 		}
 		//Ai전용 패킷이 없음.
+	}
+}
+
+void AProjectile::ApplyDamageCPP(AActor* otherActor)
+{
+
+	auto p = Cast<AMyCharacter>(otherActor);
+
+	//UE_LOG(LogTemp, Log, TEXT("ApplyDamage : in apply damage"));
+	if (nullptr != p)
+	{
+		UE_LOG(LogTemp, Log, TEXT("ApplyDamage : ready damage"));
+		//p->TakeDamage(0, FDamageEvent(), nullptr, this);
+		UGameplayStatics::ApplyDamage(otherActor, 1, GetInstigatorController(), this, NULL);
 	}
 }

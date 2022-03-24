@@ -38,7 +38,6 @@ public:
 		int OverlapInteractId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 		bool OverlapType;	//true == Tree , false == Punnet
-
 public:
 	//related network
 
@@ -75,8 +74,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "tree")
 	class ATree* mTree;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Farming")
-	//bool bIsUndertheTree;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
+	bool bIsUndertheTree;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	bool bAttacking;
