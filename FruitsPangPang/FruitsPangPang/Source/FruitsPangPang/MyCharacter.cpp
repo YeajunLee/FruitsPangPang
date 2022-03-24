@@ -549,7 +549,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket);
+			Network::GetNetwork()->send_hitmyself_packet(s_socket,other->_fType);
 			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 		}
 	}

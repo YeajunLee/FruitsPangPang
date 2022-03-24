@@ -471,7 +471,8 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << client_id << "의 이전 hp : " << character->hp << endl;
-		character->Hurt(10);
+		character->HurtBy(packet->fruitType);
+		//character->Hurt(10);
 		cout << client_id << "의 이후 hp : " << character->hp << endl;
 		break;
 	}
