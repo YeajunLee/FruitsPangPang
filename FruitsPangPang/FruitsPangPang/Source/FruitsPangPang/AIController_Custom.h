@@ -4,23 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "AIControllerCustom.generated.h"
+#include "AIController_Custom.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FRUITSPANGPANG_API AAIControllerCustom : public AAIController
+class FRUITSPANGPANG_API AAIController_Custom : public AAIController
 {
 	GENERATED_BODY()
-	
+
 public:
-	AAIControllerCustom();
+	AAIController_Custom();
 	virtual void OnPossess(APawn* InPawn) override;
 
 	static const FName HomePosKey;
 	static const FName PatrolPosKey;
 	static const FName TargetKey;
+
+	static FName TreePosKey;
+
+	static FName AmountKey;
 
 private:
 	UPROPERTY();
@@ -28,6 +32,5 @@ private:
 
 	UPROPERTY();
 	class UBlackboardData* BBAsset;
-
 	
 };

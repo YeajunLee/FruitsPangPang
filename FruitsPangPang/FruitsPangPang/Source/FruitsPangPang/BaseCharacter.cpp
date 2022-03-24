@@ -26,6 +26,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Log, TEXT("BaseCharacter"));
+
+	bIsUndertheTree = false;
 }
 
 // Called every frame
