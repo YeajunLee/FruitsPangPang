@@ -2,23 +2,23 @@
 
 
 #include "AICharacter.h"
-#include "AIControllerCustom.h"
+#include "AIController_Custom.h"
 #include "Inventory.h"
 #include "Projectile.h"
 #include "Tree.h"
 #include "Punnet.h"
 #include "Network.h"
+#include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 AAICharacter::AAICharacter()
+	:_prev_size(0)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	AIControllerClass = AAIControllerCustom::StaticClass();
+	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
-
-
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +49,8 @@ void AAICharacter::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
 	Network::GetNetwork()->mAiCharacter[overID] = this;
 	//ConnServer();
+
+	bIsUndertheTree = false;
 }
 
 void AAICharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -74,6 +76,75 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 
 
+void AAICharacter::Attack()
+{
+	/*if (!bAttacking)
+	{
+		bAttacking = true;
+	}*/
+
+	//Play Throw Montage	
+	if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
+	{
+		SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+		mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+		//if (c_id == Network::GetNetwork()->mId) 
+		{
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+			Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+		}
+		AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && ThrowMontage_AI)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
+			UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
+
+			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
+		}
+
+		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
+		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+	}
+}
+
+//void AAICharacter::PostInitializeComponents()
+//{
+//	Super::PostInitializeComponents();
+//
+//}
+
+//void AAICharacter::AttackEnd()
+//{
+//	bAttacking = false;
+//	Attack();
+//}
+
+void AAICharacter::Throw_AI()
+{
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+	
+	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+
+	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
+	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
+	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
+
+	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	//bomb->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "BombSocket");
+	
+	
+	//bomb->BombOwner = this;
+	//bomb->ProjectileMovementComponent->Activate();
+
+
+}
+
+void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	OnAttackEnd.Broadcast();
+}
 
 void AAICharacter::GetFruits()
 {
@@ -90,6 +161,8 @@ void AAICharacter::GetFruits()
 		//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 	}
 }
+
+
 
 bool AAICharacter::ConnServer()
 {

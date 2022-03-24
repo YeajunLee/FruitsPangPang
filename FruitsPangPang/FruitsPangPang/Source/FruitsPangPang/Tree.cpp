@@ -6,6 +6,8 @@
 #include "MyCharacter.h"
 #include "BaseCharacter.h"
 #include "Inventory.h"
+#include "AICharacter.h"
+
 ATree::ATree()
     : CanHarvest(true)
 {
@@ -25,6 +27,8 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
             player->OverlapInteract = true;
             player->OverlapType = true;
             player->OverlapInteractId = TreeId;
+
+            player->bIsUndertheTree = true;
         }
     }
 }
@@ -41,6 +45,8 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
             player->OverlapInteract = false;
             player->OverlapType = true;
             player->OverlapInteractId = 0;
+
+            player->bIsUndertheTree = false;
         }
     }
 }

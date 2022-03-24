@@ -40,7 +40,7 @@ public:
 
 	//대파 staticmesh component 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"),true);
+		class UStaticMeshComponent* GreenOnionComponent; 
 	
 
 	//speed에 따른 애니메이션을 위해

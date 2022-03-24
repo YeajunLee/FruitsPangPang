@@ -62,6 +62,7 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
+	GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
 	GreenOnionComponent->SetupAttachment(GetMesh());
 	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));

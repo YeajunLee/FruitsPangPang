@@ -52,6 +52,12 @@ public:
 		int OverlapInteractId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 		bool OverlapType;	//true == Tree , false == Punnet
+
+public:
+	// ai <-> tree collision check
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
+		bool bIsUndertheTree;
+
 public:
 	virtual bool ConnServer();
 	const char* SERVER_ADDR = "127.0.0.1";
