@@ -8,7 +8,7 @@
 #include "Inventory.h"
 
 APunnet::APunnet()
-    : CanHarvest(true)
+    : CanHarvest(false)
 {
 }
 
@@ -51,34 +51,25 @@ void APunnet::GenerateFruit(int _FruitType)
 {
     UWorld* world = GetWorld();
     if (world)
-    {
-        switch (_FruitType)
-        {
-        case 0:
-        {
-
-
-            break;
-        }
-        }
-        // 일단 임시로 모든 과일 다 토마토로 작업.
-        FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
-        UE_LOG(LogTemp, Log, TEXT("Punnet Generate Fruit Type : %d"), _FruitType);
-        //FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
-        UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        FRotator rotator;
-        FVector  SpawnLocation = GetActorLocation();
-        SpawnLocation.Z += 10.0f;
-        mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        SpawnLocation.X -= 20.0f;
-        mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        SpawnLocation.X += 20.0f;
-        mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-
-        CanHarvest = true;
-    }
+	{
+		if (false == CanHarvest)
+		{
+			FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
+			UE_LOG(LogTemp, Log, TEXT("Punnet Generate Fruit Type : %d"), _FruitType);
+			UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			FRotator rotator;
+			FVector  SpawnLocation = GetActorLocation();
+			SpawnLocation.Z += 10.0f;
+			mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+			SpawnLocation.X -= 20.0f;
+			mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+			SpawnLocation.X += 20.0f;
+			mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+		}
+		CanHarvest = true;
+	}
 }
 
 
@@ -103,26 +94,7 @@ void APunnet::HarvestFruit()
 void APunnet::BeginPlay()
 {
     Super::BeginPlay();
-    {
-        Network::GetNetwork()->mPunnet[PunnetId] = this;
-
-        UWorld* world = GetWorld();
-        if (world)
-        {
-            FName path = TEXT("Blueprint'/Game/Objects/Fruit/FallinFruit_BP.FallinFruit_BP_C'");
-            UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-            FActorSpawnParameters SpawnParams;
-            SpawnParams.Owner = this;
-            FRotator rotator;
-            FVector  SpawnLocation = GetActorLocation();
-            SpawnLocation.Z += 10.0f;
-            mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            SpawnLocation.X -= 20.0f;
-            mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            SpawnLocation.X += 20.0f;
-            mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-        }
-    }
+    Network::GetNetwork()->mPunnet[PunnetId] = this;    
 }
 
 void APunnet::EndPlay(EEndPlayReason::Type Reason)
