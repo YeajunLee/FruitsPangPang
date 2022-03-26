@@ -61,25 +61,34 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
-	GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
+	GreenOnionComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("GreenOnion"),true);
 	GreenOnionComponent->SetupAttachment(GetMesh());
 	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	if (GreenOnionAsset.Succeeded())
-		GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
+	
+	
+	
+	//GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
 
-	GreenOnionComponent->SetHiddenInGame(true, false);
+	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
+	//GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
+	//GreenOnionComponent->SetupAttachment(GetMesh());
+	//GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
+	//if (GreenOnionAsset.Succeeded())
+		//GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
 
-	//당근을 캐릭터에 부착
-	CarrotComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<Carrot>"), true);
+	//GreenOnionComponent->SetHiddenInGame(true, false);
+
+	////당근을 캐릭터에 부착
+	CarrotComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Carrot"), true);
 	CarrotComponent->SetupAttachment(GetMesh());
 	CarrotComponent->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
-	if (CarrotAsset.Succeeded())
-		CarrotComponent->SetStaticMesh(CarrotAsset.Object);
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
+	//if (CarrotAsset.Succeeded())
+	//	CarrotComponent->SetStaticMesh(CarrotAsset.Object);
 
-	CarrotComponent->SetHiddenInGame(true, false);
+	//CarrotComponent->SetHiddenInGame(true, false);
+	
 	
 
 	// 추후에 당근이나 대파를 들고 있지 않는데 상대 캐릭터와 충돌했을 경우 상대의 체력이 깎이면 set collision enabled 를 해줘서 충돌되지 않게 하자
@@ -89,6 +98,8 @@ AMyCharacter::AMyCharacter()
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
+	GreenOnionComponent->SetHiddenInGame(true, false);
+
 	Super::BeginPlay();
 	if (GetController()->IsPlayerController())
 	{
@@ -291,7 +302,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		else
 		{
 			GreenOnionComponent->SetHiddenInGame(true, false);
-			CarrotComponent->SetHiddenInGame(true, false);
+		CarrotComponent->SetHiddenInGame(true, false);
 		}
 	}
 	else if (Key == EKeys::MouseScrollUp)

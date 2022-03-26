@@ -4,7 +4,7 @@
 
 
 #include "CoreMinimal.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/ChildActorComponent.h"
 #include "Network.h"
 #include "BaseCharacter.h"
 #include <memory>
@@ -14,9 +14,11 @@
 
 
 
+
 UCLASS()
 class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
+
 	GENERATED_BODY()
 
 
@@ -38,12 +40,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 
+	
 	//대파 staticmesh component 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent;
-	//당근 staticmesh component
+		class UChildActorComponent* GreenOnionComponent;
+	////당근 staticmesh component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* CarrotComponent;
+		class UChildActorComponent* CarrotComponent;
+
+
+	
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
@@ -139,5 +145,6 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
 
 };
