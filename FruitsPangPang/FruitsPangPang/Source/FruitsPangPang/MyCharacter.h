@@ -96,18 +96,23 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* SlashMontage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* AnimSlashMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-		class UAnimMontage* StabbingMontage;
+		class UAnimMontage* StabbingMontage;	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* AnimStabbingMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* PickSwordMontage;
+	void PickSwordAnimation();
+	void DropSwordAnimation();
 
 protected:
 	// Called when the game starts or when spawned
@@ -131,7 +136,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AnyKeyPressed(FKey Key);
-
+	void ChangeSelectedHotKey(int WannaChange);
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
