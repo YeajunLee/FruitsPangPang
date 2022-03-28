@@ -23,6 +23,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
+#include "ActorGreenOnion.h"
 
 
 
@@ -64,32 +65,12 @@ AMyCharacter::AMyCharacter()
 	GreenOnionComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("GreenOnion"),true);
 	GreenOnionComponent->SetupAttachment(GetMesh());
 	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	
-	
-	
-	//GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-
-	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
-	//GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
-	//GreenOnionComponent->SetupAttachment(GetMesh());
-	//GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	//if (GreenOnionAsset.Succeeded())
-		//GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
-
-	//GreenOnionComponent->SetHiddenInGame(true, false);
 
 	////당근을 캐릭터에 부착
 	CarrotComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Carrot"), true);
 	CarrotComponent->SetupAttachment(GetMesh());
 	CarrotComponent->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
-	//if (CarrotAsset.Succeeded())
-	//	CarrotComponent->SetStaticMesh(CarrotAsset.Object);
 
-	//CarrotComponent->SetHiddenInGame(true, false);
-	
-	
 
 	// 추후에 당근이나 대파를 들고 있지 않는데 상대 캐릭터와 충돌했을 경우 상대의 체력이 깎이면 set collision enabled 를 해줘서 충돌되지 않게 하자
 	
@@ -99,6 +80,7 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	GreenOnionComponent->SetHiddenInGame(true, false);
+	CarrotComponent->SetHiddenInGame(true, false);
 
 	Super::BeginPlay();
 	if (GetController()->IsPlayerController())
@@ -134,10 +116,10 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 7; //대파 1개 생성
+		itemClass.ItemCode = 8; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(7);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		itemClass.Name = AInventory::ItemCodeToItemName(8);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(8);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
@@ -488,11 +470,6 @@ void AMyCharacter::AttackEnd()
 	{
 		Attack();
 	}
-}
-
-void AMyCharacter::SwordAttackStart()
-{
-
 }
 
 void AMyCharacter::Jump()

@@ -101,8 +101,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void AttackEnd();
-	UFUNCTION(BlueprintCallable)
-		void SwordAttackStart();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;

@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ActorGreenOnion.h"
-
+#include "MyCharacter.h"
 // Sets default values
 AActorGreenOnion::AActorGreenOnion()
 {
@@ -40,7 +39,6 @@ void AActorGreenOnion::Tick(float DeltaTime)
 void AActorGreenOnion::AttackStart()
 {
 	capsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("hello"));
 }
 
 void AActorGreenOnion::AttackEnd()
@@ -54,7 +52,9 @@ void AActorGreenOnion::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 	{
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+			auto p = Cast<AMyCharacter>(OtherActor);
+			if(nullptr != p)
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
 		}
 	}
 }
@@ -62,11 +62,10 @@ void AActorGreenOnion::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 void AActorGreenOnion::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
-	}
-	
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+		}
 }
 
 

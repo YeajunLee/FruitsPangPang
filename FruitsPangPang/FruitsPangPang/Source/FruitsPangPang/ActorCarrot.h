@@ -6,18 +6,15 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Actor.h"
-#include "ActorGreenOnion.generated.h"
-
+#include "ActorCarrot.generated.h"
 
 UCLASS()
-class FRUITSPANGPANG_API AActorGreenOnion : public AActor
+class FRUITSPANGPANG_API AActorCarrot : public AActor
 {
 
 	GENERATED_BODY()
 
-
 public:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class UStaticMeshComponent* staticMeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -32,10 +29,10 @@ public:
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	
 public:	
 	// Sets default values for this actor's properties
-	AActorGreenOnion();
+	AActorCarrot();
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,7 +42,4 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public:
-
-	
 };
