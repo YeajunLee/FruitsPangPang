@@ -55,13 +55,13 @@ private:
 public:
 	enum class AnimType
 	{
-		Throw
+		Throw,PickSword,DropSword,Slash,Stab
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
 	class AMyCharacter* mOtherCharacter[MAX_USER];
-	class ATree* mTree[10];
-	class APunnet* mPunnet[10];
+	class ATree* mTree[TREE_CNT];
+	class APunnet* mPunnet[PUNNET_CNT];
 	int WorldCharacterCnt;
 	static std::shared_ptr<class Network> GetNetwork();
 	int mGeneratedID;

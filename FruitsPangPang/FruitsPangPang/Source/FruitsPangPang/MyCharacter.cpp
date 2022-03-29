@@ -227,31 +227,50 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
+{
+	int tmp = SelectedHotKeySlotNum;
+	SelectedHotKeySlotNum = WannaChange;
+	if (tmp != SelectedHotKeySlotNum)
+	{
+		mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+		mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+		Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+	}
+}
+
 void AMyCharacter::AnyKeyPressed(FKey Key)
 {
 	if (Key == EKeys::One)
 	{
 		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
-		int tmp = SelectedHotKeySlotNum;
-		SelectedHotKeySlotNum = 0;
-		if (tmp != SelectedHotKeySlotNum)
-		{
-			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
+		DropSwordAnimation();
+		ChangeSelectedHotKey(0);		
 	}
 	else if (Key == EKeys::Two)
 	{
 		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
-		int tmp = SelectedHotKeySlotNum;
-		SelectedHotKeySlotNum = 1;
-		if (tmp != SelectedHotKeySlotNum)
-		{
-			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
+		DropSwordAnimation();
+		ChangeSelectedHotKey(1);
+	}
+	else if (Key == EKeys::Three)
+	{
+		UE_LOG(LogTemp, Log, TEXT("three Hitted"));
+		ChangeSelectedHotKey(2);
+		if (mInventory->IsSlotValid(SelectedHotKeySlotNum))
+			PickSwordAnimation();	
+	}
+	else if (Key == EKeys::Four)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
+		DropSwordAnimation();
+		ChangeSelectedHotKey(3);
+	}
+	else if (Key == EKeys::Five)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Five Hitted"));
+		DropSwordAnimation();
+		ChangeSelectedHotKey(4);
 	}
 	else if (Key == EKeys::MouseScrollDown)
 	{
@@ -260,31 +279,17 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 
 		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
+		DropSwordAnimation();
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
 		if (tmp != SelectedHotKeySlotNum)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
-		if (SelectedHotKeySlotNum == 2 && mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
-		{
-			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 7)
-				GreenOnionComponent->SetHiddenInGame(false, false);
-			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 8)
-				CarrotComponent->SetHiddenInGame(false, false);
-		
-			if (AnimInstance && PickSwordMontage)
+			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(SelectedHotKeySlotNum))
 			{
-				AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-
+				PickSwordAnimation();
 			}
-		}
-		else
-		{
-			GreenOnionComponent->SetHiddenInGame(true, false);
-		CarrotComponent->SetHiddenInGame(true, false);
 		}
 	}
 	else if (Key == EKeys::MouseScrollUp)
@@ -292,31 +297,18 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
 		int tmp = SelectedHotKeySlotNum;
+		DropSwordAnimation();
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
 		if (tmp != SelectedHotKeySlotNum)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
-		if (SelectedHotKeySlotNum == 2 && mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
-		{
-			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 7)
-				GreenOnionComponent->SetHiddenInGame(false, false);
-			if (mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode == 8)
-			    CarrotComponent->SetHiddenInGame(false, false);
-
-			if (AnimInstance && PickSwordMontage)
+			//CarrotComponent->SetHiddenInGame(false, false);
+			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(2))
 			{
-				AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-
+				PickSwordAnimation();
 			}
-		}
-		else
-		{
-			GreenOnionComponent->SetHiddenInGame(true, false);
-			CarrotComponent->SetHiddenInGame(true, false);
 		}
 	}
 }
@@ -413,17 +405,6 @@ void AMyCharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-
-			if(SavedHotKeyItemCode != 7 && SavedHotKeyItemCode != 8)
-				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-			//if (SavedHotKeyItemCode != 8)
-				//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-
-			//if (c_id == Network::GetNetwork()->mId) 
-			{
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
-			}
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -436,11 +417,10 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
+					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
 
 				}
 			}
-			
-
 			else if (SavedHotKeyItemCode == 8)
 			{
 				if (AnimInstance && StabbingMontage)
@@ -450,12 +430,13 @@ void AMyCharacter::Attack()
 					
 				}
 			}
-
 			else if (AnimInstance && ThrowMontage)
 			{
+				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
-
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			
 		}
@@ -475,6 +456,27 @@ void AMyCharacter::AttackEnd()
 void AMyCharacter::Jump()
 {
 	Super::Jump();
+}
+
+void AMyCharacter::PickSwordAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && PickSwordMontage)
+	{
+		GreenOnionComponent->SetHiddenInGame(false, false);
+		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
+		Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword);
+
+	}
+}
+void AMyCharacter::DropSwordAnimation()
+{
+	if (2 != SelectedHotKeySlotNum) return;
+	if (!mInventory->IsSlotValid(2)) return;
+
+	GreenOnionComponent->SetHiddenInGame(true, false);
+	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
 void AMyCharacter::Throww()
@@ -575,10 +577,6 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	return Damage;
 }
-
-
-
-
 
 
 bool AMyCharacter::ConnServer()

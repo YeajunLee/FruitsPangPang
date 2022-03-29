@@ -328,10 +328,10 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_anim* packet = reinterpret_cast<cs_packet_anim*>(p);
 		cout << client_id << endl;
 
-		switch (packet->animtype)
-		{
-		case 0://Throw
-		{
+		//switch (packet->animtype)
+		//{
+		//case 0://Throw
+		//{
 			for (auto& other : objects) {
 				if (!other->isPlayer()) break;
 				if (other->_id == client_id) continue;
@@ -345,9 +345,9 @@ void process_packet(int client_id, unsigned char* p)
 				}
 				else character->state_lock.unlock();
 			}
-			break;
-		}
-		}
+		//break;
+		//}
+		//}
 		
 
 		break;
@@ -437,7 +437,11 @@ void process_packet(int client_id, unsigned char* p)
 		{
 			character->Heal(10);
 		}
-		else {
+		else if (punnet->_ftype == FRUITTYPE::T_GREENONION)
+		{
+			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
+			send_update_inventory_packet(client_id, 2);
+		}else{
 			character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
 			send_update_inventory_packet(client_id, 3);
 		}
