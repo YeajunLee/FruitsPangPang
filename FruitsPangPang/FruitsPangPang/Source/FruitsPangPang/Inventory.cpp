@@ -207,9 +207,9 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 6:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/PumpkinBomb.PumpkinBomb_C'");
 	case 7:
-		return TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/GreenOnionSword.GreenOnionSword_C'");
+		return TEXT("None");
 	case 8:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Carrot/CarrotSword.CarrotSword_C'");
+		return TEXT("None");
 	case 9:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb.DurianBomb_C'");
 	case 10:

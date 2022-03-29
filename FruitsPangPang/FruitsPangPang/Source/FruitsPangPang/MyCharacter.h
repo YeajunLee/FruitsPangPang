@@ -4,7 +4,7 @@
 
 
 #include "CoreMinimal.h"
-#include "Components/ChildActorComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Network.h"
 #include "BaseCharacter.h"
 #include <memory>
@@ -43,12 +43,19 @@ public:
 	
 	//대파 staticmesh component 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UChildActorComponent* GreenOnionComponent;
+		class UStaticMeshComponent* GreenOnionComponent;
 	////당근 staticmesh component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UChildActorComponent* CarrotComponent;
+		class UStaticMeshComponent* CarrotComponent;
 
-
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	/*UFUNCTION()
+		void CarrotOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void CarrotOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);*/
 	
 
 	//speed에 따른 애니메이션을 위해
@@ -102,6 +109,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AttackEnd();
 
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackEnd();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
@@ -122,10 +138,7 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Child Actor")
-		class TSubclassOf<AActor> ChildOfGreenOnionComponent;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Child Actor")
-		class TSubclassOf<AActor> ChildOfCarrotComponent;
+	
 
 protected:
 	// Called when the game starts or when spawned
