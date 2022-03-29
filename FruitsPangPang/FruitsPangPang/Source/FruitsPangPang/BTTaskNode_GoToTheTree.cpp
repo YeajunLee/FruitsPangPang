@@ -27,7 +27,7 @@ EBTNodeResult::Type UBTTaskNode_GoToTheTree::ExecuteTask(UBehaviorTreeComponent&
 
 	AAICharacter* ai = Cast<AAICharacter>(ControllingPawn);
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *TreePos.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *TreePos.ToString());
 	if (ai->bIsUndertheTree)
 		return EBTNodeResult::Succeeded;
 	return EBTNodeResult::Failed;

@@ -23,8 +23,8 @@ public:
 	static const FName TargetKey;
 
 	static FName TreePosKey;
-
 	static FName AmountKey;
+	static FName TargetTreeKey;
 
 private:
 	UPROPERTY();
