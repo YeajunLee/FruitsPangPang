@@ -55,7 +55,7 @@ private:
 public:
 	enum class AnimType
 	{
-		Throw,PickSword,DropSword,Slash,Stab
+		Throw,PickSword_GreenOnion,PickSword_Carrot,DropSword,Slash,Stab
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];

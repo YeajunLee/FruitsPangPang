@@ -463,10 +463,23 @@ void AMyCharacter::PickSwordAnimation()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && PickSwordMontage)
 	{
-		GreenOnionComponent->SetHiddenInGame(false, false);
+		FItemInfo info;
+		bool isempty;
+		int amount;
+		mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+		switch (info.ItemCode)
+		{
+		case 7:
+			GreenOnionComponent->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			break;
+		case 8:
+			CarrotComponent->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			break;
+		}		
 		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
 		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-		Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword);
 
 	}
 }
@@ -476,6 +489,7 @@ void AMyCharacter::DropSwordAnimation()
 	if (!mInventory->IsSlotValid(2)) return;
 
 	GreenOnionComponent->SetHiddenInGame(true, false);
+	CarrotComponent->SetHiddenInGame(true, false);
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
