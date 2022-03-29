@@ -421,12 +421,14 @@ void Network::process_packet(unsigned char* p)
 		auto character = Cast<AMyCharacter>(mMyCharacter);
 		if (nullptr != character)
 		{
+			bool firstPick = !character->mInventory->IsSlotValid(2);
+			character->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+
 			if ((7 == itemClass.ItemCode || 8 == itemClass.ItemCode) && (2 == character->SelectedHotKeySlotNum))
 			{
-				if(!character->mInventory->IsSlotValid(2))
+				if (firstPick)
 					character->PickSwordAnimation();
 			}
-			character->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 
 		}
 
