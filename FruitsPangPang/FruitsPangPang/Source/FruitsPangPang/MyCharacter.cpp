@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
@@ -23,7 +24,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
-#include "ActorGreenOnion.h"
+
 
 
 
@@ -62,30 +63,51 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	GreenOnionComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("GreenOnion"),true);
-	GreenOnionComponent->SetupAttachment(GetMesh());
-	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	GreenOnionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionMesh"));
+	GreenOnionMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
+	if (GreenOnionAsset.Succeeded())
+		GreenOnionMesh->SetStaticMesh(GreenOnionAsset.Object);
 
-	////당근을 캐릭터에 부착
-	CarrotComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Carrot"), true);
-	CarrotComponent->SetupAttachment(GetMesh());
-	CarrotComponent->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
+	CarrotMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotMesh"));
+	CarrotMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
+	if (CarrotAsset.Succeeded())
+		CarrotMesh->SetStaticMesh(CarrotAsset.Object);
 
-
-	// 추후에 당근이나 대파를 들고 있지 않는데 상대 캐릭터와 충돌했을 경우 상대의 체력이 깎이면 set collision enabled 를 해줘서 충돌되지 않게 하자
+	GreenOnionMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+	GreenOnionMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
+	
+	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
 	
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
-	GreenOnionComponent->SetChildActorClass(ChildOfGreenOnionComponent);
-	CarrotComponent->SetChildActorClass(ChildOfCarrotComponent);
-
-	GreenOnionComponent->SetHiddenInGame(true, false);
-	CarrotComponent->SetHiddenInGame(true, false);
 
 	Super::BeginPlay();
+	
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	GreenOnionMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
+	//GreenOnionMesh->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
+	//CarrotMesh->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
+	CarrotMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
+	
+	GreenOnionMesh->SetHiddenInGame(true, false);
+	CarrotMesh->SetHiddenInGame(true, false);
+	
+	GreenOnionMesh->SetGenerateOverlapEvents(true);
+	CarrotMesh->SetGenerateOverlapEvents(true);
+	GreenOnionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	CarrotMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+
+	
+
+	
 	if (GetController()->IsPlayerController())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
@@ -119,10 +141,10 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 8; //대파 1개 생성
+		itemClass.ItemCode = 7; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(8);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(8);
+		itemClass.Name = AInventory::ItemCodeToItemName(7);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
@@ -307,7 +329,6 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-			//CarrotComponent->SetHiddenInGame(false, false);
 			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(2))
 			{
 				PickSwordAnimation();
@@ -456,10 +477,94 @@ void AMyCharacter::AttackEnd()
 	}
 }
 
+//void AMyCharacter::GreenOnionOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor && (OtherActor != this) && OtherComp)
+//	{
+//		if (GEngine)
+//		{
+//			auto p = Cast<AMyCharacter>(OtherActor);
+//			if (nullptr != p)
+//				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+//		}
+//	}
+//}
+
+void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && (OtherActor != this) && OtherComp)
+	{
+		if (GEngine)
+		{
+			auto p = Cast<AMyCharacter>(OtherActor);
+			if (nullptr != p)
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+		}
+	}
+}
+
+void AMyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+	}
+}
+
+//void AMyCharacter::GreenOnionOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (GEngine)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+//	}
+//}
+//void AMyCharacter::CarrotOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor && (OtherActor != this) && OtherComp)
+//	{
+//		if (GEngine)
+//		{
+//			auto p = Cast<AMyCharacter>(OtherActor);
+//			if (nullptr != p)
+//				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+//		}
+//	}
+//}
+
+//void AMyCharacter::CarrotOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (GEngine)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+//	}
+//}
+
+void AMyCharacter::GreenOnionAttackStart()
+{
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AMyCharacter::GreenOnionAttackEnd()
+{
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AMyCharacter::CarrotAttackStart()
+{
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AMyCharacter::CarrotAttackEnd()
+{
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void AMyCharacter::Jump()
 {
 	Super::Jump();
 }
+
+
 
 void AMyCharacter::PickSwordAnimation()
 {
@@ -473,11 +578,11 @@ void AMyCharacter::PickSwordAnimation()
 		switch (info.ItemCode)
 		{
 		case 7:
-			GreenOnionComponent->SetHiddenInGame(false, false);
+			GreenOnionMesh->SetHiddenInGame(false, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
-			CarrotComponent->SetHiddenInGame(false, false);
+			CarrotMesh->SetHiddenInGame(false, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}		
@@ -491,8 +596,8 @@ void AMyCharacter::DropSwordAnimation()
 	if (2 != SelectedHotKeySlotNum) return;
 	if (!mInventory->IsSlotValid(2)) return;
 
-	GreenOnionComponent->SetHiddenInGame(true, false);
-	CarrotComponent->SetHiddenInGame(true, false);
+	GreenOnionMesh->SetHiddenInGame(true, false);
+	CarrotMesh->SetHiddenInGame(true, false);
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
