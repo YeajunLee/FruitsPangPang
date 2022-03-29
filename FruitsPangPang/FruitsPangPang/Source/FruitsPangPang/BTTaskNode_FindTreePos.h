@@ -15,7 +15,10 @@ class FRUITSPANGPANG_API UBTTaskNode_FindTreePos : public UBTTaskNode
 	GENERATED_BODY()
 	
 public:
+	float currentClosestDistance;
 	UBTTaskNode_FindTreePos();
+
+	AActor* GetClosestActor(FVector sourceLocation, TArray<AActor*> actors);
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)override;
 };

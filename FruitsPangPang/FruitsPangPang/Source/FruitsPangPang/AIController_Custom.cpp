@@ -12,6 +12,8 @@ const FName AAIController_Custom::TargetKey(TEXT("Target"));
 
 FName AAIController_Custom::TreePosKey(TEXT("TreePos"));
 FName AAIController_Custom::AmountKey(TEXT("Amount"));
+FName AAIController_Custom::TargetTreeKey(TEXT("TargetTree"));
+
 
 AAIController_Custom::AAIController_Custom()
 {
