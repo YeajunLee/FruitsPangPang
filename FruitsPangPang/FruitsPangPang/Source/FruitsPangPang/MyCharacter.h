@@ -42,11 +42,17 @@ public:
 
 	
 	//대파 staticmesh component 추가
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent;
-	////당근 staticmesh component
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* CarrotComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	//	class UStaticMeshComponent* GreenOnionComponent;
+	////////당근 staticmesh component
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	//	class UStaticMeshComponent* CarrotComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* GreenOnionMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* CarrotMesh;
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
