@@ -52,10 +52,10 @@ int main()
 
 	for (int i = TREEID_START; i < TREEID_END; ++i)
 	{
-		if (i == TREEID_START + 1)
-			objects[i] = new Tree(TREETYPE::ORANGE);
-		else
+		if (i < TREEID_START + GREEN_TREE_CNT + 1 )
 			objects[i] = new Tree(TREETYPE::GREEN);
+		else
+			objects[i] = new Tree(TREETYPE::ORANGE);
 		auto tree = reinterpret_cast<Tree*>(objects[i]);
 		tree->_id = i;
 	}

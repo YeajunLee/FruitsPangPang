@@ -56,7 +56,8 @@ void Character::UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode,
 	auto& slot = mSlot[index];
 	if (slot.type == itemcode)
 	{
-		slot.amount += amount;
+		if(index != 2)
+			slot.amount += amount;
 	}
 	else {
 		slot.type = itemcode;
