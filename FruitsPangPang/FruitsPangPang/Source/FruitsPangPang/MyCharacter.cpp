@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
@@ -23,6 +24,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
+
 
 
 
@@ -61,24 +63,51 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	// Set ParentSocket of GreenOnion -> 대파를 캐릭터에 부착
-	GreenOnionComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("<GreenOnion>"), true);
-	GreenOnionComponent->SetupAttachment(GetMesh());
-	GreenOnionComponent->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, true);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	
+	GreenOnionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionMesh"));
+	GreenOnionMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
 	if (GreenOnionAsset.Succeeded())
-		GreenOnionComponent->SetStaticMesh(GreenOnionAsset.Object);
+		GreenOnionMesh->SetStaticMesh(GreenOnionAsset.Object);
 
-	GreenOnionComponent->SetHiddenInGame(true, false);
+	CarrotMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotMesh"));
+	CarrotMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
+	if (CarrotAsset.Succeeded())
+		CarrotMesh->SetStaticMesh(CarrotAsset.Object);
+
+	GreenOnionMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+	GreenOnionMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
 	
+	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
 	
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
+
 	Super::BeginPlay();
+	
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	GreenOnionMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
+	//GreenOnionMesh->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
+	//CarrotMesh->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
+	CarrotMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
+	
+	GreenOnionMesh->SetHiddenInGame(true, false);
+	CarrotMesh->SetHiddenInGame(true, false);
+	
+	GreenOnionMesh->SetGenerateOverlapEvents(true);
+	CarrotMesh->SetGenerateOverlapEvents(true);
+	GreenOnionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	CarrotMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+
+	
+
+	
 	if (GetController()->IsPlayerController())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
@@ -223,83 +252,88 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
+{
+	int tmp = SelectedHotKeySlotNum;
+	SelectedHotKeySlotNum = WannaChange;
+	if (tmp != SelectedHotKeySlotNum)
+	{
+		mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
+		mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
+		Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+	}
+}
+
 void AMyCharacter::AnyKeyPressed(FKey Key)
 {
 	if (Key == EKeys::One)
 	{
 		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
-		int tmp = SelectedHotKeySlotNum;
-		SelectedHotKeySlotNum = 0;
-		if (tmp != SelectedHotKeySlotNum)
-		{
-			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
+		DropSwordAnimation();
+		ChangeSelectedHotKey(0);		
 	}
 	else if (Key == EKeys::Two)
 	{
 		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
-		int tmp = SelectedHotKeySlotNum;
-		SelectedHotKeySlotNum = 1;
-		if (tmp != SelectedHotKeySlotNum)
-		{
-			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
-			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
+		DropSwordAnimation();
+		ChangeSelectedHotKey(1);
+	}
+	else if (Key == EKeys::Three)
+	{
+		UE_LOG(LogTemp, Log, TEXT("three Hitted"));
+		ChangeSelectedHotKey(2);
+		if (mInventory->IsSlotValid(SelectedHotKeySlotNum))
+			PickSwordAnimation();	
+	}
+	else if (Key == EKeys::Four)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
+		DropSwordAnimation();
+		ChangeSelectedHotKey(3);
+	}
+	else if (Key == EKeys::Five)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Five Hitted"));
+		DropSwordAnimation();
+		ChangeSelectedHotKey(4);
 	}
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		//SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+
 		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
+		DropSwordAnimation();
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
 		if (tmp != SelectedHotKeySlotNum)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
-		if (SelectedHotKeySlotNum == 2)
-		{
-			GreenOnionComponent->SetHiddenInGame(false, false);
-		
-			if (AnimInstance && PickSwordMontage)
+			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(SelectedHotKeySlotNum))
 			{
-				AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-
+				PickSwordAnimation();
 			}
 		}
-		else
-			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 	else if (Key == EKeys::MouseScrollUp)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
 		int tmp = SelectedHotKeySlotNum;
+		DropSwordAnimation();
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
 		if (tmp != SelectedHotKeySlotNum)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
 			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
-		}
-		if (SelectedHotKeySlotNum == 2)
-		{
-			
-			GreenOnionComponent->SetHiddenInGame(false, false);
-			if (AnimInstance && PickSwordMontage)
+			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(2))
 			{
-				AnimInstance->Montage_Play(PickSwordMontage, 1.f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-
+				PickSwordAnimation();
 			}
 		}
-		else
-			GreenOnionComponent->SetHiddenInGame(true, false);
 	}
 }
 
@@ -395,15 +429,6 @@ void AMyCharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-
-			if(SavedHotKeyItemCode != 7 )
-				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-
-			//if (c_id == Network::GetNetwork()->mId) 
-			{
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
-			}
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -416,26 +441,26 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
+					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
 
 				}
 			}
-			
-
 			else if (SavedHotKeyItemCode == 8)
 			{
 				if (AnimInstance && StabbingMontage)
 				{
 					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
-					//UGameplayStatics::PlaySoundAtLocation(this, TEXT("Blueprint'/Game/Assets/Fruits/BigGreenOnion/pa.pa'"), GetActorLocation());
+					
 				}
 			}
-
 			else if (AnimInstance && ThrowMontage)
 			{
+				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
-
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			
 		}
@@ -452,10 +477,128 @@ void AMyCharacter::AttackEnd()
 	}
 }
 
+//void AMyCharacter::GreenOnionOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor && (OtherActor != this) && OtherComp)
+//	{
+//		if (GEngine)
+//		{
+//			auto p = Cast<AMyCharacter>(OtherActor);
+//			if (nullptr != p)
+//				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+//		}
+//	}
+//}
+
+void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && (OtherActor != this) && OtherComp)
+	{
+		if (GEngine)
+		{
+			auto p = Cast<AMyCharacter>(OtherActor);
+			if (nullptr != p)
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+		}
+	}
+}
+
+void AMyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+	}
+}
+
+//void AMyCharacter::GreenOnionOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (GEngine)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+//	}
+//}
+//void AMyCharacter::CarrotOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor && (OtherActor != this) && OtherComp)
+//	{
+//		if (GEngine)
+//		{
+//			auto p = Cast<AMyCharacter>(OtherActor);
+//			if (nullptr != p)
+//				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+//		}
+//	}
+//}
+
+//void AMyCharacter::CarrotOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (GEngine)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+//	}
+//}
+
+void AMyCharacter::GreenOnionAttackStart()
+{
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AMyCharacter::GreenOnionAttackEnd()
+{
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AMyCharacter::CarrotAttackStart()
+{
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AMyCharacter::CarrotAttackEnd()
+{
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
 
 void AMyCharacter::Jump()
 {
 	Super::Jump();
+}
+
+
+
+void AMyCharacter::PickSwordAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && PickSwordMontage)
+	{
+		FItemInfo info;
+		bool isempty;
+		int amount;
+		mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+		switch (info.ItemCode)
+		{
+		case 7:
+			GreenOnionMesh->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			break;
+		case 8:
+			CarrotMesh->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			break;
+		}		
+		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
+
+	}
+}
+void AMyCharacter::DropSwordAnimation()
+{
+	if (2 != SelectedHotKeySlotNum) return;
+	if (!mInventory->IsSlotValid(2)) return;
+
+	GreenOnionMesh->SetHiddenInGame(true, false);
+	CarrotMesh->SetHiddenInGame(true, false);
+	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
 void AMyCharacter::Throww()
@@ -556,10 +699,6 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	return Damage;
 }
-
-
-
-
 
 
 bool AMyCharacter::ConnServer()

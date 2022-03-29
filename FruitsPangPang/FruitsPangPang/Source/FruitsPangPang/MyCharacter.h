@@ -14,9 +14,11 @@
 
 
 
+
 UCLASS()
 class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 {
+
 	GENERATED_BODY()
 
 
@@ -38,9 +40,28 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 
+	
 	//대파 staticmesh component 추가
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-		class UStaticMeshComponent* GreenOnionComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	//	class UStaticMeshComponent* GreenOnionComponent;
+	////////당근 staticmesh component
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	//	class UStaticMeshComponent* CarrotComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* GreenOnionMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* CarrotMesh;
+
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	/*UFUNCTION()
+		void CarrotOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void CarrotOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);*/
 	
 
 	//speed에 따른 애니메이션을 위해
@@ -94,20 +115,36 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AttackEnd();
 
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackEnd();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* SlashMontage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* AnimSlashMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-		class UAnimMontage* StabbingMontage;
+		class UAnimMontage* StabbingMontage;	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* AnimStabbingMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* PickSwordMontage;
+	void PickSwordAnimation();
+	void DropSwordAnimation();
+
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -131,9 +168,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AnyKeyPressed(FKey Key);
-
+	void ChangeSelectedHotKey(int WannaChange);
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
 
 };

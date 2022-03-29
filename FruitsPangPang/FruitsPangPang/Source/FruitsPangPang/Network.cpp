@@ -297,13 +297,13 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_ANIM: {
 		sc_packet_anim* packet = reinterpret_cast<sc_packet_anim*>(p);
-		int thrower_character_id = packet->id;
+		int anim_character_id = packet->id;
 
 		switch (packet->animtype)
 		{
 		case static_cast<char>(Network::AnimType::Throw): {
 
-			if (thrower_character_id < MAX_USER) {
+			if (anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
@@ -315,6 +315,69 @@ void Network::process_packet(unsigned char* p)
 					}
 				}
 			}
+			break;
+		}
+		case static_cast<char>(Network::AnimType::PickSword_GreenOnion) : {
+			if (anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
+						mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(false, false);
+
+					}
+				}
+			}
+			break;
+		}
+		case static_cast<char>(Network::AnimType::PickSword_Carrot) : {
+			if (anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
+						mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(false, false);
+
+					}
+				}
+			}
+			break;
+		}
+		case static_cast<char>(Network::AnimType::DropSword) : {
+			if (anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(true, false);
+					mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(true, false);
+				}
+			}
+			break;
+		}
+		case static_cast<char>(Network::AnimType::Slash) : {
+			if (anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->AnimSlashMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->AnimSlashMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->AnimSlashMontage);
+
+					}
+				}
+			}
+			break;
+		}
+		case static_cast<char>(Network::AnimType::Stab) : {
 			break;
 		}
 
@@ -356,8 +419,16 @@ void Network::process_packet(unsigned char* p)
 		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		auto character = Cast<AMyCharacter>(mMyCharacter);
-		if(nullptr != character)
+		if (nullptr != character)
+		{
+			if ((7 == itemClass.ItemCode || 8 == itemClass.ItemCode) && (2 == character->SelectedHotKeySlotNum))
+			{
+				if(!character->mInventory->IsSlotValid(2))
+					character->PickSwordAnimation();
+			}
 			character->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+
+		}
 
 		break;
 	}
