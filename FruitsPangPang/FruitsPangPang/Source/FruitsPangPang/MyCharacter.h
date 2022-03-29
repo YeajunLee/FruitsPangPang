@@ -117,6 +117,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* PickSwordMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Child Actor")
+		class TSubclassOf<AActor> ChildOfGreenOnionComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Child Actor")
+		class TSubclassOf<AActor> ChildOfCarrotComponent;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

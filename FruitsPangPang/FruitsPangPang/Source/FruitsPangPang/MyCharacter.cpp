@@ -79,6 +79,9 @@ AMyCharacter::AMyCharacter()
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
+	GreenOnionComponent->SetChildActorClass(ChildOfGreenOnionComponent);
+	CarrotComponent->SetChildActorClass(ChildOfCarrotComponent);
+
 	GreenOnionComponent->SetHiddenInGame(true, false);
 	CarrotComponent->SetHiddenInGame(true, false);
 
