@@ -128,17 +128,17 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 1;	//토마토 30개 생성
+		itemClass.ItemCode = 3;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(1);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
+		itemClass.Name = AInventory::ItemCodeToItemName(3);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 4;	//수박 30개 생성
+		itemClass.ItemCode = 6;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = AInventory::ItemCodeToItemName(4);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
+		itemClass.Name = AInventory::ItemCodeToItemName(6);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(6);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 7; //대파 1개 생성
