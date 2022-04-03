@@ -199,13 +199,13 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/KiwiBomb.KiwiBomb_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/AppleBomb.AppleBomb_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/DM_Apple_BP.DM_Apple_BP_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
 	case 5:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Pineapple/PineappleBomb.PineappleBomb_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pineapple/DM_Pineapple_BP.DM_Pineapple_BP_C'");
 	case 6:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/PumpkinBomb.PumpkinBomb_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/DM_Pumpkin_BP.DM_Pumpkin_BP_C'");
 	case 7:
 		return TEXT("None");
 	case 8:
