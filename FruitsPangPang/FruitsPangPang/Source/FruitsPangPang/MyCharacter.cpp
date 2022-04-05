@@ -16,6 +16,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/Actor.h"
 #include "Tree.h"
 #include "Punnet.h"
 #include "Inventory.h"
@@ -24,8 +26,6 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
-
-
 
 
 
@@ -58,6 +58,12 @@ AMyCharacter::AMyCharacter()
 
 	//GroundSpeed = 0.f;
 
+	//Player Stats Initialize------------------------------------------------------------------------------
+
+
+
+	//-----------------------------------------------------------------------------------------------------
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true; //캐릭터 방향에 따라
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 1080.f, 0.f); // 회전
 	GetCharacterMovement()->JumpZVelocity = 600.f;
@@ -128,10 +134,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 3;	//토마토 30개 생성
+		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(3);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -219,6 +225,11 @@ void AMyCharacter::Tick(float DeltaTime)
 			//	FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
 
 		}
+
+		//Update GroundSpeedd (22-04-05)
+		float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+		GroundSpeedd = CharXYVelocity;
+		
 	}
 
 	
@@ -417,10 +428,13 @@ void AMyCharacter::LMBUp()
 	bLMBDown = false;
 }
 
+void AMyCharacter::Jump()
+{
+	Super::Jump();
+}
+
 void AMyCharacter::Attack()
 {
-	
-	
 	if (!bAttacking)
 	{
 		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
@@ -442,7 +456,7 @@ void AMyCharacter::Attack()
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
 					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
-
+					
 				}
 			}
 			else if (SavedHotKeyItemCode == 8)
@@ -476,6 +490,21 @@ void AMyCharacter::AttackEnd()
 		Attack();
 	}
 }
+
+//죽는 애니메이션(22-04-05)
+void AMyCharacter::Die()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage, 1.f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), DeathMontage);
+		UE_LOG(LogTemp, Warning, TEXT("die!!"));
+	}
+}
+
+
 
 //void AMyCharacter::GreenOnionOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 //{
@@ -559,10 +588,7 @@ void AMyCharacter::CarrotAttackEnd()
 	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AMyCharacter::Jump()
-{
-	Super::Jump();
-}
+
 
 
 
@@ -606,7 +632,7 @@ void AMyCharacter::Throww()
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
-	CameraRotate.Pitch += 18;
+	CameraRotate.Pitch += 14;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
