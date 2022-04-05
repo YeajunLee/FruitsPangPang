@@ -22,15 +22,15 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     if (nullptr == AICharacter)
         return EBTNodeResult::Failed;
 
-    //update KeyAmount(BTS_subtomato before)--------------------------------------------------------
-    int FruitAmount = AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount;
-    OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
-    //----------------------------------------------------------------------------------------------
 
     AICharacter->Attack();
     IsAttacking = true;
     AICharacter->OnAttackEnd.AddLambda([this]()->void { IsAttacking = false; });
 
+    //update KeyAmount(BTS_subtomato before)--------------------------------------------------------
+    int FruitAmount = AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount;
+    OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+    //----------------------------------------------------------------------------------------------
 
 
     return EBTNodeResult::InProgress;
