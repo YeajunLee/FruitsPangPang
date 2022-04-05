@@ -134,10 +134,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 3;	//토마토 30개 생성
+		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(3);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -456,7 +456,7 @@ void AMyCharacter::Attack()
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
 					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
-
+					
 				}
 			}
 			else if (SavedHotKeyItemCode == 8)
@@ -632,7 +632,7 @@ void AMyCharacter::Throww()
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
-	CameraRotate.Pitch += 18;
+	CameraRotate.Pitch += 14;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
