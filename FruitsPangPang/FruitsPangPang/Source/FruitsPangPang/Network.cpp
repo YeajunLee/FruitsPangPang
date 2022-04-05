@@ -12,6 +12,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MainWidget.h"
+#include "ScoreWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -201,13 +202,13 @@ void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& a
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_hitmyself_packet(SOCKET& sock, const int& FruitType)
+void Network::send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType)
 {
 	cs_packet_hit packet;
 	packet.size = sizeof(cs_packet_hit);
 	packet.type = CS_PACKET_HIT;
 	packet.fruitType = FruitType;
-
+	packet.attacker_id = AttackerId;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_hit), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
@@ -516,6 +517,29 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[packet->id]->GroundSpeedd = 0;
 			}
 		}
+		break;
+	}
+	case SC_PACKET_UPDATE_SCORE: {
+		sc_packet_update_score* packet = reinterpret_cast<sc_packet_update_score*>(p);
+		for (int i = USER_START; i < MAX_USER; ++i)
+		{
+			//이거 고쳐야함 버그 있음.
+			//서버에서 받아오는게 무조건 c_id 0번째부터 character id 0번째부터 killcount 0번째에 넣어주는게 아님. 지금은 그런데 나중엔 어떻게될지모름.
+			if (i == mMyCharacter->c_id)
+			{
+				mMyCharacter->killcount = packet->characterkillcount[i];
+				mMyCharacter->deathcount = packet->characterdeathcount[i];
+			}
+			else {
+				if (nullptr != mOtherCharacter[i])
+				{
+					mOtherCharacter[i]->killcount = packet->characterkillcount[i];
+					mOtherCharacter[i]->deathcount = packet->characterdeathcount[i];
+				}
+			}
+		}
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+
 		break;
 	}
 	}

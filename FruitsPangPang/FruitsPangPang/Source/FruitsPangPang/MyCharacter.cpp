@@ -635,6 +635,7 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
 	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
@@ -692,8 +693,11 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket,other->_fType);
-			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			if (nullptr != other->BombOwner)
+			{
+				Network::GetNetwork()->send_hitmyself_packet(s_socket, other->BombOwner->c_id, other->_fType);
+				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			}
 		}
 	}
 

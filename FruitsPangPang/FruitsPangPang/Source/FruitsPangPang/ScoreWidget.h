@@ -18,10 +18,12 @@ private:
 public:
 	ScoreInfo();
 	ScoreInfo(class ABaseCharacter* character);
+	void UpdateScore();
 	bool operator<(ScoreInfo& other) const {
 		return this->score < other.score;
 	}
 	const class ABaseCharacter* GetCharacter() const { return mCharacter; }
+	const int GetScore() const { return score; }
 };
 
 UCLASS()
@@ -37,6 +39,7 @@ public:
 
 	std::vector<ScoreInfo>  ScoreBoard;
 	void UpdateRank();
+	void UpdateScoreBoard();
 
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* No_1;

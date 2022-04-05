@@ -156,10 +156,46 @@ void Character::Hurt(const int& damage, const int& attacker)
 	{
 		if (0 <= attacker && attacker <= MAX_USER)
 		{
+			short userDeathcount[8];
+			short userKillcount[8];
+
 			Character* attackerCharacter = reinterpret_cast<Character*>(objects[attacker]);
 			attackerCharacter->mKillCount++;
+			Die();
+
+			for(int i = USER_START ; i < MAX_USER;++i)
+			{
+				auto character = reinterpret_cast<Character*>(objects[i]);
+
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					userDeathcount[i] = character->mDeathCount;
+					userKillcount[i] = character->mKillCount;
+				}
+				else {
+					character->state_lock.unlock();
+					userDeathcount[i] = -1;
+					userKillcount[i] = -1;
+				}
+			}
+
+			for (int i = USER_START; i < MAX_USER; ++i)
+			{
+				auto character = reinterpret_cast<Character*>(objects[i]);
+
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					send_update_score_packet(character->_id, userDeathcount, userKillcount);
+				}
+				else {
+					character->state_lock.unlock();
+				}
+			}
 		}
-		Die();
 	}
 }
 

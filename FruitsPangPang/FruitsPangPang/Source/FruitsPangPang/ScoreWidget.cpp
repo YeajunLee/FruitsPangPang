@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include <algorithm>
 #include "ScoreWidget.h"
+#include <algorithm>
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Components/TextBlock.h"
@@ -22,6 +22,12 @@ ScoreInfo::ScoreInfo(class ABaseCharacter* character)
 {
 
 }
+
+void ScoreInfo::UpdateScore()
+{
+	score = (mCharacter->killcount * 2) - mCharacter->deathcount;
+}
+
 void UScoreWidget::NativePreConstruct()
 {
 
@@ -126,8 +132,17 @@ void UScoreWidget::NativeDestruct()
 	ScoreBoard.clear();
 }
 
+void UScoreWidget::UpdateScoreBoard()
+{
+	for (auto& scoreInfo : ScoreBoard)
+	{
+		scoreInfo.UpdateScore();
+	}
+}
+
 void UScoreWidget::UpdateRank()
 {
+	UpdateScoreBoard();
 	sort(ScoreBoard.begin(), ScoreBoard.end());
 
 
@@ -137,28 +152,28 @@ void UScoreWidget::UpdateRank()
 		switch (i)
 		{
 		case 0:
-			No_1Score->SetText(FText::Format(LOCTEXT("score", "({0})"),ScoreBoard[0].GetCharacter()->score ));
+			No_1Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[0].GetScore()));
 			break;
 		case 1:
-			No_2Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[1].GetCharacter()->score));
+			No_2Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[1].GetScore()));
 			break;
 		case 2:
-			No_3Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[2].GetCharacter()->score));
+			No_3Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[2].GetScore()));
 			break;
 		case 3:
-			No_4Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[3].GetCharacter()->score));
+			No_4Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[3].GetScore()));
 			break;
 		case 4:
-			No_5Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[4].GetCharacter()->score));
+			No_5Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[4].GetScore()));
 			break;
 		case 5:
-			No_6Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[5].GetCharacter()->score));
+			No_6Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[5].GetScore()));
 			break;
 		case 6:
-			No_7Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[6].GetCharacter()->score));
+			No_7Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[6].GetScore()));
 			break;
 		case 7:
-			No_8Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[7].GetCharacter()->score));
+			No_8Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[7].GetScore()));
 			break;
 
 		}

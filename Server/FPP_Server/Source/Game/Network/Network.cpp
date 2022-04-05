@@ -232,6 +232,19 @@ void send_respawn_packet(int player_id, int respawner_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_update_score_packet(int player_id,short* userdeathcount, short* userkillcount)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_update_score packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_UPDATE_SCORE;
+	packet.id = player_id;
+	memcpy(packet.characterdeathcount, userdeathcount, sizeof(packet.characterdeathcount));
+	memcpy(packet.characterkillcount, userkillcount, sizeof(packet.characterkillcount));
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -474,10 +487,8 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_HIT: {
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		cout << client_id << "의 이전 hp : " << character->hp << endl;
+		cout << "HurtBy ID:" << packet->attacker_id << endl;
 		character->HurtBy(packet->fruitType, packet->attacker_id);
-		//character->Hurt(10);
-		cout << client_id << "의 이후 hp : " << character->hp << endl;
 		break;
 	}
 	case CS_PACKET_CHANGE_HOTKEYSLOT: {

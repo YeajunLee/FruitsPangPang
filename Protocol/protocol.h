@@ -5,6 +5,7 @@ const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int BUFSIZE = 256;
 const int  MAX_NAME_SIZE = 20;
+const int USER_START = 0;
 const int  MAX_USER = 8;
 const int TREE_CNT = 56;
 const int GREEN_TREE_CNT = 41;
@@ -44,6 +45,7 @@ const char SC_PACKET_UPDATE_INTERSTAT = 9;
 const char SC_PACKET_UPDATE_USERSTATUS = 10;
 const char SC_PACKET_DIE = 11;
 const char SC_PACKET_RESPAWN = 12;
+const char SC_PACKET_UPDATE_SCORE = 13;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -199,5 +201,13 @@ struct sc_packet_respawn {
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 
+};
+
+struct sc_packet_update_score {
+	unsigned char size;
+	char type;
+	int id;
+	short characterkillcount[8];
+	short characterdeathcount[8];
 };
 #pragma pack(pop)
