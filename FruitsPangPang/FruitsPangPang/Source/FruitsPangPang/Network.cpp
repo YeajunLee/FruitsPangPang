@@ -71,8 +71,8 @@ void Network::release()
 		mMyCharacter = nullptr;
 		for (auto& p : mAiCharacter)
 			p = nullptr;
-		for (int i = 0; i < MAX_USER; ++i)
-			mOtherCharacter[i] = nullptr;
+		for (auto& p : mOtherCharacter)
+			p = nullptr;
 
 		WSACleanup();
 		isInit = false;
@@ -197,7 +197,7 @@ void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& a
 	packet.slotNum = slotNum;
 	packet.Amount = amount;
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_useitem), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
@@ -208,7 +208,7 @@ void Network::send_hitmyself_packet(SOCKET& sock, const int& FruitType)
 	packet.type = CS_PACKET_HIT;
 	packet.fruitType = FruitType;
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_hit), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }
@@ -221,7 +221,7 @@ void Network::send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
 	packet.type = CS_PACKET_CHANGE_HOTKEYSLOT;
 	packet.HotkeySlotNum = slotNum;
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_change_hotkeyslot), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 

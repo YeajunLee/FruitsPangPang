@@ -52,9 +52,14 @@ public:
 		int OverlapInteractId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 		bool OverlapType;	//true == Tree , false == Punnet
-
+public:
+	//related score
+	int killcount;
+	int deathcount;
+	int score;
 public:
 	// ai <-> tree collision check
+	// Ai인데 왜 Base에 있나요? - 수민
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
 		bool bIsUndertheTree;
 

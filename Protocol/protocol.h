@@ -92,6 +92,7 @@ struct cs_packet_hit {
 	unsigned char size;
 	char type;
 	int fruitType;
+	int attacker_id;
 };
 
 struct cs_packet_change_hotkeyslot {

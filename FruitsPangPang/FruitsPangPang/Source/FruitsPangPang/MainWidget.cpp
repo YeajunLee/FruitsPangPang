@@ -7,6 +7,7 @@
 #include "BaseCharacter.h"
 #include "Network.h"
 #include "RespawnWindowWidget.h"
+#include "ScoreWidget.h"
 #include "Components/HorizontalBox.h"
 
 
@@ -14,13 +15,26 @@ void UMainWidget::NativePreConstruct()
 {
 	HPBar->Percent = 1.0f;
 
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MRespawnWindowWidget.MRespawnWindowWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto RespawnWGT = CreateWidget<URespawnWindowWidget>(GetWorld(), WidgetClass);
+		MinimapBox->AddChildToHorizontalBox(RespawnWGT);
+		mRespawnWindowWidget = RespawnWGT;
+		HideRespawnWidget();
+	}
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MScoreWidget.MScoreWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto ScoreWGT = CreateWidget<UScoreWidget>(GetWorld(), WidgetClass);
+		ScoreBox->AddChildToHorizontalBox(ScoreWGT);
+		mScoreWidget = ScoreWGT;
+	}
 
-	FSoftClassPath my2(TEXT("WidgetBlueprint'/Game/Widget/MRespawnWindowWidget.MRespawnWindowWidget_C'"));
-	auto p2 = my2.TryLoadClass<UUserWidget>();
-	auto wi2 = CreateWidget<URespawnWindowWidget>(GetWorld(), p2);
-	MinimapBox->AddChildToHorizontalBox(wi2);
-	mRespawnWindowWidget = wi2;
-	HideRespawnWidget();
+
+
+
+
 }
 
 
@@ -51,8 +65,11 @@ void UMainWidget::HideRespawnWidget()
 {
 	FInputModeGameOnly gamemode;
 	auto controller = GetWorld()->GetFirstPlayerController();
-	controller->SetInputMode(gamemode);
-	controller->SetShowMouseCursor(false);
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(false);
+	}
 	mRespawnWindowWidget->Activate = false;
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Hidden);
 }

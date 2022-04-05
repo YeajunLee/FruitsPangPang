@@ -35,14 +35,24 @@ void WorkerThread()
 
 			Character* player = reinterpret_cast<Character*>(objects[client_id]);
 			int To_Process_Bytes = bytes + player->_prev_size;
-			unsigned char* packets = wsa_ex->getBuf();
+			if (player->_prev_size > 0)
+				cout << "time to breakpoint" << endl;
+			unsigned char* packets = wsa_ex->getBuf();	//wsa_ex == player->wsa_ex.buf
 
-			while (To_Process_Bytes >= packets[0]) {
-				process_packet(client_id, packets);
-				To_Process_Bytes -= packets[0];
-				packets += packets[0];
-				if (To_Process_Bytes <= 0)break;
+			if (To_Process_Bytes >= packets[0])
+			{
+				do {
+					process_packet(client_id, packets);
+					To_Process_Bytes -= packets[0];
+					packets += packets[0];
+				} while ((To_Process_Bytes & ~0) && (To_Process_Bytes >= packets[0]));
 			}
+			//while (To_Process_Bytes >= packets[0]) {
+			//	process_packet(client_id, packets);
+			//	To_Process_Bytes -= packets[0];
+			//	packets += packets[0];
+			//	if (To_Process_Bytes <= 0)break;
+			//}
 			player->_prev_size = 0;
 			ZeroMemory(wsa_ex->getBuf(), sizeof(wsa_ex->getBuf()));
 
@@ -135,9 +145,7 @@ void WorkerThread()
 				delete wsa_ex;
 				break;
 			}
-			RespawnPlayer->hp = RespawnPlayer->maxhp;
-			RespawnPlayer->x = 32030, RespawnPlayer->y = 24480, RespawnPlayer->z = 398;
-			RespawnPlayer->rx = 0, RespawnPlayer->ry = 0, RespawnPlayer->rz = 0, RespawnPlayer->rw = 1;
+			RespawnPlayer->Respawn(8);
 
 			cout << "플레이어 " << client_id << "리스폰\n";
 
@@ -187,7 +195,7 @@ void WorkerThread()
 					if (Character::STATE::ST_INGAME == character->_state)
 					{
 						character->state_lock.unlock();
-						character->Hurt(4);						
+						//character->Hurt(4);						
 					}
 					else character->state_lock.unlock();
 					//dmg apply

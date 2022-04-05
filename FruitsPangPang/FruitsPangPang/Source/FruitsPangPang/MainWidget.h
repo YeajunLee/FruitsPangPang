@@ -29,8 +29,13 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UHorizontalBox* MinimapBox;
 
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* ScoreBox;
+
 	TArray<class UInventorySlotWidget*> minventorySlot;
 	class URespawnWindowWidget* mRespawnWindowWidget;
+
+	class UScoreWidget* mScoreWidget;
 
 	class AInventory* mInventory;
 
