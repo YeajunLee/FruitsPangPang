@@ -43,11 +43,11 @@ void UScoreWidget::NativePreConstruct()
 
 	if(nullptr!= Network::GetNetwork()->mMyCharacter)
 		ScoreBoard.push_back(ScoreInfo(Network::GetNetwork()->mMyCharacter));
-	for (int i = 0; i < 8; ++i)
-	{
-		if (nullptr != Network::GetNetwork()->mOtherCharacter[i])
-			ScoreBoard.push_back(ScoreInfo(Network::GetNetwork()->mOtherCharacter[i]));
-	}
+	//for (int i = 0; i < 8; ++i)
+	//{
+	//	if (nullptr != Network::GetNetwork()->mOtherCharacter[i])
+	//		ScoreBoard.push_back(ScoreInfo(Network::GetNetwork()->mOtherCharacter[i]));
+	//}
 	UpdateRank();
 
 

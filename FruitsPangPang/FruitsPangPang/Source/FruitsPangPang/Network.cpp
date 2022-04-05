@@ -390,6 +390,8 @@ void Network::process_packet(unsigned char* p)
 		int id = packet->id;
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 		mOtherCharacter[id]->c_id = packet->id;
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 		break;
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
