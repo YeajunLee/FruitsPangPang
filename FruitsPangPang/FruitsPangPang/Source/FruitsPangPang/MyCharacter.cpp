@@ -110,6 +110,7 @@ void AMyCharacter::BeginPlay()
 	
 	if (GetController()->IsPlayerController())
 	{
+		Network::GetNetwork()->mMyCharacter = this;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			FString::Printf(TEXT("other id ")));		
 		/*
@@ -161,7 +162,6 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 		
-		Network::GetNetwork()->mMyCharacter = this;
 
 		//if (Network::GetNetwork()->init())
 		//{

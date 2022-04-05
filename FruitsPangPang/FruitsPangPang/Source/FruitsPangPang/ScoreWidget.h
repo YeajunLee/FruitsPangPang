@@ -20,7 +20,7 @@ public:
 	ScoreInfo(class ABaseCharacter* character);
 	void UpdateScore();
 	bool operator<(ScoreInfo& other) const {
-		return this->score < other.score;
+		return  other.score < this->score;
 	}
 	const class ABaseCharacter* GetCharacter() const { return mCharacter; }
 	const int GetScore() const { return score; }
