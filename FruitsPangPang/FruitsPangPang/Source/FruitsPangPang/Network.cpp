@@ -368,10 +368,10 @@ void Network::process_packet(unsigned char* p)
 				{
 					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
-					if (AnimInstance && mOtherCharacter[packet->id]->AnimSlashMontage)
+					if (AnimInstance && mOtherCharacter[packet->id]->SlashMontage)
 					{
-						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->AnimSlashMontage, 2.f);
-						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->AnimSlashMontage);
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->SlashMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->SlashMontage);
 
 					}
 				}
@@ -379,6 +379,19 @@ void Network::process_packet(unsigned char* p)
 			break;
 		}
 		case static_cast<char>(Network::AnimType::Stab) : {
+			if (anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
+					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+					if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
+					{
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->StabbingMontage, 2.f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->StabbingMontage);
+
+					}
+				}
+			}
 			break;
 		}
 

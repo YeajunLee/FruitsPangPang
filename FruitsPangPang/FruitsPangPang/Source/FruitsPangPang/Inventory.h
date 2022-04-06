@@ -63,6 +63,7 @@ public:
 	void AddItem(const FItemInfo& item, const int& amount);
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);
 	void GetItemInfoAtSlotIndex(__in const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount);
+	int GetItemCodeAtSlotIndex(const int& index);
 	void RemoveItemAtSlotIndex(const int& index, const int& amount);
 	void ClearInventory();
 	bool IsSlotValid(const int& index);
