@@ -38,6 +38,10 @@ public:
 	//	int OverlapInteractId;
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 	//	bool OverlapType;	//true == Tree , false == Punnet
+protected:
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	//related network
 

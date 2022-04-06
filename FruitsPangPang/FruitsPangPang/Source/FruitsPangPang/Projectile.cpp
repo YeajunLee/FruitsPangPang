@@ -53,7 +53,7 @@ void AProjectile::durianPacket(const FVector& pos)
 void AProjectile::ApplyDamageCPP(AActor* otherActor)
 {
 
-	auto p = Cast<AMyCharacter>(otherActor);
+	auto p = Cast<ABaseCharacter>(otherActor);
 
 	//UE_LOG(LogTemp, Log, TEXT("ApplyDamage : in apply damage"));
 	if (nullptr != p)
