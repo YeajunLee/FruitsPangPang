@@ -23,6 +23,18 @@ Character::~Character()
 }
 
 
+void Character::PreRecvPacket(unsigned char* RemainMsg,int RemainBytes)
+{
+
+	//player->_prev_size = 0;
+	//ZeroMemory(wsa_ex->getBuf(), sizeof(wsa_ex->getBuf()));
+	_prev_size = 0;
+	if (RemainBytes > 0)
+	{
+		_prev_size = RemainBytes;
+		memcpy(wsa_ex_recv.getBuf(), RemainMsg, RemainBytes);
+	}
+}
 
 void Character::recvPacket()
 {

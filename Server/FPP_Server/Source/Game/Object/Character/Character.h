@@ -32,6 +32,7 @@ public:
 	SOCKET  _socket;
 	int		_prev_size;
 	void recvPacket();
+	void PreRecvPacket(unsigned char* RemainMsg,int RemainBytes);
 	void sendPacket(void* packet, int bytes);
 
 public:

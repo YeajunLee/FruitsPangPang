@@ -35,8 +35,6 @@ void WorkerThread()
 
 			Character* player = reinterpret_cast<Character*>(objects[client_id]);
 			int To_Process_Bytes = bytes + player->_prev_size;
-			if (player->_prev_size > 0)
-				cout << "time to breakpoint" << endl;
 			unsigned char* packets = wsa_ex->getBuf();	//wsa_ex == player->wsa_ex.buf
 
 			if (To_Process_Bytes >= packets[0])
@@ -47,20 +45,10 @@ void WorkerThread()
 					packets += packets[0];
 				} while ((To_Process_Bytes & ~0) && (To_Process_Bytes >= packets[0]));
 			}
-			//while (To_Process_Bytes >= packets[0]) {
-			//	process_packet(client_id, packets);
-			//	To_Process_Bytes -= packets[0];
-			//	packets += packets[0];
-			//	if (To_Process_Bytes <= 0)break;
-			//}
-			player->_prev_size = 0;
-			ZeroMemory(wsa_ex->getBuf(), sizeof(wsa_ex->getBuf()));
-
-			if (To_Process_Bytes > 0) {
-
-				player->_prev_size = To_Process_Bytes;
-				memcpy(wsa_ex->getBuf(), packets, player->_prev_size);
-			}
+			//To_Process_Bytes != 0 이면 packets보다 큰지 확인해야 알 수 있지만
+			//to_Process_Bytes가 packets보다 크면, To_Process_Bytes != 0인건 확실하므로, 이때는 필요없는 구문
+			//뒷구문이 앞으로오는건 의미가 없음. 앞구문에서 성공하여 cmp를 한 번 만으로 끝낼 수 있는 기대효과
+			player->PreRecvPacket(packets,To_Process_Bytes);
 			player->recvPacket();
 			break;
 		}
