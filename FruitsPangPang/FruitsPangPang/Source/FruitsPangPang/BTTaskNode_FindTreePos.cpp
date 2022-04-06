@@ -33,7 +33,7 @@ AActor* UBTTaskNode_FindTreePos::GetClosestActor(FVector sourceLocation, TArray<
 			currentClosestDistance = distance;
 			closestActor = actors[i];
 
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *closestActor->GetActorLocation().ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("%s"), *closestActor->GetActorLocation().ToString());
 
 		}
 	}
@@ -81,13 +81,15 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 			
 		}
 	}
-	//디버깅 용
-	DrawDebugSphere(World, aiLocation, 2000.f, 16, FColor::Purple, false, 0.2f);
-	DrawDebugPoint(World, GetClosestActor(aiLocation, trees)->GetActorLocation(), 10.0f, FColor::Cyan, false, 0.2f);
-	DrawDebugLine(World, aiLocation, GetClosestActor(aiLocation, trees)->GetActorLocation(), FColor::Cyan, false, 0.2f);
+	if (0 != trees.Num()) {
+		//디버깅 용
+		DrawDebugSphere(World, aiLocation, 2000.f, 16, FColor::Purple, false, 0.2f);
+		DrawDebugPoint(World, GetClosestActor(aiLocation, trees)->GetActorLocation(), 10.0f, FColor::Cyan, false, 0.2f);
+		DrawDebugLine(World, aiLocation, GetClosestActor(aiLocation, trees)->GetActorLocation(), FColor::Cyan, false, 0.2f);
 
-	//closestTree 블랙보드에 저장.
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(AAIController_Custom::TreePosKey, GetClosestActor(aiLocation, trees)->GetActorLocation());
+		//closestTree 블랙보드에 저장.
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AAIController_Custom::TreePosKey, GetClosestActor(aiLocation, trees)->GetActorLocation());
+	}
 
 	/*else
 	{
