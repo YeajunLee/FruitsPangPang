@@ -114,7 +114,7 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		Hurt(3, attacker);
 		break;
 	}
-	case static_cast<int>(FRUITTYPE::T_QUIUI) : {
+	case static_cast<int>(FRUITTYPE::T_KIWI) : {
 		Hurt(10, attacker);
 		break;
 	}
