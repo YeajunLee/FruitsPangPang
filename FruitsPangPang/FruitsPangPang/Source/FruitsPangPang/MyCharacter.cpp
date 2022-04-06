@@ -26,6 +26,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -465,6 +466,7 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
+					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
 					
 				}
 			}
@@ -527,7 +529,23 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 		{
 			auto p = Cast<AMyCharacter>(OtherActor);
 			if (nullptr != p)
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start"));
+			{
+				TSubclassOf<UDamageType> dmgCauser;
+				dmgCauser = UDamageType::StaticClass();
+				
+				if (p->GreenOnionMesh->bHiddenInGame)
+				{
+					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
+					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
+				}
+				else if (p->CarrotMesh->bHiddenInGame)
+				{
+					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
+				}				
+				UGameplayStatics::ApplyDamage(OtherActor, 1, GetInstigatorController(), this, dmgCauser);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+				UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+			}
 		}
 	}
 }
@@ -712,18 +730,30 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CurrentHP -= Damage;
 	*/
 
-	auto other = Cast<AProjectile>(DamageCauser);
+	auto projectile = Cast<AProjectile>(DamageCauser);
 
-	if (other != nullptr)
+	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
+	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
-			if (nullptr != other->BombOwner)
+			if (nullptr != projectile->BombOwner)
 			{
-				Network::GetNetwork()->send_hitmyself_packet(s_socket, other->BombOwner->c_id, other->_fType);
+				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
 				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
+		}
+	}
+
+	if (nullptr != DMGCauserCharacter)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
+			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
 		}
 	}
 

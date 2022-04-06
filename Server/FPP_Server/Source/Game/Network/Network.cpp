@@ -323,7 +323,6 @@ void process_packet(int client_id, unsigned char* p)
 		object->ry = packet->ry;
 		object->rz = packet->rz;
 		object->rw = packet->rw;
-
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			auto character = reinterpret_cast<Character*>(other);
@@ -454,7 +453,14 @@ void process_packet(int client_id, unsigned char* p)
 		{
 			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
 			send_update_inventory_packet(client_id, 2);
-		}else{
+		}
+		else if (punnet->_ftype == FRUITTYPE::T_CARROT)
+		{
+			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
+			send_update_inventory_packet(client_id, 2);
+		}
+		else
+		{
 			character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
 			send_update_inventory_packet(client_id, 3);
 		}

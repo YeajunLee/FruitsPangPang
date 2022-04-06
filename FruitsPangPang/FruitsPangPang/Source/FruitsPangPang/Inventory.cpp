@@ -100,6 +100,18 @@ void AInventory::GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, _
 
 }
 
+int AInventory::GetItemCodeAtSlotIndex(const int& index)
+{
+	bool isempty = !IsSlotValid(index);
+	if (!isempty)
+	{
+		return mSlots[index].ItemClass.ItemCode;
+	}
+
+	return 0;	//invalid code 
+
+}
+
 void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 {
 	if (amount <= 0 || !IsSlotValid(index)) return;
