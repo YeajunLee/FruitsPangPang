@@ -640,6 +640,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 		//if Ai Move, dump packet
 		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
+		//for문으로 하지말고, Map 구조 Key-value 구조를 사용하여 최적화 할 것.
 		bool escape = false;
 		for (auto ai : mAiCharacter)
 		{
@@ -652,7 +653,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		}
 		if (escape) break;
 
-		UE_LOG(LogTemp, Log, TEXT("move called"));
+		//UE_LOG(LogTemp, Log, TEXT("move called"));
 
 		if (move_id < MAX_USER)
 		{

@@ -66,6 +66,9 @@ void AAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	auto pos = GetTransform().GetLocation();
+	auto rot = GetTransform().GetRotation();
+	Network::GetNetwork()->send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
 }
 
 // Called to bind functionality to input
@@ -132,6 +135,7 @@ void AAICharacter::Throw_AI()
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	bomb->BombOwner = this;
 	//bomb->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "BombSocket");
 	
 	
@@ -163,6 +167,43 @@ void AAICharacter::GetFruits()
 }
 
 
+
+float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// Apply damage와 연계되는 take damage 함수.
+	// 사용 예시는 아래와 같다.
+	/*
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
+		if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
+		{
+			Damage *= 5; // 맞은 부위가 Head면, 데미지 5배.
+		}
+	}
+	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
+
+	CurrentHP -= Damage;
+	*/
+
+	auto other = Cast<AProjectile>(DamageCauser);
+
+	if (other != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		if (nullptr != other->BombOwner)
+		{
+			Network::GetNetwork()->send_hitmyself_packet(s_socket, other->BombOwner->c_id, other->_fType);
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+		}
+	}
+
+	return Damage;
+}
 
 bool AAICharacter::ConnServer()
 {
