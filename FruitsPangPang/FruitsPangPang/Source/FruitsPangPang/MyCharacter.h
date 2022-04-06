@@ -40,14 +40,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 
-	
-	//대파 staticmesh component 추가
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
-	//	class UStaticMeshComponent* GreenOnionComponent;
-	////////당근 staticmesh component
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
-	//	class UStaticMeshComponent* CarrotComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* GreenOnionMesh;
 
@@ -58,11 +50,12 @@ public:
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	/*UFUNCTION()
-		void CarrotOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-		void CarrotOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);*/
 	
+	//가방에 붙어있는 대파, 당근
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class UStaticMeshComponent* GreenOnionBag;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class UStaticMeshComponent* CarrotBag;
 
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
@@ -148,6 +141,8 @@ public:
 		class UAnimMontage* PickSwordMontage;
 	void PickSwordAnimation();
 	void DropSwordAnimation();
+
+	void SwordInTheBag();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* DeathMontage;
