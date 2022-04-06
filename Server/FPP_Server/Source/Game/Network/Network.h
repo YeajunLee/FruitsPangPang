@@ -32,6 +32,7 @@ void send_remove_object_packet(int player_id, int removeCharacter_id);
 void send_update_userstatus_packet(int player_id);
 void send_die_packet(int player_id, int deadplayer_id);
 void send_respawn_packet(int player_id, int respawner_id);
+void send_update_score_packet(int player_id, short* userdeathcount, short* userkillcount);
 
 
 

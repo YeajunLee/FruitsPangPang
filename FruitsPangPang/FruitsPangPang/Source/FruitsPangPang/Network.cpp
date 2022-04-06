@@ -12,6 +12,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MainWidget.h"
+#include "ScoreWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -71,8 +72,8 @@ void Network::release()
 		mMyCharacter = nullptr;
 		for (auto& p : mAiCharacter)
 			p = nullptr;
-		for (int i = 0; i < MAX_USER; ++i)
-			mOtherCharacter[i] = nullptr;
+		for (auto& p : mOtherCharacter)
+			p = nullptr;
 
 		WSACleanup();
 		isInit = false;
@@ -197,18 +198,18 @@ void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& a
 	packet.slotNum = slotNum;
 	packet.Amount = amount;
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_useitem), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_hitmyself_packet(SOCKET& sock, const int& FruitType)
+void Network::send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType)
 {
 	cs_packet_hit packet;
 	packet.size = sizeof(cs_packet_hit);
 	packet.type = CS_PACKET_HIT;
 	packet.fruitType = FruitType;
-
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	packet.attacker_id = AttackerId;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_hit), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }
@@ -221,7 +222,7 @@ void Network::send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
 	packet.type = CS_PACKET_CHANGE_HOTKEYSLOT;
 	packet.HotkeySlotNum = slotNum;
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_change_hotkeyslot), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
@@ -389,6 +390,8 @@ void Network::process_packet(unsigned char* p)
 		int id = packet->id;
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 		mOtherCharacter[id]->c_id = packet->id;
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 		break;
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
@@ -520,6 +523,29 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[packet->id]->GroundSpeedd = 0;
 			}
 		}
+		break;
+	}
+	case SC_PACKET_UPDATE_SCORE: {
+		sc_packet_update_score* packet = reinterpret_cast<sc_packet_update_score*>(p);
+		for (int i = USER_START; i < MAX_USER; ++i)
+		{
+			//이거 고쳐야함 버그 있음.
+			//서버에서 받아오는게 무조건 c_id 0번째부터 character id 0번째부터 killcount 0번째에 넣어주는게 아님. 지금은 그런데 나중엔 어떻게될지모름.
+			if (i == mMyCharacter->c_id)
+			{
+				mMyCharacter->killcount = packet->characterkillcount[i];
+				mMyCharacter->deathcount = packet->characterdeathcount[i];
+			}
+			else {
+				if (nullptr != mOtherCharacter[i])
+				{
+					mOtherCharacter[i]->killcount = packet->characterkillcount[i];
+					mOtherCharacter[i]->deathcount = packet->characterdeathcount[i];
+				}
+			}
+		}
+		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+
 		break;
 	}
 	}
