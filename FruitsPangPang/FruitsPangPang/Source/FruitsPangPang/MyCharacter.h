@@ -78,6 +78,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
+
+public:
+	//Player Stats
+
+	void Die();
 public:
 	//related Network
 	bool s_connected;	//server_connected;
@@ -144,7 +149,8 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* DeathMontage;
 
 protected:
 	// Called when the game starts or when spawned

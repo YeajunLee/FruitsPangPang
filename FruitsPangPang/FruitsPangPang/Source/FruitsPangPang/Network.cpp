@@ -481,8 +481,10 @@ void Network::process_packet(unsigned char* p)
 		//현재는 그냥 꺾어놓기만 했음.
 		if (packet->id == mMyCharacter->c_id) {
 
-			mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
+			//mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+			mMyCharacter->Die();
+
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
 			UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
 
@@ -491,7 +493,9 @@ void Network::process_packet(unsigned char* p)
 		{
 			if (mOtherCharacter[packet->id] != nullptr)
 			{
-				mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
+				mOtherCharacter[packet->id]->Die();
+
+				//mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
 			}
 		}
 		//
