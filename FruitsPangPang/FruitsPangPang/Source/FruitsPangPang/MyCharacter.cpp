@@ -149,10 +149,10 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(6);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 7; //대파 1개 생성
+		itemClass.ItemCode = 8; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(7);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		itemClass.Name = AInventory::ItemCodeToItemName(8);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(8);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
