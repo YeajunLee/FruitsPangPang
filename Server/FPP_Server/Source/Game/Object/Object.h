@@ -1,8 +1,8 @@
 #pragma once
 #include "../../../../../Protocol/protocol.h"
 
-
-enum class FRUITTYPE { NONE, T_TOMATO,T_QUIUI,T_APPLE,T_WATERMELON,T_PINEAPPLE,T_PUMPKIN,T_GREENONION,T_CARROT,T_DURIAN,T_NUT,T_BANANA,T_HEAL };
+//Tomato, kiwi, apple , watermelon, pumpkin, greenonion,carrot, durian,nut, banna, heal
+enum class FRUITTYPE { NONE, T_TOMATO,T_KIWI,T_APPLE,T_WATERMELON,T_PINEAPPLE,T_PUMPKIN,T_GREENONION,T_CARROT,T_DURIAN,T_NUT,T_BANANA,T_HEAL };
 
 class Object
 {
