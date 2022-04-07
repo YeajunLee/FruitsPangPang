@@ -304,7 +304,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Nut/Bam_slot.Bam_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 11:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Banana/Banana_slot.Banana_slot"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/Fruits/Banana/BananaSkin/BananaSkin_Slot.BananaSkin_Slot'"), NULL, LOAD_None, NULL);
 		break;
 	case 12:
 		break;
