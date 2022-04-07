@@ -112,8 +112,6 @@ void AMyCharacter::BeginPlay()
 	
 	GreenOnionMesh->SetHiddenInGame(true, false);
 	CarrotMesh->SetHiddenInGame(true, false);
-	//GreenOnionBag->SetHiddenInGame(false, false);
-	//CarrotBag->SetHiddenInGame(false, false);
 	
 	GreenOnionMesh->SetGenerateOverlapEvents(true);
 	CarrotMesh->SetGenerateOverlapEvents(true);
@@ -122,9 +120,10 @@ void AMyCharacter::BeginPlay()
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
-	GreenOnionBag->SetHiddenInGame(true, false);
 	CarrotBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CarrotBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotBag"));
+	
+	GreenOnionBag->SetHiddenInGame(true, false);
 	CarrotBag->SetHiddenInGame(true, false);
 
 	
@@ -150,10 +149,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 3;	//토마토 30개 생성
+		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(3);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(3);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -163,10 +162,10 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(6);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 7; //대파 1개 생성
+		itemClass.ItemCode = 8; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(7);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		itemClass.Name = AInventory::ItemCodeToItemName(8);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(8);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
@@ -302,8 +301,13 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::Two)
 	{
 		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
+		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum == 2)
+		{
+			PickSwordAnimation();
+		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(1);
+		
 	}
 	else if (Key == EKeys::Three)
 	{
@@ -318,8 +322,13 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::Four)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
+		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum==2)
+		{
+			PickSwordAnimation();
+		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(3);
+		
 	}
 	else if (Key == EKeys::Five)
 	{
@@ -622,10 +631,28 @@ void AMyCharacter::DropSwordAnimation()
 	if (2 != SelectedHotKeySlotNum) return;
 	if (!mInventory->IsSlotValid(2)) return;
 
-	GreenOnionMesh->SetHiddenInGame(true, false);
-	CarrotMesh->SetHiddenInGame(true, false);
-	GreenOnionBag->SetHiddenInGame(false, false);
-	CarrotBag->SetHiddenInGame(false, false);
+	FItemInfo info;
+	bool isempty;
+	int amount;
+	mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+	switch (info.ItemCode)
+	{
+	case 7:
+		GreenOnionMesh->SetHiddenInGame(true, false);
+		GreenOnionBag->SetHiddenInGame(false, false);
+		
+		break;
+	case 8:
+		CarrotMesh->SetHiddenInGame(true, false);
+		CarrotBag->SetHiddenInGame(false, false);
+		
+		break;
+	}
+
+	//GreenOnionMesh->SetHiddenInGame(true, false);
+	//CarrotMesh->SetHiddenInGame(true, false);
+	//GreenOnionBag->SetHiddenInGame(false, false);
+	//CarrotBag->SetHiddenInGame(false, false);
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
