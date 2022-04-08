@@ -142,8 +142,6 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
-	void SwordInTheBag();
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* DeathMontage;
 
