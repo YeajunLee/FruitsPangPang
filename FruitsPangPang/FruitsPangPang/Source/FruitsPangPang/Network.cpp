@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MainWidget.h"
 #include "ScoreWidget.h"
+#include "GameResultWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -560,6 +561,19 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 
 		break;
+	}
+	case SC_PACKET_GAMESTART: {
+		//3초 기다리는 UI
+		break;
+	}
+	case SC_PACKET_GAMEEND: {
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameResultWidget.MGameResultWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto GameResultWGT = CreateWidget<UGameResultWidget>(mMyCharacter->GetWorld(), WidgetClass);
+		GameResultWGT->mScoreWidget = mMyCharacter->mInventory->mMainWidget->mScoreWidget;
+		GameResultWGT->AddToViewport();
+		break;
+
 	}
 	}
 }

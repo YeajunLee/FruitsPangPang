@@ -46,7 +46,8 @@ const char SC_PACKET_UPDATE_USERSTATUS = 10;
 const char SC_PACKET_DIE = 11;
 const char SC_PACKET_RESPAWN = 12;
 const char SC_PACKET_UPDATE_SCORE = 13;
-
+const char SC_PACKET_GAMESTART = 14;
+const char SC_PACKET_GAMEEND = 15;
 #pragma pack (push, 1)
 struct cs_packet_login {
 	unsigned char size;
@@ -209,5 +210,15 @@ struct sc_packet_update_score {
 	int id;
 	short characterkillcount[8];
 	short characterdeathcount[8];
+};
+
+struct sc_packet_gamestart {
+	unsigned char size;
+	char type;
+};
+
+struct sc_packet_gameend {
+	unsigned char size;
+	char type;
 };
 #pragma pack(pop)

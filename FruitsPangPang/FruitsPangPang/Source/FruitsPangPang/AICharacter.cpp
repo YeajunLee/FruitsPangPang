@@ -9,6 +9,7 @@
 #include "Punnet.h"
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -69,6 +70,10 @@ void AAICharacter::Tick(float DeltaTime)
 	auto pos = GetTransform().GetLocation();
 	auto rot = GetTransform().GetRotation();
 	Network::GetNetwork()->send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
+
+	//Update GroundSpeedd (22-04-05)
+	float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+	GroundSpeed_AI = CharXYVelocity;
 }
 
 // Called to bind functionality to input
@@ -123,24 +128,21 @@ void AAICharacter::Attack()
 //	Attack();
 //}
 
-void AAICharacter::Throw_AI()
+void AAICharacter::Throw()
 {
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
-	
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	//Ai가 바라보고 있는 방향벡터로 Rotater를 만든다음 그걸 소켓과 합쳐서 transform을 만든다.
+	FRotator aiRotate = GetActorForwardVector().Rotation();
+	FTransform trans(aiRotate.Quaternion(), SocketTransform.GetLocation());
+	//Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), aiRotate, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
-	//FName path = TEXT("Blueprint'/Game/Bomb/Bomb.Bomb_C'"); //_C를 꼭 붙여야 된다고 함.
-	//FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb.Bomb_C'");
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	bomb->BombOwner = this;
-	//bomb->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "BombSocket");
-	
-	
-	//bomb->BombOwner = this;
-	//bomb->ProjectileMovementComponent->Activate();
+	bomb->ProjectileMovementComponent->Activate();
 
 
 }
@@ -190,15 +192,31 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CurrentHP -= Damage;
 	*/
 
-	auto other = Cast<AProjectile>(DamageCauser);
 
-	if (other != nullptr)
+	auto projectile = Cast<AProjectile>(DamageCauser);
+
+	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
+	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
-		if (nullptr != other->BombOwner)
+		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket, other->BombOwner->c_id, other->_fType);
-			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			if (nullptr != projectile->BombOwner)
+			{
+				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
+				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			}
+		}
+	}
+
+	if (nullptr != DMGCauserCharacter)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
+			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
 		}
 	}
 

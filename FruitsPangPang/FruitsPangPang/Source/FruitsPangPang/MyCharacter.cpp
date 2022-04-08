@@ -149,10 +149,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 1;	//토마토 30개 생성
+		itemClass.ItemCode = 2;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(1);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
+		itemClass.Name = AInventory::ItemCodeToItemName(2);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(2);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -162,10 +162,10 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(6);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
-		itemClass.ItemCode = 8; //대파 1개 생성
+		itemClass.ItemCode = 7; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(8);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(8);
+		itemClass.Name = AInventory::ItemCodeToItemName(7);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
@@ -648,28 +648,10 @@ void AMyCharacter::DropSwordAnimation()
 		
 		break;
 	}
-
-	//GreenOnionMesh->SetHiddenInGame(true, false);
-	//CarrotMesh->SetHiddenInGame(true, false);
-	//GreenOnionBag->SetHiddenInGame(false, false);
-	//CarrotBag->SetHiddenInGame(false, false);
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
-void AMyCharacter::SwordInTheBag()
-{
-	if (mInventory->IsSlotValid(2))
-	{
-		if (SavedHotKeyItemCode == 7)
-			GreenOnionBag->SetHiddenInGame(false, false);
-		if (SavedHotKeyItemCode == 8)
-			CarrotBag->SetHiddenInGame(false, false);
-	}
-	else
-		return;
-}
-
-void AMyCharacter::Throww()
+void AMyCharacter::Throw()
 {
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
