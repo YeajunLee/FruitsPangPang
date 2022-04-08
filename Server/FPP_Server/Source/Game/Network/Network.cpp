@@ -13,6 +13,7 @@ HANDLE hiocp;
 SOCKET s_socket;
 
 std::array<Object*, MAX_OBJECT> objects;
+std::atomic_int loginPlayerCnt;
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
@@ -244,6 +245,25 @@ void send_update_score_packet(int player_id,short* userdeathcount, short* userki
 
 	player->sendPacket(&packet, sizeof(packet));
 }
+
+void send_gamestart_packet(int player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_gamestart packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_GAMESTART;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_gameend_packet(int player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_gameend packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_GAMEEND;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 
 void process_packet(int client_id, unsigned char* p)
 {
