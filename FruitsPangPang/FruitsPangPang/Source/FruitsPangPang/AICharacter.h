@@ -24,9 +24,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 		float GroundSpeed_AI;
 
-	UFUNCTION(BlueprintCallable)
-		void Throw_AI();
-
+	//UFUNCTION(BlueprintCallable)
+	//	void Throw_AI();
 public:
 	//related interact
 	
@@ -82,10 +81,13 @@ public:
 	//	bool bIsUndertheTree;
 
 public:
+	//related attack
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 		bool bAttacking;
 
 	void Attack();
+
+	virtual void Throw() override;
 
 	//UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Delegate")
 	FOnAttackEndDelegate OnAttackEnd;

@@ -63,8 +63,6 @@ public:
 
 	virtual void Jump() override;
 
-	UFUNCTION(BlueprintCallable)
-		void Throww();
 	void Throw(const FVector& location, FRotator rotation, const FName& path);
 	bool bLMBDown;
 	void LMBDown();
@@ -98,6 +96,7 @@ protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
+	//related attack
 	UFUNCTION(BlueprintCallable)
 		void SendHitPacket();
 
@@ -109,9 +108,8 @@ public:
 		bool bAttacking;
 
 	void Attack();
-
-	UFUNCTION(BlueprintCallable)
-		void AttackEnd();
+	virtual void Throw() override;
+	virtual void AttackEnd() override;
 
 	UFUNCTION(BlueprintCallable)
 		void GreenOnionAttackStart();

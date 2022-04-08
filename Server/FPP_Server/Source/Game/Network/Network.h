@@ -11,6 +11,7 @@ extern HANDLE hiocp;
 extern SOCKET s_socket;
 
 extern std::array<class Object*, MAX_OBJECT> objects;
+extern std::atomic_int loginPlayerCnt;
 
 void error_display(int err_no);
 int Generate_Id();
@@ -33,13 +34,15 @@ void send_update_userstatus_packet(int player_id);
 void send_die_packet(int player_id, int deadplayer_id);
 void send_respawn_packet(int player_id, int respawner_id);
 void send_update_score_packet(int player_id, short* userdeathcount, short* userkillcount);
-
+void send_gamestart_packet(int player_id);
+void send_gameend_packet(int player_id);
 
 
 enum COMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, //basic
-	CMD_TREE_RESPAWN, CMD_PUNNET_RESPAWN, CMD_PLAYER_RESPAWN, //respawn
-	CMD_DURIAN_DMG //Damage
+	CMD_ACCEPT, CMD_RECV, CMD_SEND, //Basic
+	CMD_TREE_RESPAWN, CMD_PUNNET_RESPAWN, CMD_PLAYER_RESPAWN, //Respawn
+	CMD_DURIAN_DMG, //Damage
+	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END //Game Cycle
 };
 
 class WSA_OVER_EX {
@@ -65,7 +68,9 @@ struct Timer_Event {
 
 	enum class TIMER_TYPE
 	{
-		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN,TYPE_PUNNET_RESPAWN,TYPE_DURIAN_DMG
+		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN,TYPE_PUNNET_RESPAWN,
+		TYPE_DURIAN_DMG,
+		TYPE_GAME_WAIT,TYPE_GAME_START,TYPE_GAME_END
 	};
 	int object_id;
 	int player_id;

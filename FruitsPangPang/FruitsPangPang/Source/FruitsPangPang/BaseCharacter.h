@@ -42,6 +42,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 		class AInventory* mInventory;
 public:
+	//related throw
+	UFUNCTION(BlueprintCallable)
+		virtual void Throw();
+	UFUNCTION(BlueprintCallable)
+		virtual void AttackEnd();
+
+public:
 	//related interact
 	UFUNCTION(BlueprintCallable)
 		virtual void GetFruits();

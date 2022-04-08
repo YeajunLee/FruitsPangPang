@@ -54,6 +54,24 @@ void TimerThread()
 						memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &is_already.spare2, sizeof(char));
 						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
 					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_GAME_WAIT);
+						PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_GAME_START)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_GAME_START);
+						PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_GAME_END)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_GAME_END);
+						PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+					}
 					triger = false;
 
 				}
@@ -97,6 +115,24 @@ void TimerThread()
 					memcpy(wsa_ex->getBuf() + sizeof(int) + sizeof(int), &exec_event.spare, sizeof(int));
 					memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &exec_event.spare2, sizeof(char));
 					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_GAME_WAIT);
+					PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_GAME_START)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_GAME_START);
+					PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_GAME_END)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_GAME_END);
+					PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
 				}
 			}
 			else {

@@ -46,7 +46,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		{
 			AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
 
-			if (myCharacter && myCharacter->GetController()->IsPlayerController())
+			if (nullptr != myCharacter)
 			{
 				// Character면, 블랙보드에 저장한다.
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, myCharacter);

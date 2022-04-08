@@ -45,6 +45,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ABaseCharacter::Throw()
+{
+
+}
+
+void ABaseCharacter::AttackEnd()
+{
+
+}
+
 void ABaseCharacter::GetFruits()
 {
 
