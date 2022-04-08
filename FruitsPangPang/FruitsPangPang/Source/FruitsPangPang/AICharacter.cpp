@@ -192,15 +192,31 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CurrentHP -= Damage;
 	*/
 
-	auto other = Cast<AProjectile>(DamageCauser);
 
-	if (other != nullptr)
+	auto projectile = Cast<AProjectile>(DamageCauser);
+
+	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
+	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
-		if (nullptr != other->BombOwner)
+		if (GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_hitmyself_packet(s_socket, other->BombOwner->c_id, other->_fType);
-			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			if (nullptr != projectile->BombOwner)
+			{
+				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
+				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+			}
+		}
+	}
+
+	if (nullptr != DMGCauserCharacter)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		if (GetController()->IsPlayerController())
+		{
+			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
+			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
 		}
 	}
 
