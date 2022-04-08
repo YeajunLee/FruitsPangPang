@@ -669,7 +669,7 @@ void AMyCharacter::SwordInTheBag()
 		return;
 }
 
-void AMyCharacter::Throww()
+void AMyCharacter::Throw()
 {
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
