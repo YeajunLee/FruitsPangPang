@@ -149,10 +149,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 2;	//토마토 30개 생성
+		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(2);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(2);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -179,7 +179,7 @@ void AMyCharacter::BeginPlay()
 		itemClass.IndexOfHotKeySlot = 4;
 		itemClass.Name = AInventory::ItemCodeToItemName(11);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
-		mInventory->UpdateInventorySlot(itemClass, 1);
+		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		
 
@@ -662,7 +662,7 @@ void AMyCharacter::Throw()
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
+ 	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
 	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
