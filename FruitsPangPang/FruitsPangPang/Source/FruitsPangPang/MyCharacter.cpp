@@ -651,7 +651,7 @@ void AMyCharacter::DropSwordAnimation()
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
-void AMyCharacter::Throww()
+void AMyCharacter::Throw()
 {
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
