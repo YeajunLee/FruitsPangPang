@@ -82,7 +82,7 @@ public:
 
 public:
 	//related attack
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Anims")
 		bool bAttacking;
 
 	void Attack();

@@ -86,34 +86,36 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AAICharacter::Attack()
 {
-	/*if (!bAttacking)
+	if (!bAttacking)
 	{
-		bAttacking = true;
-	}*/
-
-	//Play Throw Montage	
-	if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
-	{
-		SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-		mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-		//if (c_id == Network::GetNetwork()->mId) 
+		//Play Throw Montage	
+		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-			Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
-		}
-		AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage_AI)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
-			UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
+			bAttacking = true;
 
-			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
-		}
+			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+			//if (c_id == Network::GetNetwork()->mId) 
+			{
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+			}
+			AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && ThrowMontage_AI)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
+				UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
-		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
-		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+				AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
+			}
+
+			//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
+			AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+		}
 	}
+
+	
 }
 
 //void AAICharacter::PostInitializeComponents()
