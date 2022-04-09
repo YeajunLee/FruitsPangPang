@@ -10,6 +10,9 @@
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -106,7 +109,7 @@ void AAICharacter::Attack()
 				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
 				UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
-				AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 			}
 
@@ -133,11 +136,17 @@ void AAICharacter::Attack()
 void AAICharacter::Throw()
 {
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+
+	auto ToTarget = UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsRotator(AAIController_Custom::TrackingTargetKey);
+
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *ToTarget.ToString());
+
 	//Ai가 바라보고 있는 방향벡터로 Rotater를 만든다음 그걸 소켓과 합쳐서 transform을 만든다.
-	FRotator aiRotate = GetActorForwardVector().Rotation();
-	FTransform trans(aiRotate.Quaternion(), SocketTransform.GetLocation());
+	//FRotator aiRotate = GetActorForwardVector().Rotation();
+
+	FTransform trans(ToTarget.Quaternion(), SocketTransform.GetLocation());
 	//Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), aiRotate, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 
@@ -145,6 +154,10 @@ void AAICharacter::Throw()
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	bomb->BombOwner = this;
 	bomb->ProjectileMovementComponent->Activate();
+	
+
+
+
 
 
 }

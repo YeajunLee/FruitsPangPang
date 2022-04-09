@@ -25,6 +25,7 @@ public:
 	static FName TreePosKey;
 	static FName AmountKey;
 	static FName TargetTreeKey;
+	static FName TrackingTargetKey;
 
 private:
 	UPROPERTY();
