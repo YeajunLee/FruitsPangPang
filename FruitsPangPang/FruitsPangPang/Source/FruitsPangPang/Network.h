@@ -88,5 +88,6 @@ public:
 	void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum);
 	void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type);
 	void send_respawn_packet(SOCKET& sock,const char& WannaRespawn);
+	void send_PreGameSettingComplete_packet(SOCKET& sock);
 
 };
