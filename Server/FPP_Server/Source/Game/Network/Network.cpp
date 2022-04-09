@@ -245,6 +245,15 @@ void send_update_score_packet(int player_id,short* userdeathcount, short* userki
 
 	player->sendPacket(&packet, sizeof(packet));
 }
+void send_gamewaiting_packet(int player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_gamewaiting packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_GAMEWAITING;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 
 void send_gamestart_packet(int player_id)
 {
@@ -572,6 +581,20 @@ void process_packet(int client_id, unsigned char* p)
 				}
 			}
 			else character->state_lock.unlock();
+		}
+		break;
+	}
+	case CS_PACKET_PREGAMESETTINGCOMPLETE: {
+		cs_packet_pregamesettingcomplete* packet = reinterpret_cast<cs_packet_pregamesettingcomplete*>(p);
+
+		loginPlayerCnt++;
+		if (loginPlayerCnt == MAX_PLAYER_CONN)
+		{
+			cout << " gogo" << endl;
+			Timer_Event instq;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT;
+			instq.exec_time = chrono::system_clock::now() + 3000ms;
+			timer_queue.push(instq);
 		}
 		break;
 	}

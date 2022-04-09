@@ -69,7 +69,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
-
+public:
+	//related HUD
+	class UMainWidget* mMainWidget;
+	class UMainWidget* MakeMainHUD();
+	class UUserWidget* mLoadingWidget;
+	class UUserWidget* mWaitingWidget;
+	void MakeLoadingHUD();
 public:
 	//Player Stats
 
