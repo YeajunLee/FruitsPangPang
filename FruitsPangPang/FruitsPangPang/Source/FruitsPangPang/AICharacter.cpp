@@ -10,6 +10,9 @@
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -86,34 +89,36 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AAICharacter::Attack()
 {
-	/*if (!bAttacking)
+	if (!bAttacking)
 	{
-		bAttacking = true;
-	}*/
-
-	//Play Throw Montage	
-	if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
-	{
-		SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
-		mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-		//if (c_id == Network::GetNetwork()->mId) 
+		//Play Throw Montage	
+		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-			Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
-		}
-		AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && ThrowMontage_AI)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
-			UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
+			bAttacking = true;
 
-			AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
-			AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
-		}
+			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+			//if (c_id == Network::GetNetwork()->mId) 
+			{
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+			}
+			AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && ThrowMontage_AI)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
+				UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
-		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
-		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
+				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
+			}
+
+			//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
+			AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+		}
 	}
+
+	
 }
 
 //void AAICharacter::PostInitializeComponents()
@@ -131,11 +136,17 @@ void AAICharacter::Attack()
 void AAICharacter::Throw()
 {
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+
+	auto ToTarget = UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsRotator(AAIController_Custom::TrackingTargetKey);
+
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *ToTarget.ToString());
+
 	//Ai가 바라보고 있는 방향벡터로 Rotater를 만든다음 그걸 소켓과 합쳐서 transform을 만든다.
-	FRotator aiRotate = GetActorForwardVector().Rotation();
-	FTransform trans(aiRotate.Quaternion(), SocketTransform.GetLocation());
+	//FRotator aiRotate = GetActorForwardVector().Rotation();
+
+	FTransform trans(ToTarget.Quaternion(), SocketTransform.GetLocation());
 	//Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), aiRotate, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 
@@ -143,6 +154,10 @@ void AAICharacter::Throw()
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	bomb->BombOwner = this;
 	bomb->ProjectileMovementComponent->Activate();
+	
+
+
+
 
 
 }

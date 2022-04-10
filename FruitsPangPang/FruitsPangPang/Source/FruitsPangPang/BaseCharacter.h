@@ -45,8 +45,8 @@ public:
 	//related throw
 	UFUNCTION(BlueprintCallable)
 		virtual void Throw();
-	UFUNCTION(BlueprintCallable)
-		virtual void AttackEnd();
+	//UFUNCTION(BlueprintCallable)
+	//	virtual void AttackEnd();
 
 public:
 	//related interact

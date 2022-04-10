@@ -115,7 +115,9 @@ public:
 
 	void Attack();
 	virtual void Throw() override;
-	virtual void AttackEnd() override;
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 
 	UFUNCTION(BlueprintCallable)
 		void GreenOnionAttackStart();

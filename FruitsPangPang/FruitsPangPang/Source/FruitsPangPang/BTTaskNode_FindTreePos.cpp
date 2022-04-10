@@ -8,6 +8,7 @@
 #include "Tree.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "AICharacter.h"
 
 
 UBTTaskNode_FindTreePos::UBTTaskNode_FindTreePos()
@@ -23,7 +24,6 @@ AActor* UBTTaskNode_FindTreePos::GetClosestActor(FVector sourceLocation, TArray<
 		return nullptr;
 
 	AActor* closestActor = actors[0];
-	//static float 
 
 	for (int i = 0; i < actors.Num(); ++i)
 	{
@@ -104,6 +104,9 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 
 	//UAIBlueprintHelperLibrary::SimpleMoveToLocation(OwnerComp.GetAIOwner()->GetPawn()->GetController(), TreePos);
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *OwnerComp.GetBlackboardComponent()->GetValueAsVector(AAIController_Custom::TreePosKey).ToString());
+	AAICharacter* ai = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 
-	return EBTNodeResult::Succeeded;
+	if (!ai->bAttacking)
+		return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
