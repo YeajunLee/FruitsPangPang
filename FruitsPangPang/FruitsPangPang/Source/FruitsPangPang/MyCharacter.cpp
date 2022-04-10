@@ -297,6 +297,7 @@ void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
 
 void AMyCharacter::AnyKeyPressed(FKey Key)
 {
+	if (bAttacking) return;
 	if (Key == EKeys::One)
 	{
 		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
