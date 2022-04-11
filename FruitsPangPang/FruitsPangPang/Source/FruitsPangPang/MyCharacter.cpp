@@ -662,6 +662,8 @@ void AMyCharacter::DropSwordAnimation()
 void AMyCharacter::Throw()
 {
 
+	if (SelectedHotKeySlotNum == 4) return;
+
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
 	CameraRotate.Pitch += 14;
@@ -670,6 +672,7 @@ void AMyCharacter::Throw()
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+
  	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
@@ -701,12 +704,28 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 	bomb->ProjectileMovementComponent->Activate();
 }
 
+void AMyCharacter::BananaThrow()
+{
+	if (SelectedHotKeySlotNum != 4) return;
+
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
+	FRotator CameraRotate = FollowCamera->GetComponentRotation();
+	CameraRotate.Pitch += 14;
+	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+	FName path = AInventory::ItemCodeToItemBombPath(11);
+	
+	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
+	//banana->BombOwner = this;
+	//banana->ProjectileMovementComponent->Activate();
+}
+
 
 void AMyCharacter::GetFruits()
 {
 	Super::GetFruits();
 	if (OverlapType)
-	{
+	{           
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
 		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
