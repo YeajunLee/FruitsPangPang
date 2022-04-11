@@ -169,10 +169,10 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
-		itemClass.ItemCode = 10;	//두리안 30개 생성
+		itemClass.ItemCode = 9;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(10);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(10);
+		itemClass.Name = AInventory::ItemCodeToItemName(9);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(9);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 11; //바나나 1개 생성
@@ -303,7 +303,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum == 2)
 		{
-			PickSwordAnimation();
+			DropSwordAnimation();
 		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(1);
@@ -324,7 +324,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum==2)
 		{
-			PickSwordAnimation();
+			DropSwordAnimation();
 		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(3);
@@ -357,7 +357,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 			if (SelectedHotKeySlotNum == 1 && mInventory->IsSlotValid(2))
 			{
-				PickSwordAnimation();
+				DropSwordAnimation();
 			}
 		}
 	}
@@ -379,7 +379,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 			if (SelectedHotKeySlotNum == 3 && mInventory->IsSlotValid(2))
 			{
-				PickSwordAnimation();
+				DropSwordAnimation();
+
 			}
 			
 		}
@@ -631,23 +632,30 @@ void AMyCharacter::DropSwordAnimation()
 	if (2 != SelectedHotKeySlotNum) return;
 	if (!mInventory->IsSlotValid(2)) return;
 
-	FItemInfo info;
-	bool isempty;
-	int amount;
-	mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
-	switch (info.ItemCode)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && PickSwordMontage)
 	{
-	case 7:
-		GreenOnionMesh->SetHiddenInGame(true, false);
-		GreenOnionBag->SetHiddenInGame(false, false);
-		
-		break;
-	case 8:
-		CarrotMesh->SetHiddenInGame(true, false);
-		CarrotBag->SetHiddenInGame(false, false);
-		
-		break;
+		FItemInfo info;
+		bool isempty;
+		int amount;
+		mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+		switch (info.ItemCode)
+		{
+		case 7:
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			break;
+		case 8:
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			break;
+		}
+		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
 	}
+
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
@@ -692,6 +700,7 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 	//bomb->DetachFromActor(Detachrules);
 	bomb->ProjectileMovementComponent->Activate();
 }
+
 
 void AMyCharacter::GetFruits()
 {
