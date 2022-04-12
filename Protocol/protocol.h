@@ -5,6 +5,7 @@ const int MAX_PLAYER_CONN = 4;
 const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int BUFSIZE = 256;
+const int GAMEPLAYTIME_MILLI = 11'000;
 const int  MAX_NAME_SIZE = 20;
 const int USER_START = 0;
 const int  MAX_USER = 8;

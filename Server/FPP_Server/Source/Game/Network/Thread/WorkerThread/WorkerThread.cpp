@@ -257,7 +257,7 @@ void WorkerThread()
 
 			Timer_Event instq;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_END;
-			instq.exec_time = chrono::system_clock::now() + 11'000ms;
+			instq.exec_time = chrono::system_clock::now() + chrono::milliseconds(GAMEPLAYTIME_MILLI);
 			timer_queue.push(instq);
 			delete wsa_ex;
 			break;

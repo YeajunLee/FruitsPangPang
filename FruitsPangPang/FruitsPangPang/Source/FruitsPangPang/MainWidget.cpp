@@ -9,12 +9,13 @@
 #include "RespawnWindowWidget.h"
 #include "ScoreWidget.h"
 #include "Components/HorizontalBox.h"
+#include "Components/TextBlock.h"
 
 
 void UMainWidget::NativePreConstruct()
 {
 	HPBar->Percent = 1.0f;
-
+	fRemainTime = GAMEPLAYTIME_MILLI / 1000;
 	{
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MRespawnWindowWidget.MRespawnWindowWidget_C'"));
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
@@ -58,7 +59,7 @@ void UMainWidget::ShowRespawnWidget()
 	controller->SetShowMouseCursor(true);
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Visible);
 	mRespawnWindowWidget->RemainTime = mRespawnWindowWidget->RespawnTime;
-	mRespawnWindowWidget->Activate = true;
+	mRespawnWindowWidget->bActivate = true;
 }
 
 void UMainWidget::HideRespawnWidget()
@@ -70,6 +71,20 @@ void UMainWidget::HideRespawnWidget()
 		controller->SetInputMode(gamemode);
 		controller->SetShowMouseCursor(false);
 	}
-	mRespawnWindowWidget->Activate = false;
+	mRespawnWindowWidget->bActivate = false;
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+
+void UMainWidget::UpdateCountDown(const FText& minute, const FText& second)
+{
+#define LOCTEXT_NAMESPACE "Game"
+	RemainGameTimeText->SetText(FText::Format(LOCTEXT("Game", "{0}:{1}"), minute, second));
+#undef LOCTEXT_NAMESPACE
+}
+
+const float UMainWidget::ReduceRemainTime(const float& deltatime)
+{
+	fRemainTime = FMath::Max<float>(fRemainTime - deltatime, 0.0f);
+	return fRemainTime;
 }
