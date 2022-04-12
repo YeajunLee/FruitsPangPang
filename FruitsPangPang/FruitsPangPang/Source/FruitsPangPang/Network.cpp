@@ -589,6 +589,7 @@ void Network::process_packet(unsigned char* p)
 		//waiting 위젯 지우고, 게임모드 바꿔주는
 		mMyCharacter->mWaitingWidget->RemoveFromParent();
 		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+		mMyCharacter->mMainWidget->bActivate = true;
 		FInputModeGameOnly gamemode;
 		if (nullptr != controller)
 		{
