@@ -53,12 +53,12 @@ public:
 		int mAmountOfSlots;
 
 
-	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
-		TSubclassOf<class UMainWidget> mMakerMainWidget;
+	//UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
+	//	TSubclassOf<class UMainWidget> mMakerMainWidget;
 	class UMainWidget* mMainWidget;
-
-	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
-		TSubclassOf<class UInventorySlotWidget> mMakerInventorySlotWidget;
+	//
+	//UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "Widget", Meta = (AllowPrivateAccess = true))
+	//	TSubclassOf<class UInventorySlotWidget> mMakerInventorySlotWidget;
 
 	void AddItem(const FItemInfo& item, const int& amount);
 	void UpdateInventorySlot(const FItemInfo& item, const int& amount);

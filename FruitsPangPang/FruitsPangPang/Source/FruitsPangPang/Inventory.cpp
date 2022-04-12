@@ -9,6 +9,7 @@
 
 // Sets default values
 AInventory::AInventory()
+	:mMainWidget(nullptr)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,28 +25,28 @@ void AInventory::BeginPlay()
 	for (int i = 0; i < mAmountOfSlots; ++i)
 		mSlots.Add(FInventorySlot());
 
-	if (mMainWidget == nullptr)
-	{
-		mMainWidget = CreateWidget<UMainWidget>(GetWorld(), mMakerMainWidget);
-		if (mMainWidget != nullptr)
-		{
-			//... Do Something
-			mMainWidget->mInventory = this;
-			mMainWidget->mOwnerCharacter = mOwnerCharacter;
-			for (int i = 0; i < 5; ++i)
-			{
-				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
-				slot->inventoryRef = this;
-				slot->mIndex = i;
-				slot->Update();
-				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
-				mMainWidget->minventorySlot.Add(slot);
-			}
-			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
-			mMainWidget->SetVisibility(ESlateVisibility::Visible);
-			mMainWidget->minventorySlot[0]->Select();
-		}
-	}
+	//if (mMainWidget == nullptr)
+	//{
+	//	mMainWidget = CreateWidget<UMainWidget>(GetWorld(), mMakerMainWidget);
+	//	if (mMainWidget != nullptr)
+	//	{
+	//		//... Do Something
+	//		mMainWidget->mInventory = this;
+	//		mMainWidget->mOwnerCharacter = mOwnerCharacter;
+	//		for (int i = 0; i < 5; ++i)
+	//		{
+	//			auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), mMakerInventorySlotWidget);
+	//			slot->inventoryRef = this;
+	//			slot->mIndex = i;
+	//			slot->Update();
+	//			mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
+	//			mMainWidget->minventorySlot.Add(slot);
+	//		}
+	//		mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
+	//		mMainWidget->SetVisibility(ESlateVisibility::Visible);
+	//		mMainWidget->minventorySlot[0]->Select();
+	//	}
+	//}
 }
 
 // Called every frame
@@ -66,9 +67,8 @@ void AInventory::AddItem(const FItemInfo& item, const int& amount)
 		slot.ItemClass = item;
 		slot.Amount = amount;
 	}
-
-	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update(); //<- 이런식으로 바뀔 예정
-	//mInventoryMainWidget->minventorySlot->Update();
+	if(mMainWidget)
+		mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();
 }
 
 void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
@@ -83,8 +83,8 @@ void AInventory::UpdateInventorySlot(const FItemInfo& item, const int& amount)
 		slot.Amount = amount;
 	}
 
-	mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();// <- 이런식으로 바뀔 예정
-	//mInventoryMainWidget->minventorySlot->Update();
+	if (mMainWidget)
+		mMainWidget->minventorySlot[item.IndexOfHotKeySlot]->Update();
 }
 
 void AInventory::GetItemInfoAtSlotIndex(const int& index, __out bool& isempty, __out FItemInfo& iteminfo, __out int& amount)
@@ -119,15 +119,15 @@ void AInventory::RemoveItemAtSlotIndex(const int& index, const int& amount)
 	if (mSlots[index].Amount > amount)
 	{
 		mSlots[index].Amount -= amount;
-		mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
-		//mInventoryMainWidget->minventorySlot->Update();
+		if (mMainWidget)
+			mMainWidget->minventorySlot[index]->Update(); 
 		return;
 	}
 
 	mSlots[index].Amount = 0;
 	mSlots[index].ItemClass = FItemInfo();
-	mMainWidget->minventorySlot[index]->Update(); //<- 이런식으로 바뀔 예정
-	//mInventoryMainWidget->minventorySlot->Update();
+	if (mMainWidget)
+		mMainWidget->minventorySlot[index]->Update();
 
 }
 
@@ -138,9 +138,13 @@ void AInventory::ClearInventory()
 		slot.Amount = 0;
 		slot.ItemClass = FItemInfo();
 	}
-	for (auto& slot : mMainWidget->minventorySlot)
+
+	if (mMainWidget)
 	{
-		slot->Update();
+		for (auto& slot : mMainWidget->minventorySlot)
+		{
+			slot->Update();
+		}
 	}
 }
 

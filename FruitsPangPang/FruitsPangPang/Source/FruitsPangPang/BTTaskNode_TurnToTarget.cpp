@@ -29,10 +29,11 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 	LookVector.Z = 0.f;
 
 	FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
-	AICharacter->SetActorRotation(FMath::RInterpTo(
-		AICharacter->GetActorRotation(),
-		TargetRot, GetWorld()->GetDeltaSeconds(),
-		2.f));
+	AICharacter->SetActorRotation(TargetRot);
+	//AICharacter->SetActorRotation(FMath::RInterpTo(
+	//	AICharacter->GetActorRotation(),
+	//	TargetRot, GetWorld()->GetDeltaSeconds(),
+	//	2.f));
 
 	return EBTNodeResult::Succeeded;
 }

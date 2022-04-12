@@ -50,10 +50,10 @@ void ABaseCharacter::Throw()
 
 }
 
-void ABaseCharacter::AttackEnd()
-{
-
-}
+//void ABaseCharacter::AttackEnd()
+//{
+//
+//}
 
 void ABaseCharacter::GetFruits()
 {

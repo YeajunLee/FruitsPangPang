@@ -20,4 +20,6 @@ protected:
 public:
 	//UFUNCTION(BlueprintCallable)
 	void Conn();
+	
+	void CreateLoadingWidget();
 };

@@ -59,9 +59,13 @@ std::shared_ptr<Network> Network::GetNetwork()
 
 bool Network::init()
 {
-	isInit = true;
-	WSAStartup(MAKEWORD(2, 2), &WSAData);
-	return true;
+	if (!isInit)
+	{
+		isInit = true;
+		WSAStartup(MAKEWORD(2, 2), &WSAData);
+		return true;
+	}
+	return false;
 }
 
 void Network::release()
@@ -253,6 +257,16 @@ void Network::send_respawn_packet(SOCKET& sock,const char& WannaRespawn)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
+void Network::send_PreGameSettingComplete_packet(SOCKET& sock)
+{
+	cs_packet_pregamesettingcomplete packet;
+	packet.size = sizeof(cs_packet_pregamesettingcomplete);
+	packet.type = CS_PACKET_PREGAMESETTINGCOMPLETE;
+
+
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -562,8 +576,25 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
-	case SC_PACKET_GAMESTART: {
+	case SC_PACKET_GAMEWAITING: {
 		//3초 기다리는 UI
+		mMyCharacter->mLoadingWidget->RemoveFromParent();
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MWaitingWidget.MWaitingWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		mMyCharacter->mWaitingWidget = CreateWidget<UUserWidget>(mMyCharacter->GetWorld(), WidgetClass);
+		mMyCharacter->mWaitingWidget->AddToViewport();
+		break;
+	}
+	case SC_PACKET_GAMESTART: {
+		//waiting 위젯 지우고, 게임모드 바꿔주는
+		mMyCharacter->mWaitingWidget->RemoveFromParent();
+		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+		FInputModeGameOnly gamemode;
+		if (nullptr != controller)
+		{
+			controller->SetInputMode(gamemode);
+			controller->SetShowMouseCursor(false);
+		}
 		break;
 	}
 	case SC_PACKET_GAMEEND: {

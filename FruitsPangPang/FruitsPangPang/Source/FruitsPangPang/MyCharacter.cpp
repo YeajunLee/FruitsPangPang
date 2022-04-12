@@ -133,8 +133,11 @@ void AMyCharacter::BeginPlay()
 	GreenOnionBag->SetHiddenInGame(true, false);
 	CarrotBag->SetHiddenInGame(true, false);
 
-	
-	
+	if (nullptr == GetController())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Not controller!! PleaseMake SpawnDefaultController and AutoPossessPlayer EAutoReceiveInput::Disabled"));
+		return;
+	}
 	if (GetController()->IsPlayerController())
 	{
 		Network::GetNetwork()->mMyCharacter = this;
@@ -151,8 +154,9 @@ void AMyCharacter::BeginPlay()
 		mInventory->mAmountOfSlots = 5;
 		mInventory->FinishSpawning(spawnLocAndRot);
 
-		//mInventory->mMainWidget->MinimapBox->AddChildToHorizontalBox(CreateWidget<UUserWidget>(GetWorld(), p));
-		//mInventory->mMainWidget->MinimapBox->SetVisibility(ESlateVisibility::Hidden);
+		//지금은 개발 편의성을 위해 여기 넣었지만, 나중에는 서버에서 패킷을 받았을 때 만들어줄 예정임.
+		MakeMainHUD();
+		//
 
 
 		FItemInfo itemClass;
@@ -197,6 +201,7 @@ void AMyCharacter::BeginPlay()
 		//}
 	}
 	else {
+		UE_LOG(LogTemp, Log, TEXT("OtherCharacter Spawn"));
 		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
 		Network::GetNetwork()->WorldCharacterCnt++;
 	}
@@ -299,6 +304,7 @@ void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
 
 void AMyCharacter::AnyKeyPressed(FKey Key)
 {
+	if (bAttacking) return;
 	if (Key == EKeys::One)
 	{
 		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
@@ -811,6 +817,90 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	return Damage;
 }
+
+
+
+UMainWidget* AMyCharacter::MakeMainHUD()
+{
+	if (mMainWidget == nullptr)
+	{
+		
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMainWidget.MMainWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+
+		FSoftClassPath SlotWidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MInventorySlotWidget.MInventorySlotWidget_C'"));
+		auto SlotWidgetClass = SlotWidgetSource.TryLoadClass<UUserWidget>();
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("MainWidget Source is invalid !! check '/Game/Widget/MMainWidget.MMainWidget_C'"));
+			return nullptr;
+		}
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SlotWidget Source is invalid !! check '/Game/Widget/MInventorySlotWidget.MInventorySlotWidget_C'"));
+			return nullptr;
+		}
+
+		mMainWidget = CreateWidget<UMainWidget>(GetWorld(), WidgetClass);
+		if (mMainWidget != nullptr)
+		{
+			//... Do Something
+			mMainWidget->mInventory = mInventory;
+			mInventory->mMainWidget = mMainWidget;
+			mMainWidget->mOwnerCharacter = this;
+			for (int i = 0; i < 5; ++i)
+			{
+				auto slot = CreateWidget<UInventorySlotWidget>(GetWorld(), SlotWidgetClass);
+				slot->inventoryRef = mInventory;
+				slot->mIndex = i;
+				slot->Update();
+				mMainWidget->InventoryBar->AddChildToHorizontalBox(slot);
+				mMainWidget->minventorySlot.Add(slot);
+			}
+			mMainWidget->AddToViewport();//Nativecontruct 호출 시점임.
+			mMainWidget->SetVisibility(ESlateVisibility::Visible);
+			mMainWidget->minventorySlot[0]->Select();
+			return mMainWidget;
+		}
+		else {
+			return mMainWidget;
+		}
+	}
+	else {
+		return mMainWidget;
+	}
+}
+
+
+void AMyCharacter::MakeLoadingHUD()
+{
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MLoadingWidget.MLoadingWidget_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	if (nullptr == WidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MLoadingWidget.MLoadingWidget_C'"));
+		return;
+	}
+	mLoadingWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	mLoadingWidget->AddToViewport();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 bool AMyCharacter::ConnServer()

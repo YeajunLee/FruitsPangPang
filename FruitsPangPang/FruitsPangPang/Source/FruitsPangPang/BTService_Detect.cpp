@@ -25,7 +25,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	if (nullptr == World) return;
 
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 600.0f;
+	float DetectRadius = 900.0f;
 
 	// 600의 반지름을 가진 구체를 만들어서 오브젝트를 감지한다.
 	TArray<FOverlapResult> OverlapResults;

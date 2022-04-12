@@ -78,7 +78,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LMBUp();
-
+public:
+	//related HUD
+	class UMainWidget* mMainWidget;
+	class UMainWidget* MakeMainHUD();
+	class UUserWidget* mLoadingWidget;
+	class UUserWidget* mWaitingWidget;
+	void MakeLoadingHUD();
 public:
 	//Player Stats
 
@@ -118,7 +124,9 @@ public:
 
 	void Attack();
 	virtual void Throw() override;
-	virtual void AttackEnd() override;
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 
 	UFUNCTION(BlueprintCallable)
 		void BananaThrow();

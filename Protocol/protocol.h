@@ -1,6 +1,7 @@
 #pragma once
 
 const short SERVER_PORT = 4000;
+const int MAX_PLAYER_CONN = 4;
 const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int BUFSIZE = 256;
@@ -33,6 +34,7 @@ const char CS_PACKET_HIT = 8;
 const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
 const char CS_PACKET_POS = 10;
 const char CS_PACKET_SELECT_RESPAWN = 11;
+const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -46,8 +48,10 @@ const char SC_PACKET_UPDATE_USERSTATUS = 10;
 const char SC_PACKET_DIE = 11;
 const char SC_PACKET_RESPAWN = 12;
 const char SC_PACKET_UPDATE_SCORE = 13;
-const char SC_PACKET_GAMESTART = 14;
-const char SC_PACKET_GAMEEND = 15;
+const char SC_PACKET_GAMEWAITING = 14;
+const char SC_PACKET_GAMESTART = 15;
+const char SC_PACKET_GAMEEND = 16;
+
 #pragma pack (push, 1)
 struct cs_packet_login {
 	unsigned char size;
@@ -115,6 +119,11 @@ struct cs_packet_select_respawn {
 	unsigned char size;
 	char type;
 	char numbering;
+};
+
+struct cs_packet_pregamesettingcomplete {
+	unsigned char size;
+	char type;
 };
 //-------------------- server to client
 struct sc_packet_login_ok {
@@ -210,6 +219,11 @@ struct sc_packet_update_score {
 	int id;
 	short characterkillcount[8];
 	short characterdeathcount[8];
+};
+
+struct sc_packet_gamewaiting {
+	unsigned char size;
+	char type;
 };
 
 struct sc_packet_gamestart {

@@ -77,16 +77,6 @@ void WorkerThread()
 			CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), hiocp, new_id, 0);
 			player->recvPacket();
 
-			loginPlayerCnt++;
-			if (loginPlayerCnt >= 4)
-			{
-				cout << " gogo" << endl;
-				Timer_Event instq;
-				instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT;
-				instq.exec_time = chrono::system_clock::now() + 3000ms;
-				timer_queue.push(instq);
-			}
-
 			ZeroMemory(&wsa_ex->getWsaOver(), sizeof(wsa_ex->getWsaOver()));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 			*(reinterpret_cast<SOCKET*>(wsa_ex->getBuf())) = c_socket;
@@ -224,7 +214,7 @@ void WorkerThread()
 				if (Character::STATE::ST_INGAME == character->_state)
 				{
 					character->state_lock.unlock();
-					send_gamestart_packet(character->_id);
+					send_gamewaiting_packet(character->_id);
 				}
 				else character->state_lock.unlock();
 			}
@@ -238,6 +228,33 @@ void WorkerThread()
 		case CMD_GAME_START: {
 			//send_respawn()
 			cout << "Start" << endl;
+
+			for (int i =  USER_START; i < MAX_USER; ++i)
+			{
+				auto RespawnPlayer = reinterpret_cast<Character*>(objects[i]);
+				if (RespawnPlayer->_id < 0)break;
+				RespawnPlayer->Respawn(8);
+
+				for (int j = USER_START; j < MAX_USER; ++j)
+				{
+					auto character = reinterpret_cast<Character*>(objects[j]);
+					send_respawn_packet(character->_id, RespawnPlayer->_id);
+				}
+			}
+
+			for (auto& other : objects)
+			{
+				if (!other->isPlayer())break;
+				auto character = reinterpret_cast<Character*>(other);
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					send_gamestart_packet(character->_id);
+				}
+				else character->state_lock.unlock();
+			}
+
 			Timer_Event instq;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_END;
 			instq.exec_time = chrono::system_clock::now() + 11'000ms;
