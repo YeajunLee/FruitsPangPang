@@ -190,7 +190,7 @@ void AMyCharacter::BeginPlay()
 		itemClass.IndexOfHotKeySlot = 4;
 		itemClass.Name = AInventory::ItemCodeToItemName(11);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
-		mInventory->UpdateInventorySlot(itemClass, 30);
+		mInventory->UpdateInventorySlot(itemClass, 200);
 
 		
 
@@ -696,7 +696,14 @@ void AMyCharacter::Throw()
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+	}
  	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
@@ -740,8 +747,14 @@ void AMyCharacter::BananaThrow()
 	
 	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
-	banana->BombOwner = this;
-	banana->ProjectileMovementComponent->Activate();
+	if (nullptr != banana)
+	{
+		banana->BombOwner = this;
+		banana->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+	}
 }
 
 
