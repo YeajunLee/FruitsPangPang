@@ -238,6 +238,7 @@ void WorkerThread()
 				for (int j = USER_START; j < MAX_USER; ++j)
 				{
 					auto character = reinterpret_cast<Character*>(objects[j]);
+					if (character->_id < 0)break;
 					send_respawn_packet(character->_id, RespawnPlayer->_id);
 				}
 			}

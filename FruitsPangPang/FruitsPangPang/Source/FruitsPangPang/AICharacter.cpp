@@ -214,7 +214,7 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
-		if (GetController()->IsPlayerController())
+		//if (GetController()->IsPlayerController())
 		{
 			if (nullptr != projectile->BombOwner)
 			{
@@ -227,7 +227,7 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (nullptr != DMGCauserCharacter)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
-		if (GetController()->IsPlayerController())
+		//if (GetController()->IsPlayerController())
 		{
 			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
 			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
