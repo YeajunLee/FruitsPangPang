@@ -39,6 +39,9 @@ public:
 		float BaseTurnRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "test");
+		class UStaticMeshComponent* collisionTest;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* GreenOnionMesh;
@@ -46,6 +49,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* CarrotMesh;
 
+	UFUNCTION()
+		void OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
@@ -60,6 +65,10 @@ public:
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 		float GroundSpeedd;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "sweep")
+		bool StepOnBanana;
+	
 
 	virtual void Jump() override;
 
@@ -147,6 +156,7 @@ public:
 		class UAnimMontage* DeathMontage;
 
 
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

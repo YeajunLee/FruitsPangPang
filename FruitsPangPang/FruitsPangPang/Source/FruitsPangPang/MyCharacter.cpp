@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
@@ -94,6 +95,12 @@ AMyCharacter::AMyCharacter()
 	CarrotBag = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotBag"));
 	CarrotBag->SetupAttachment(GetMesh());
 	
+
+	collisionTest = CreateDefaultSubobject < UStaticMeshComponent>(TEXT("Test"));
+	collisionTest->SetupAttachment(GetRootComponent());
+	collisionTest->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnCapsuleOverlapBegin);
+
+	StepOnBanana = false;
 }
 
 // Called when the game starts or when spawned
@@ -542,6 +549,17 @@ void AMyCharacter::Die()
 	}
 }
 
+void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+
+	if (OtherActor && (OtherActor != this) && OtherActor)
+	{
+		StepOnBanana = true;
+	}
+}
+
+
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && (OtherActor != this) && OtherComp)
@@ -716,8 +734,8 @@ void AMyCharacter::BananaThrow()
 	
 	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
-	//banana->BombOwner = this;
-	//banana->ProjectileMovementComponent->Activate();
+	banana->BombOwner = this;
+	banana->ProjectileMovementComponent->Activate();
 }
 
 
