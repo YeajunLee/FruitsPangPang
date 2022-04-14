@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MeshComponent.h"
@@ -94,6 +95,12 @@ AMyCharacter::AMyCharacter()
 	CarrotBag = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotBag"));
 	CarrotBag->SetupAttachment(GetMesh());
 	
+
+	collisionTest = CreateDefaultSubobject < UStaticMeshComponent>(TEXT("Test"));
+	collisionTest->SetupAttachment(GetRootComponent());
+	collisionTest->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnCapsuleOverlapBegin);
+
+	StepOnBanana = false;
 }
 
 // Called when the game starts or when spawned
@@ -153,10 +160,10 @@ void AMyCharacter::BeginPlay()
 
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 2;	//토마토 30개 생성
+		itemClass.ItemCode = 1;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(2);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(2);
+		itemClass.Name = AInventory::ItemCodeToItemName(1);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
@@ -173,17 +180,17 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
-		itemClass.ItemCode = 10;	//두리안 30개 생성
+		itemClass.ItemCode = 9;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(10);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(10);
+		itemClass.Name = AInventory::ItemCodeToItemName(9);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(9);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 11; //바나나 1개 생성
 		itemClass.IndexOfHotKeySlot = 4;
 		itemClass.Name = AInventory::ItemCodeToItemName(11);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
-		mInventory->UpdateInventorySlot(itemClass, 1);
+		mInventory->UpdateInventorySlot(itemClass, 200);
 
 		
 
@@ -309,7 +316,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum == 2)
 		{
-			PickSwordAnimation();
+			DropSwordAnimation();
 		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(1);
@@ -330,7 +337,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum==2)
 		{
-			PickSwordAnimation();
+			DropSwordAnimation();
 		}
 		DropSwordAnimation();
 		ChangeSelectedHotKey(3);
@@ -363,7 +370,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 			if (SelectedHotKeySlotNum == 1 && mInventory->IsSlotValid(2))
 			{
-				PickSwordAnimation();
+				DropSwordAnimation();
 			}
 		}
 	}
@@ -385,7 +392,8 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 			if (SelectedHotKeySlotNum == 3 && mInventory->IsSlotValid(2))
 			{
-				PickSwordAnimation();
+				DropSwordAnimation();
+
 			}
 			
 		}
@@ -547,6 +555,17 @@ void AMyCharacter::Die()
 	}
 }
 
+void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+
+	if (OtherActor && (OtherActor != this) && OtherActor)
+	{
+		StepOnBanana = true;
+	}
+}
+
+
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && (OtherActor != this) && OtherComp)
@@ -637,28 +656,37 @@ void AMyCharacter::DropSwordAnimation()
 	if (2 != SelectedHotKeySlotNum) return;
 	if (!mInventory->IsSlotValid(2)) return;
 
-	FItemInfo info;
-	bool isempty;
-	int amount;
-	mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
-	switch (info.ItemCode)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && PickSwordMontage)
 	{
-	case 7:
-		GreenOnionMesh->SetHiddenInGame(true, false);
-		GreenOnionBag->SetHiddenInGame(false, false);
-		
-		break;
-	case 8:
-		CarrotMesh->SetHiddenInGame(true, false);
-		CarrotBag->SetHiddenInGame(false, false);
-		
-		break;
+		FItemInfo info;
+		bool isempty;
+		int amount;
+		mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+		switch (info.ItemCode)
+		{
+		case 7:
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			break;
+		case 8:
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(false, false);
+			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			break;
+		}
+		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
 	}
+
 	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
 void AMyCharacter::Throw()
 {
+
+	if (SelectedHotKeySlotNum == 4) return;
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
@@ -668,7 +696,15 @@ void AMyCharacter::Throw()
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+	}
+ 	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
 	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
@@ -699,11 +735,34 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 	bomb->ProjectileMovementComponent->Activate();
 }
 
+void AMyCharacter::BananaThrow()
+{
+	if (SelectedHotKeySlotNum != 4) return;
+
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
+	FRotator CameraRotate = FollowCamera->GetComponentRotation();
+	CameraRotate.Pitch += 14;
+	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+	FName path = AInventory::ItemCodeToItemBombPath(11);
+	
+	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
+	if (nullptr != banana)
+	{
+		banana->BombOwner = this;
+		banana->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+	}
+}
+
+
 void AMyCharacter::GetFruits()
 {
 	Super::GetFruits();
 	if (OverlapType)
-	{
+	{           
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
 		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));

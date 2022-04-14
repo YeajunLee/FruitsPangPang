@@ -28,5 +28,5 @@ public:
 	class URespawnWidget* mRespawnWidget;
 	const float RespawnTime = 5.0f;
 	float RemainTime;
-	bool Activate;
+	bool bActivate;
 };

@@ -27,7 +27,7 @@ void URespawnWindowWidget::NativePreConstruct()
 	MinimapBox->AddChildToVerticalBox(wi);
 	mRespawnWidget = wi;
 
-	Activate = true;
+	bActivate = true;
 }
 
 
@@ -39,7 +39,7 @@ void URespawnWindowWidget::NativeDestruct()
 
 void URespawnWindowWidget::NativeTick(const FGeometry& my, float deltatime)
 {
-	if (!Activate) return;
+	if (!bActivate) return;
 
 	RemainTime = FMath::Max<float>(RemainTime - deltatime, 0.0f);
 

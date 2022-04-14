@@ -238,6 +238,7 @@ void WorkerThread()
 				for (int j = USER_START; j < MAX_USER; ++j)
 				{
 					auto character = reinterpret_cast<Character*>(objects[j]);
+					if (character->_id < 0)break;
 					send_respawn_packet(character->_id, RespawnPlayer->_id);
 				}
 			}
@@ -257,7 +258,7 @@ void WorkerThread()
 
 			Timer_Event instq;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_END;
-			instq.exec_time = chrono::system_clock::now() + 11'000ms;
+			instq.exec_time = chrono::system_clock::now() + chrono::milliseconds(GAMEPLAYTIME_MILLI);
 			timer_queue.push(instq);
 			delete wsa_ex;
 			break;

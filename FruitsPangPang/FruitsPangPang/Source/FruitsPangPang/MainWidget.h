@@ -32,6 +32,18 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UHorizontalBox* ScoreBox;
 
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* RemainGameTimeText;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
+		float fRemainTime;
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateCountDown(const FText& minute, const FText& second);
+	UFUNCTION(BlueprintCallable)
+		const float ReduceRemainTime(const float& deltatime);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
+		bool bActivate = false;
 	TArray<class UInventorySlotWidget*> minventorySlot;
 	class URespawnWindowWidget* mRespawnWindowWidget;
 

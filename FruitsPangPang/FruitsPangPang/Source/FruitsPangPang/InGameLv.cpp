@@ -21,7 +21,7 @@ void AInGameLv::BeginPlay() {
 	
 	*/
 
-	//CreateLoadingWidget();
+	CreateLoadingWidget();
 
 	//FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 	//UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -44,7 +44,7 @@ void AInGameLv::BeginPlay() {
 	//To Do SomeThing ...
 
 	//Loading Complete ! Send Complete Packet
-	//Network::GetNetwork()->send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
+	Network::GetNetwork()->send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
 
 }
 
