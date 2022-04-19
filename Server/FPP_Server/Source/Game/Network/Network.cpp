@@ -307,6 +307,11 @@ void process_packet(int client_id, unsigned char* p)
 			packet.type = SC_PACKET_PUT_OBJECT;
 			packet.x = character->x;
 			packet.y = character->y;
+			packet.z = character->z;
+			packet.rx = character->rx;
+			packet.ry = character->ry;
+			packet.rz = character->rz;
+			packet.rw = character->rw;
 			OtherPlayer->sendPacket(&packet, sizeof(packet));
 		}
 
@@ -323,7 +328,7 @@ void process_packet(int client_id, unsigned char* p)
 
 			sc_packet_put_object packet;
 			packet.id = OtherPlayer->_id;
-			strcpy_s(packet.name, OtherPlayer->name);
+			//strcpy_s(packet.name, OtherPlayer->name);
 			packet.object_type = 0;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;

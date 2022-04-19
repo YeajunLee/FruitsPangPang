@@ -416,8 +416,21 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		int id = packet->id;
-		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
-		mOtherCharacter[id]->c_id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+			mOtherCharacter[id]->c_id = packet->id;
+		}
+		else {
+			FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
+			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->x, packet->y, packet->z));
+			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
+			mc->SpawnDefaultController();
+			mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+			mc->FinishSpawning(trans);
+			mOtherCharacter[id] = mc;
+		}
 		mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 		break;

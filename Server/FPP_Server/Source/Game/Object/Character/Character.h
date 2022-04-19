@@ -1,7 +1,6 @@
 #pragma once
 #include <atomic>
 #include <mutex>
-#include <unordered_set>
 #include "../Object.h"
 #include "../../Network/Network.h"
 

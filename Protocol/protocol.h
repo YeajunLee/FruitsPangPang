@@ -1,6 +1,7 @@
 #pragma once
 
-const short SERVER_PORT = 4000;
+const short GAMESERVER_PORT = 4000;
+const short LOBBYSERVER_PORT = 4100;
 const int MAX_PLAYER_CONN = 2;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 70'000;
@@ -146,7 +147,8 @@ struct sc_packet_put_object {
 	unsigned char size;
 	char type;
 	int id;
-	short x, y;
+	float x, y, z;
+	float rx, ry, rz, rw;
 	char object_type;
 	char	name[MAX_NAME_SIZE];
 };
