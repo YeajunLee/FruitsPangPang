@@ -100,6 +100,8 @@ AMyCharacter::AMyCharacter()
 	collisionTest->SetupAttachment(GetRootComponent());
 	collisionTest->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnCapsuleOverlapBegin);
 
+	
+
 	StepOnBanana = false;
 }
 
