@@ -351,6 +351,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		DropSwordAnimation();
 		ChangeSelectedHotKey(4);
 	}
+
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -458,13 +459,32 @@ void AMyCharacter::InteractDown()
 		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
 		{
 			GetFruits();
+			
+
 		}
 		bInteractDown = true;
 	}
+
+	
 }
 
 void AMyCharacter::InteractUp()
 {
+	
+	if (OverlapInteract)
+	{
+		PickSwordAnimation();
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 7 && GreenOnionMesh->bHiddenInGame)
+		{
+			GreenOnionBag->SetHiddenInGame(false, false);
+			CarrotBag->SetHiddenInGame(true, false);
+		}
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 8 && CarrotMesh->bHiddenInGame)
+		{
+			GreenOnionBag->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(false, false);
+		}
+	}
 	bInteractDown = false;
 }
 
@@ -531,7 +551,6 @@ void AMyCharacter::Attack()
 			}
 			
 		}
-		
 	}
 }
 
@@ -640,11 +659,15 @@ void AMyCharacter::PickSwordAnimation()
 		case 7:
 			GreenOnionMesh->SetHiddenInGame(false, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			CarrotMesh->SetHiddenInGame(false, false);
 			CarrotBag->SetHiddenInGame(true, false);
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}		
@@ -670,11 +693,15 @@ void AMyCharacter::DropSwordAnimation()
 		case 7:
 			GreenOnionMesh->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(false, false);
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			CarrotMesh->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(false, false);
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}
