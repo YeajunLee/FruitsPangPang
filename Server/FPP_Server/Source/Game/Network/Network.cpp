@@ -14,6 +14,8 @@ SOCKET s_socket;
 
 std::array<Object*, MAX_OBJECT> objects;
 std::atomic_int loginPlayerCnt;
+std::atomic_bool GameActive = true;
+std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
@@ -273,6 +275,15 @@ void send_gameend_packet(int player_id)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_cheat_changegametime_packet(int player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_cheat_gametime packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_CHEAT_GAMETIME;
+	packet.milliseconds = GAMEPLAYTIME_CHEAT_MILLI;
+	player->sendPacket(&packet, sizeof(packet));
+}
 
 void process_packet(int client_id, unsigned char* p)
 {
@@ -307,6 +318,11 @@ void process_packet(int client_id, unsigned char* p)
 			packet.type = SC_PACKET_PUT_OBJECT;
 			packet.x = character->x;
 			packet.y = character->y;
+			packet.z = character->z;
+			packet.rx = character->rx;
+			packet.ry = character->ry;
+			packet.rz = character->rz;
+			packet.rw = character->rw;
 			OtherPlayer->sendPacket(&packet, sizeof(packet));
 		}
 
@@ -323,7 +339,7 @@ void process_packet(int client_id, unsigned char* p)
 
 			sc_packet_put_object packet;
 			packet.id = OtherPlayer->_id;
-			strcpy_s(packet.name, OtherPlayer->name);
+			//strcpy_s(packet.name, OtherPlayer->name);
 			packet.object_type = 0;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;
@@ -596,6 +612,45 @@ void process_packet(int client_id, unsigned char* p)
 			instq.exec_time = chrono::system_clock::now() + 3000ms;
 			timer_queue.push(instq);
 		}
+		break;
+	}
+	case CS_PACKET_CHEAT: {
+		cs_packet_cheat* packet = reinterpret_cast<cs_packet_cheat*>(p);
+		switch (packet->cheatType)
+		{
+		case 0: {
+			if (CheatGamePlayTime)
+				break;
+			CheatGamePlayTime = true;
+
+			//reset Game Play Time
+			Timer_Event instq;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_END;
+			instq.exec_time = chrono::system_clock::now() + chrono::milliseconds(10000);
+			timer_queue.push(instq);
+
+			//게임플레이시간이 바뀐걸 모든 유저에게 알린다.
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				auto character = reinterpret_cast<Character*>(other);
+
+				character->state_lock.lock();
+				if (Character::STATE::ST_INGAME == character->_state)
+				{
+					character->state_lock.unlock();
+					send_cheat_changegametime_packet(character->_id);
+				}
+				else character->state_lock.unlock();
+			}
+
+			break;
+
+		}
+		}
+
+
+
+
 		break;
 	}
 	}

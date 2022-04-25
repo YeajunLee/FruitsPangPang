@@ -351,6 +351,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		DropSwordAnimation();
 		ChangeSelectedHotKey(4);
 	}
+
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -399,6 +400,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 			
 		}
+	}
+	else if (Key == EKeys::P)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, 0);
 	}
 }
 
@@ -458,13 +463,32 @@ void AMyCharacter::InteractDown()
 		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
 		{
 			GetFruits();
+			
+
 		}
 		bInteractDown = true;
 	}
+
+	
 }
 
 void AMyCharacter::InteractUp()
 {
+	
+	if (OverlapInteract)
+	{
+		PickSwordAnimation();
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 7 && GreenOnionMesh->bHiddenInGame)
+		{
+			GreenOnionBag->SetHiddenInGame(false, false);
+			CarrotBag->SetHiddenInGame(true, false);
+		}
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 8 && CarrotMesh->bHiddenInGame)
+		{
+			GreenOnionBag->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(false, false);
+		}
+	}
 	bInteractDown = false;
 }
 
@@ -531,7 +555,6 @@ void AMyCharacter::Attack()
 			}
 			
 		}
-		
 	}
 }
 
@@ -580,12 +603,12 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 				TSubclassOf<UDamageType> dmgCauser;
 				dmgCauser = UDamageType::StaticClass();
 				
-				if (p->GreenOnionMesh->bHiddenInGame)
+				if (!p->GreenOnionMesh->bHiddenInGame)
 				{
 					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
 					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
 				}
-				else if (p->CarrotMesh->bHiddenInGame)
+				if (!p->CarrotMesh->bHiddenInGame)
 				{
 					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
 				}				
@@ -640,11 +663,15 @@ void AMyCharacter::PickSwordAnimation()
 		case 7:
 			GreenOnionMesh->SetHiddenInGame(false, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			CarrotMesh->SetHiddenInGame(false, false);
 			CarrotBag->SetHiddenInGame(true, false);
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}		
@@ -670,11 +697,15 @@ void AMyCharacter::DropSwordAnimation()
 		case 7:
 			GreenOnionMesh->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(false, false);
+			CarrotMesh->SetHiddenInGame(true, false);
+			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			CarrotMesh->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(false, false);
+			GreenOnionMesh->SetHiddenInGame(true, false);
+			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}
@@ -925,7 +956,7 @@ bool AMyCharacter::ConnServer()
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
+	server_addr.sin_port = htons(GAMESERVER_PORT);
 
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
 	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
