@@ -398,6 +398,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			
 		}
 	}
+	else if (Key == EKeys::P)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, 0);
+	}
 }
 
 void AMyCharacter::MoveForward(float value)

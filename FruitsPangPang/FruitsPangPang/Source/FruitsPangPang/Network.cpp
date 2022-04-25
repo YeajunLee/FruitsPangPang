@@ -267,6 +267,21 @@ void Network::send_PreGameSettingComplete_packet(SOCKET& sock)
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
+
+
+void Network::send_Cheat(SOCKET& sock, const int& cheatNum)
+{
+	cs_packet_cheat packet;
+	packet.size = sizeof(cs_packet_cheat);
+	packet.type = CS_PACKET_CHEAT;
+	packet.cheatType = cheatNum;
+
+
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
+
 void Network::process_packet(unsigned char* p)
 {
 	unsigned char Type = p[1];
@@ -619,6 +634,11 @@ void Network::process_packet(unsigned char* p)
 		GameResultWGT->AddToViewport();
 		break;
 
+	}	
+	case SC_PACKET_CHEAT_GAMETIME: {
+		sc_packet_cheat_gametime* packet = reinterpret_cast<sc_packet_cheat_gametime*>(p);
+		mMyCharacter->mMainWidget->fRemainTime = packet->milliseconds / 1000;
+		break;
 	}
 	}
 }

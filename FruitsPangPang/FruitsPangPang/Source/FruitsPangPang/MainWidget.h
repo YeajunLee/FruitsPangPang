@@ -36,7 +36,7 @@ public:
 		class UTextBlock* RemainGameTimeText;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
-		float fRemainTime;
+		float fRemainTime;	//Game Remain Time
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateCountDown(const FText& minute, const FText& second);

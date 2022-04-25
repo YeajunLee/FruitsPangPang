@@ -12,6 +12,8 @@ extern SOCKET s_socket;
 
 extern std::array<class Object*, MAX_OBJECT> objects;
 extern std::atomic_int loginPlayerCnt;
+extern std::atomic_bool GameActive;
+extern std::atomic_bool CheatGamePlayTime;	
 
 void error_display(int err_no);
 int Generate_Id();
@@ -37,7 +39,7 @@ void send_update_score_packet(int player_id, short* userdeathcount, short* userk
 void send_gamewaiting_packet(int player_id);
 void send_gamestart_packet(int player_id);
 void send_gameend_packet(int player_id);
-
+void send_cheat_changegametime_packet(int player_id);
 
 enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, //Basic

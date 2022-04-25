@@ -264,6 +264,10 @@ void WorkerThread()
 			break;
 		}
 		case CMD_GAME_END: {
+			if (!GameActive)
+				break;
+
+			GameActive = false;
 			for (auto& other : objects)
 			{
 				if (!other->isPlayer())break;
@@ -279,8 +283,10 @@ void WorkerThread()
 			//Stop Receiving
 			//all Thread Exit();
 			//Post Game Ending()
+			// End Event Push to TimerThread And ALL Thread Terminate.  
+			//
 			delete wsa_ex;
-			break;
+			return;
 		}
 		}
 	}

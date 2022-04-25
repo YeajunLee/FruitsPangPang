@@ -42,3 +42,14 @@ public:
 	WSABUF& getWsaBuf() { return _wsabuf; }
 
 };
+
+class Network {
+public:
+	Network();
+	virtual ~Network();
+	WSA_OVER_EX wsa_ex_recv;
+	SOCKET  _socket;
+	int		_prev_size;
+
+	virtual void init() = 0;
+};

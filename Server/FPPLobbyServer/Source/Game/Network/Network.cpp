@@ -87,3 +87,14 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	}
 }
+
+
+Network::Network()
+{
+
+}
+
+Network::~Network();
+{
+
+}
