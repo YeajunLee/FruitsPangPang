@@ -1,9 +1,11 @@
 #pragma once
 
-const short SERVER_PORT = 4000;
+const short GAMESERVER_PORT = 4000;
+const short LOBBYSERVER_PORT = 4100;
 const int MAX_PLAYER_CONN = 2;
 const int BUFSIZE = 256;
-const int GAMEPLAYTIME_MILLI = 70'000;
+const int GAMEPLAYTIME_MILLI = 600'000;
+const int GAMEPLAYTIME_CHEAT_MILLI = 10'000;
 const int  MAX_NAME_SIZE = 20;
 const int USER_START = 0;
 const int  MAX_USER = 8;
@@ -35,6 +37,8 @@ const char CS_PACKET_POS = 10;
 const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 
+const char CS_PACKET_CHEAT = 100;
+
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
@@ -50,6 +54,8 @@ const char SC_PACKET_UPDATE_SCORE = 13;
 const char SC_PACKET_GAMEWAITING = 14;
 const char SC_PACKET_GAMESTART = 15;
 const char SC_PACKET_GAMEEND = 16;
+
+const char SC_PACKET_CHEAT_GAMETIME = 100;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -124,6 +130,12 @@ struct cs_packet_pregamesettingcomplete {
 	unsigned char size;
 	char type;
 };
+
+struct cs_packet_cheat {
+	unsigned char size;
+	char type;
+	char cheatType;
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -146,7 +158,8 @@ struct sc_packet_put_object {
 	unsigned char size;
 	char type;
 	int id;
-	short x, y;
+	float x, y, z;
+	float rx, ry, rz, rw;
 	char object_type;
 	char	name[MAX_NAME_SIZE];
 };
@@ -233,5 +246,14 @@ struct sc_packet_gamestart {
 struct sc_packet_gameend {
 	unsigned char size;
 	char type;
+};
+
+
+
+
+struct sc_packet_cheat_gametime {
+	unsigned char size;
+	char type;
+	int milliseconds;
 };
 #pragma pack(pop)

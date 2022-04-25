@@ -401,6 +401,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			
 		}
 	}
+	else if (Key == EKeys::P)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, 0);
+	}
 }
 
 void AMyCharacter::MoveForward(float value)
@@ -599,12 +603,12 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 				TSubclassOf<UDamageType> dmgCauser;
 				dmgCauser = UDamageType::StaticClass();
 				
-				if (p->GreenOnionMesh->bHiddenInGame)
+				if (!p->GreenOnionMesh->bHiddenInGame)
 				{
 					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
 					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
 				}
-				else if (p->CarrotMesh->bHiddenInGame)
+				if (!p->CarrotMesh->bHiddenInGame)
 				{
 					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
 				}				
@@ -952,7 +956,7 @@ bool AMyCharacter::ConnServer()
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
+	server_addr.sin_port = htons(GAMESERVER_PORT);
 
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
 	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
