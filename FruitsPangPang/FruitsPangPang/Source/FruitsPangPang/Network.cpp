@@ -445,6 +445,7 @@ void Network::process_packet(unsigned char* p)
 			mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
 			mc->FinishSpawning(trans);
 			mOtherCharacter[id] = mc;
+			mOtherCharacter[id]->c_id = packet->id;
 		}
 		mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
