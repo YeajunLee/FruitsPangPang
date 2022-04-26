@@ -118,6 +118,7 @@ Test/언리얼 자동차/JparkCar/Saved/*
 # FruitsPangPang Ignore
 */FruitsPangPang/Saved/*
 */FruitsPangPang/Intermediate/*
+*/FruitsPangPang/DerivedDataCache/*
 
 # Server Ignore
 Server/FPP_Server/x64/*
