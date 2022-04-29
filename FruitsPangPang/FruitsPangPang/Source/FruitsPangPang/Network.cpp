@@ -540,7 +540,7 @@ void Network::process_packet(unsigned char* p)
 
 			//mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
-			mMyCharacter->Die();
+			mMyCharacter->bIsDie = true;
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
 			UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
@@ -550,7 +550,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			if (mOtherCharacter[packet->id] != nullptr)
 			{
-				mOtherCharacter[packet->id]->Die();
+				mOtherCharacter[packet->id]->bIsDie = true;
 
 				//mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
 			}
@@ -569,6 +569,8 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->GroundSpeedd = 0;
 			mMyCharacter->EnableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
 			mMyCharacter->mInventory->mMainWidget->HideRespawnWidget();
+
+			mMyCharacter->bIsDie = false;
 			
 		}
 		else if (packet->id < MAX_USER)
@@ -578,6 +580,8 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[packet->id]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
 				mOtherCharacter[packet->id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[packet->id]->GroundSpeedd = 0;
+
+				mOtherCharacter[packet->id]->bIsDie = false;
 			}
 		}
 		break;

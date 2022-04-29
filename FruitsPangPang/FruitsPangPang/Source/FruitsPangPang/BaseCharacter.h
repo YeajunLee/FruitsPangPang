@@ -29,6 +29,16 @@ public:
 
 public:
 	int hp;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDie;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bStepBanana;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bHitbyFruit;
+
 public:
 	//related inventory
 

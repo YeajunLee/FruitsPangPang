@@ -568,17 +568,18 @@ void AMyCharacter::AttackEnd()
 }
 
 //죽는 애니메이션(22-04-05)
-void AMyCharacter::Die()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (AnimInstance && DeathMontage)
-	{
-		AnimInstance->Montage_Play(DeathMontage, 1.f);
-		AnimInstance->Montage_JumpToSection(FName("Default"), DeathMontage);
-		UE_LOG(LogTemp, Warning, TEXT("die!!"));
-	}
-}
+//스테이트 머신으로 돌림(22-04-30)
+//void AMyCharacter::Die()
+//{
+//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+//
+//	if (AnimInstance && DeathMontage)
+//	{
+//		AnimInstance->Montage_Play(DeathMontage, 1.f);
+//		AnimInstance->Montage_JumpToSection(FName("Default"), DeathMontage);
+//		UE_LOG(LogTemp, Warning, TEXT("die!!"));
+//	}
+//}
 
 void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
