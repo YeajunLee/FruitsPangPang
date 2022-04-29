@@ -538,9 +538,9 @@ void Network::process_packet(unsigned char* p)
 		//현재는 그냥 꺾어놓기만 했음.
 		if (packet->id == mMyCharacter->c_id) {
 
-			//mMyCharacter->SetActorRotation(FQuat(90, 0, 0, 1));
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
 			mMyCharacter->bIsDie = true;
+			mMyCharacter->SetActorEnableCollision(false);
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
 			UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
@@ -551,8 +551,8 @@ void Network::process_packet(unsigned char* p)
 			if (mOtherCharacter[packet->id] != nullptr)
 			{
 				mOtherCharacter[packet->id]->bIsDie = true;
-
-				//mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
+				mOtherCharacter[packet->id]->SetActorEnableCollision(false);
+				
 			}
 		}
 		//
@@ -571,6 +571,7 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->mInventory->mMainWidget->HideRespawnWidget();
 
 			mMyCharacter->bIsDie = false;
+			mMyCharacter->SetActorEnableCollision(true);
 			
 		}
 		else if (packet->id < MAX_USER)
@@ -582,6 +583,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[packet->id]->GroundSpeedd = 0;
 
 				mOtherCharacter[packet->id]->bIsDie = false;
+				mOtherCharacter[packet->id]->SetActorEnableCollision(true);
 			}
 		}
 		break;
@@ -872,9 +874,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		//현재는 그냥 꺾어놓기만 했음.
 		if (packet->id == PacketOwner->c_id) {
 
-			PacketOwner->SetActorRotation(FQuat(90, 0, 0, 1));
-			//PacketOwner->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
-
+			PacketOwner->bIsDie = true;
+			PacketOwner->SetActorEnableCollision(false);
 		}
 		else if (packet->id < MAX_USER)
 		{
@@ -882,7 +883,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			{
 				if (true == mOtherCharacter[packet->id]->s_connected)
 				{
-					mOtherCharacter[packet->id]->SetActorRotation(FQuat(90, 0, 0, 1));
+					mOtherCharacter[packet->id]->bIsDie = true;
+					mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 				}
 			}
 		}
@@ -898,8 +900,9 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			PacketOwner->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
 			PacketOwner->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 			PacketOwner->GroundSpeed_AI = 0;
-			//PacketOwner->EnableInput(PacketOwner->GetWorld()->GetFirstPlayerController());
-
+			
+			PacketOwner->bIsDie = false;
+			PacketOwner->SetActorEnableCollision(true);
 		}
 		else if (packet->id < MAX_USER)
 		{
@@ -910,6 +913,9 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 					mOtherCharacter[packet->id]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
 					mOtherCharacter[packet->id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 					mOtherCharacter[packet->id]->GroundSpeedd = 0;
+
+					mOtherCharacter[packet->id]->bIsDie = false;
+					mOtherCharacter[packet->id]->SetActorEnableCollision(true);
 				}
 			}
 		}

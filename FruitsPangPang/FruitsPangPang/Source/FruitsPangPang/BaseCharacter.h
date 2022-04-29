@@ -33,10 +33,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDie;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	bool bStepBanana;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	bool bHitbyFruit;
 
 public:
