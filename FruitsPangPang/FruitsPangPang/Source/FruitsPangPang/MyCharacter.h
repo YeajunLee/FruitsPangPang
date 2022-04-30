@@ -88,7 +88,7 @@ public:
 public:
 	//Player Stats
 
-	void Die();
+
 public:
 	//related Network
 	bool s_connected;	//server_connected;
@@ -160,8 +160,6 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-		class UAnimMontage* DeathMontage;
 
 
 	

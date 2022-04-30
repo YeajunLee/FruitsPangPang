@@ -9,6 +9,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "AICharacter.h"
+#include <algorithm>
 
 
 UBTTaskNode_FindTreePos::UBTTaskNode_FindTreePos()
@@ -16,27 +17,31 @@ UBTTaskNode_FindTreePos::UBTTaskNode_FindTreePos()
 	NodeName = TEXT("CPP_BTTFindTreePos");
 
 	currentClosestDistance = TNumericLimits<float>::Max();
+	//bNotifyTick = true;
 }
 
-AActor* UBTTaskNode_FindTreePos::GetClosestActor(FVector sourceLocation, TArray<AActor*> actors)
+ATree* UBTTaskNode_FindTreePos::GetClosestTree(FVector sourceLocation, std::vector<ATree*> actors)
 {
-	if (actors.Num() <= 0)
+	if (actors.size() <= 0)
 		return nullptr;
 
-	AActor* closestActor = actors[0];
 
-	for (int i = 0; i < actors.Num(); ++i)
+	ATree* closestActor = nullptr;
+	for (int i = 0; i < actors.size(); ++i)
 	{
 		float distance = FVector::DistSquared(sourceLocation, actors[i]->GetActorLocation());
-		if (distance < currentClosestDistance)
+		if (actors[i]->CanHarvest)
 		{
-			currentClosestDistance = distance;
-			closestActor = actors[i];
+			if (distance < currentClosestDistance)
+			{
+				currentClosestDistance = distance;				
+				closestActor = actors[i];
+				//UE_LOG(LogTemp, Warning, TEXT("%s"), *closestActor->GetActorLocation().ToString());
 
-			//UE_LOG(LogTemp, Warning, TEXT("%s"), *closestActor->GetActorLocation().ToString());
-
+			}
 		}
 	}
+	currentClosestDistance = TNumericLimits<float>::Max();
 
 	return closestActor;
 }
@@ -50,7 +55,7 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 	UWorld* World = ControllingPawn->GetWorld();
 
 	FVector aiLocation = ControllingPawn->GetActorLocation();
-	float DetectTreesRadius = 2000.f;
+	float DetectTreesRadius = 10000.f;
 	//구체 반경(2000반지름) 안에 tree 엑터들 감지
 	TArray <FOverlapResult> OverlapedTrees;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
@@ -65,7 +70,7 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 
 	//static float distance_ClosestTree_AI = TNumericLimits<float>::Max();
 
-	TArray<AActor*> trees;
+	std::vector<ATree*> trees;
 
 	// 오브젝트가 감지되면, tree인지 검사
 	if (bResult)
@@ -73,22 +78,32 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 		for (FOverlapResult it : OverlapedTrees)
 		{
 			ATree* tree = Cast<ATree>(it.GetActor());
+			/*if (false == tree->CanHarvest)
+				trees.erase(remove(trees.begin(), trees.end(), tree), trees.end());*/
 
 			if (tree)
-			{
-				trees.Add(tree);
+			{				
+				trees.push_back(tree);
 			}
-			
+		
 		}
 	}
-	if (0 != trees.Num()) {
-		//디버깅 용
-		DrawDebugSphere(World, aiLocation, 2000.f, 16, FColor::Purple, false, 0.2f);
-		DrawDebugPoint(World, GetClosestActor(aiLocation, trees)->GetActorLocation(), 10.0f, FColor::Cyan, false, 0.2f);
-		DrawDebugLine(World, aiLocation, GetClosestActor(aiLocation, trees)->GetActorLocation(), FColor::Cyan, false, 0.2f);
+	if (0 != trees.size()) {
 
-		//closestTree 블랙보드에 저장.
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AAIController_Custom::TreePosKey, GetClosestActor(aiLocation, trees)->GetActorLocation());
+		/*trees.erase(std::remove_if(trees.begin(), trees.end(), [](const ATree* a) {
+			return a->CanHarvest == false;
+		}), trees.end());*/
+
+		//디버깅 용
+		auto t = GetClosestTree(aiLocation, trees);
+		if (nullptr != t)
+		{
+			DrawDebugSphere(World, aiLocation, 2000.f, 16, FColor::Purple, false, 0.2f);
+			DrawDebugPoint(World, t->GetActorLocation(), 10.0f, FColor::Cyan, false, 0.2f);
+			DrawDebugLine(World, aiLocation, t->GetActorLocation(), FColor::Cyan, false, 0.2f);
+			//closestTree 블랙보드에 저장.
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TreePosKey, t);
+		}
 	}
 
 	/*else
@@ -104,9 +119,18 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 
 	//UAIBlueprintHelperLibrary::SimpleMoveToLocation(OwnerComp.GetAIOwner()->GetPawn()->GetController(), TreePos);
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *OwnerComp.GetBlackboardComponent()->GetValueAsVector(AAIController_Custom::TreePosKey).ToString());
-	AAICharacter* ai = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 
-	if (!ai->bAttacking)
-		return EBTNodeResult::Succeeded;
-	return EBTNodeResult::Failed;
+	
+	return EBTNodeResult::Succeeded;
 }
+//void UBTTaskNode_FindTreePos::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+//{
+//	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+//	AAICharacter* ai = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
+//	if (nullptr == ai)
+//		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+//
+//	/*
+//	if (!ai->bAttacking && GetClosestActor(ai->GetActorLocation(), ))
+//		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);*/
+//}

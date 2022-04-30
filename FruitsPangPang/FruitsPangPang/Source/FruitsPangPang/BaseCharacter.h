@@ -43,6 +43,16 @@ public:
 
 public:
 	int hp;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDie;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bStepBanana;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bHitbyFruit;
+
 public:
 	//related inventory
 

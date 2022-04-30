@@ -38,6 +38,9 @@ ABaseCharacter::ABaseCharacter()
 	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
 	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
 	
+	bIsDie = false;
+	bStepBanana = false;
+	bHitbyFruit = false;
 }
 
 // Called when the game starts or when spawned
