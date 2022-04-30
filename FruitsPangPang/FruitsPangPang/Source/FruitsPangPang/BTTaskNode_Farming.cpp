@@ -50,12 +50,14 @@ void UBTTaskNode_Farming::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 
-	//ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
-	//
-	//if (targetTree->CanHarvest == false) {
-	//	UE_LOG(LogTemp, Log, TEXT("called %d"), AICharacter->c_id);
-	//	FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-	//	//UE_LOG(LogTemp, Warning, TEXT("CAN NOT HARVEST!"));
-	//}
+	ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
+	
+	if (targetTree->CanHarvest == false) {
+		//UE_LOG(LogTemp, Log, TEXT("called %d"), AICharacter->c_id);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		//UE_LOG(LogTemp, Warning, TEXT("CAN NOT HARVEST!"));
+	}
+	else
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 
 }
