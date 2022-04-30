@@ -107,11 +107,12 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void Network::send_login_packet(SOCKET& sock)
+void Network::send_login_packet(SOCKET& sock,const char& type)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
+	packet.cType = type;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_login), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
@@ -734,6 +735,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		//if Ai Move, dump packet
 		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
 		//for문으로 하지말고, Map 구조 Key-value 구조를 사용하여 최적화 할 것.
+		// ... 으나! 다른 버그가 터져서 결국 서버에서 판별하기로 결정...
 		bool escape = false;
 		for (auto ai : mAiCharacter)
 		{
@@ -804,17 +806,18 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		int id = packet->id;
 
-		bool escape = false;
-		for (auto ai : mAiCharacter)
-		{
-			if (ai == nullptr) continue;
-			if (id == ai->c_id)
-			{
-				escape = true;
-				break;
-			}
-		}
-		if (escape) break;
+		//bool escape = false;
+		//for (auto ai : mAiCharacter)
+		//{
+		//	if (ai == nullptr) continue;
+		//	if (id == ai->c_id)
+		//	{
+		//		escape = true;
+		//		break;
+		//	}
+		//}
+		//if (escape) break;
+
 
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 		mOtherCharacter[id]->c_id = packet->id;

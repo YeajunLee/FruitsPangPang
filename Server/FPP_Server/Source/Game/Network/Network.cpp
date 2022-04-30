@@ -295,14 +295,16 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		strcpy_s(character->name, packet->name);
+		character->bAi = packet->cType;
 		send_login_ok_packet(client_id);
 
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			if (other->_id == client_id) continue;
 
-
 			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+
 			OtherPlayer->state_lock.lock();
 			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
 				OtherPlayer->state_lock.unlock();
@@ -330,6 +332,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (!other->isPlayer()) break;
 			if (other->_id == client_id) continue;
 			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
 			OtherPlayer->state_lock.lock();
 			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
 				OtherPlayer->state_lock.unlock();
@@ -348,19 +351,15 @@ void process_packet(int client_id, unsigned char* p)
 
 			character->sendPacket(&packet, sizeof(packet));
 		}
+
+		character->state_lock.lock();
+		character->_state = Character::STATE::ST_INGAME;
+		character->state_lock.unlock();
 		break;
 	}
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		//switch (packet->direction) {
-		//case 0: if (y > 0) y--; break;
-		//case 1: if (y < (WORLD_HEIGHT - 1)) y++; break;
-		//case 2: if (x > 0) x--; break;
-		//case 3: if (x < (WORLD_WIDTH - 1)) x++; break;
-		//default:
-		//	std::cout << "Invalid move in client " << client_id << endl;
-		//	exit(-1);
-		//}
+		Character* character = reinterpret_cast<Character*>(object);
 		object->x = packet->x;
 		object->y = packet->y;
 		object->z = packet->z;
@@ -370,14 +369,16 @@ void process_packet(int client_id, unsigned char* p)
 		object->rw = packet->rw;
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
-			auto character = reinterpret_cast<Character*>(other);
-			character->state_lock.lock();
-			if (Character::STATE::ST_INGAME == character->_state)
+			if (other->_id == client_id) continue;
+			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+			OtherPlayer->state_lock.lock();
+			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
 			{
-				character->state_lock.unlock();
-				send_move_packet(character->_id, client_id, packet->speed);
+				OtherPlayer->state_lock.unlock();
+				send_move_packet(OtherPlayer->_id, client_id, packet->speed);
 			}
-			else character->state_lock.unlock();
+			else OtherPlayer->state_lock.unlock();
 		}
 		break;
 	}
@@ -437,12 +438,12 @@ void process_packet(int client_id, unsigned char* p)
 		
 		if (!tree->canHarvest)
 		{
-			cout << " 수확할 수 없습니다!" << endl;
+			//cout << " 수확할 수 없습니다!" << endl;
 			break;
 
 		}
 		
-		cout << "과일 받았습니다(나무)" << endl;
+		//cout << "과일 받았습니다(나무)" << endl;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -470,7 +471,7 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
+				//cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}

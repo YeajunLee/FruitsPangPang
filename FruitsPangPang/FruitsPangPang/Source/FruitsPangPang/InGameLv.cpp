@@ -55,7 +55,7 @@ void AInGameLv::Conn()
 	if (nullptr != player)
 	{
 		player->ConnServer();
-		Network::GetNetwork()->send_login_packet(player->s_socket);
+		Network::GetNetwork()->send_login_packet(player->s_socket, 0);
 		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 	}
 	UE_LOG(LogTemp, Log, TEXT("Begin Played"));

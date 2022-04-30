@@ -13,6 +13,7 @@ Character::Character(OBJTYPE type, STATE state)
 	,hp(maxhp)
 	, mKillCount(0)
 	,mDeathCount(0)
+	,bAi(false)
 {
 	_type = type;
 }

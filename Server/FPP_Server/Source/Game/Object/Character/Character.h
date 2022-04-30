@@ -35,6 +35,7 @@ public:
 	void sendPacket(void* packet, int bytes);
 
 public:
+	bool bAi;
 	short maxhp;
 	std::atomic_short hp;
 	InventorySlot mSlot[5];
