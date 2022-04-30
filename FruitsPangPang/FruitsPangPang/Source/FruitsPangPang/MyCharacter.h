@@ -49,6 +49,14 @@ public:
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
 	//	class UStaticMeshComponent* CarrotMesh;
 
+	UParticleSystemComponent* P_Star;
+
+
+	FTimerHandle TimerHandle;
+
+	UFUNCTION()
+		void onTimerEnd();
+
 	UFUNCTION()
 		void OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -65,10 +73,6 @@ public:
 	//speed에 따른 애니메이션을 위해
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 		float GroundSpeedd;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "sweep")
-		bool StepOnBanana;
-	
 
 	virtual void Jump() override;
 

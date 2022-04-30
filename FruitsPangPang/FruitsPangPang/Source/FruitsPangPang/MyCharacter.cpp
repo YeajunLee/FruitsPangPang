@@ -27,6 +27,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
+#include "Particles/ParticleSystemComponent.h "
 #include "Kismet/GameplayStatics.h"
 
 
@@ -83,8 +84,20 @@ AMyCharacter::AMyCharacter()
 	collisionTest->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnCapsuleOverlapBegin);
 
 	
+	
+	
+	P_Star = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle"));
+	P_Star->SetupAttachment(RootComponent);
+	P_Star->bAutoActivate = false;
+	P_Star->SetRelativeLocation( FVector(50.f, 10.f, 10.f));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Game/Assets/Fruits/Banana/P_Stars.P_Stars"));
+	if (ParticleAsset.Succeeded())
+	{
+		P_Star->SetTemplate(ParticleAsset.Object);
+	}
 
-	StepOnBanana = false;
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -547,13 +560,35 @@ void AMyCharacter::AttackEnd()
 //	}
 //}
 
+
+void AMyCharacter::onTimerEnd()
+{
+	EnableInput(Cast<APlayerController>(this));
+	bStepBanana = false;
+}
+
 void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
 
 	if (OtherActor && (OtherActor != this) && OtherActor)
 	{
-		StepOnBanana = true;
+		auto banana = Cast<AProjectile>(OtherActor);
+		if (nullptr != banana)
+		{
+			if (banana->_fType == 11)
+			{
+				bStepBanana = true;
+				banana->Destroy();
+				DisableInput(Cast<APlayerController>(this));
+				if (P_Star && P_Star->Template)
+				{
+					P_Star->ToggleActive();
+				}
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,this ,&AMyCharacter::onTimerEnd , 2.5, false);
+				
+			}
+		}
 	}
 }
 
