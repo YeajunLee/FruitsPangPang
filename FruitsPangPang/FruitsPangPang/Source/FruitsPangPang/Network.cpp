@@ -14,6 +14,8 @@
 #include "MainWidget.h"
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
+#include "AIController_Custom.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -168,6 +170,7 @@ void Network::send_getfruits_tree_packet(SOCKET& sock, const int& treeId)
 {
 	if (treeId == -1)
 	{
+		UE_LOG(LogTemp, Error, TEXT("UnExpected Tree ID"));
 		//Exception Occurred
 		return;
 	}
@@ -860,6 +863,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		PacketOwner->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
+		int FruitAmount = PacketOwner->mInventory->mSlots[PacketOwner->SelectedHotKeySlotNum].Amount;
+		AAIController* p = Cast<AAIController>(PacketOwner->Controller);
+		if (NULL != p)
+			p->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
 
 		break;
 	}

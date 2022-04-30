@@ -44,7 +44,7 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
         {
             player->OverlapInteract = false;
             player->OverlapType = true;
-            player->OverlapInteractId = 0;
+            player->OverlapInteractId = -1;
 
             player->bIsUndertheTree = false;
         }

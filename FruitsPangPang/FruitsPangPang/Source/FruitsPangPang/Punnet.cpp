@@ -39,7 +39,7 @@ void APunnet::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
         if (player)
         {
             player->OverlapInteract = false;
-            player->OverlapInteractId = 0;
+            player->OverlapInteractId = -1;
             player->OverlapType = false;
         }
     }

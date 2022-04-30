@@ -438,12 +438,13 @@ void process_packet(int client_id, unsigned char* p)
 		
 		if (!tree->canHarvest)
 		{
-			//cout << " 수확할 수 없습니다!" << endl;
+			cout << " 수확할 수 없습니다!" << endl;
 			break;
 
 		}
+		tree->canHarvest = false;
 		
-		//cout << "과일 받았습니다(나무)" << endl;
+		cout << "과일 받았습니다(나무)" << packet->obj_id << endl;
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -475,7 +476,6 @@ void process_packet(int client_id, unsigned char* p)
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}
-		tree->canHarvest = false;
 		/*}
 		tree->CanHarvestLock.unlock();
 		*/
