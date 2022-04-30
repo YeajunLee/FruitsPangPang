@@ -22,8 +22,9 @@ EBTNodeResult::Type UBTTaskNode_GoToTheTree::ExecuteTask(UBehaviorTreeComponent&
 	//if (nullptr == NavSystem)
 	//	return EBTNodeResult::Failed;
 
-	FVector TreePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AAIController_Custom::TreePosKey);
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(ControllingPawn->GetController(), TreePos);
+	UObject* TreePos = OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey);
+	UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), static_cast<AActor*>(TreePos));
+
 
 	AAICharacter* ai = Cast<AAICharacter>(ControllingPawn);
 
