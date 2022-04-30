@@ -11,7 +11,7 @@
 UBTTaskNode_Farming::UBTTaskNode_Farming()
 {
 	NodeName = TEXT("CPP_BTTFarming");
-	//bNotifyTick = true;
+	bNotifyTick = true;
 }
 
 EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -22,8 +22,8 @@ EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& Own
 	auto ai = Cast<AAICharacter>(ControllingPawn);
 	ai->GetFruits();
 
-	int FruitAmount = ai->mInventory->mSlots[ai->SelectedHotKeySlotNum].Amount;
-	OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+	//int FruitAmount = ai->mInventory->mSlots[ai->SelectedHotKeySlotNum].Amount;
+	//OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
 
@@ -35,24 +35,27 @@ EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& Own
 	//	return EBTNodeResult::Failed;
 
 	//}
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::InProgress;
 }
 
-//void UBTTaskNode_Farming::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-//{
-//	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-//
-//	auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
-//	if (nullptr == AICharacter)
-//		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-//
-//	ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
-//
-//	if (targetTree->CanHarvest == false) {
-//		UE_LOG(LogTemp, Log, TEXT("called %d"), AICharacter->c_id);
-//		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-//		//UE_LOG(LogTemp, Warning, TEXT("CAN NOT HARVEST!"));
-//	}
-//	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-//
-//}
+void UBTTaskNode_Farming::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
+	auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (nullptr == AICharacter)
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	if (OwnerComp.GetBlackboardComponent()->GetValueAsInt(AAIController_Custom::AmountKey) > 0)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
+
+	//ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
+	//
+	//if (targetTree->CanHarvest == false) {
+	//	UE_LOG(LogTemp, Log, TEXT("called %d"), AICharacter->c_id);
+	//	FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	//	//UE_LOG(LogTemp, Warning, TEXT("CAN NOT HARVEST!"));
+	//}
+
+}

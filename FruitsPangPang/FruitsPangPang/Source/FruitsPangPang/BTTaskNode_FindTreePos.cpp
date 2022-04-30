@@ -121,7 +121,11 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *OwnerComp.GetBlackboardComponent()->GetValueAsVector(AAIController_Custom::TreePosKey).ToString());
 
 	
-	return EBTNodeResult::Succeeded;
+	AAICharacter* ai = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
+
+	if (!ai->bAttacking)
+		return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
 //void UBTTaskNode_FindTreePos::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 //{
