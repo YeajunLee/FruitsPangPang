@@ -43,18 +43,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "test");
 		class UStaticMeshComponent* collisionTest;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
-		class UStaticMeshComponent* GreenOnionMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
-		class UStaticMeshComponent* CarrotMesh;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	//	class UStaticMeshComponent* GreenOnionMesh;
+	//
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	//	class UStaticMeshComponent* CarrotMesh;
 
 	UFUNCTION()
 		void OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)override;
 	
 	//가방에 붙어있는 대파, 당근
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

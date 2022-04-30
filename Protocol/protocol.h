@@ -62,6 +62,7 @@ struct cs_packet_login {
 	unsigned char size;
 	char	type;
 	char	name[MAX_NAME_SIZE];
+	char	cType;				//character type 0: player, 1: Ai
 };
 
 struct cs_packet_move {

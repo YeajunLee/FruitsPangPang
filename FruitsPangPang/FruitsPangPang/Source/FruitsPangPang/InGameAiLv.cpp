@@ -20,7 +20,7 @@ void AInGameAiLv::ConnAi()
 		if (nullptr != ai)
 		{
 			ai->ConnServer();
-			Network::GetNetwork()->send_login_packet(ai->s_socket);
+			Network::GetNetwork()->send_login_packet(ai->s_socket, 1);
 			UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Try Conn"), i);
 		}
 		++i;

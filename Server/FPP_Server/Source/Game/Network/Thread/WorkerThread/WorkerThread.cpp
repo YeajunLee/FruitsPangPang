@@ -66,7 +66,7 @@ void WorkerThread()
 			int new_id = Generate_Id();
 			Character* player = reinterpret_cast<Character*>(objects[new_id]);
 			player->_id = new_id;
-			player->_state = Character::STATE::ST_INGAME;
+			player->_state = Character::STATE::ST_ACCEPT;
 			player->_prev_size = 0;
 			player->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(player->wsa_ex_recv.getBuf());
 			player->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
