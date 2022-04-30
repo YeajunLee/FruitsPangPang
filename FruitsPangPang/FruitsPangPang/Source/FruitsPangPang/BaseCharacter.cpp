@@ -20,6 +20,24 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GreenOnionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionMesh"));
+	GreenOnionMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
+	if (GreenOnionAsset.Succeeded())
+		GreenOnionMesh->SetStaticMesh(GreenOnionAsset.Object);
+	
+	CarrotMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotMesh"));
+	CarrotMesh->SetupAttachment(GetRootComponent());
+	ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
+	if (CarrotAsset.Succeeded())
+		CarrotMesh->SetStaticMesh(CarrotAsset.Object);
+
+	GreenOnionMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
+	GreenOnionMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
+
+	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
+	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
+	
 }
 
 // Called when the game starts or when spawned
@@ -29,6 +47,20 @@ void ABaseCharacter::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("BaseCharacter"));
 
 	bIsUndertheTree = false;
+
+	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	GreenOnionMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
+	CarrotMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
+	
+	GreenOnionMesh->SetHiddenInGame(true, false);
+	CarrotMesh->SetHiddenInGame(true, false);
+	
+	GreenOnionMesh->SetGenerateOverlapEvents(true);
+	CarrotMesh->SetGenerateOverlapEvents(true);
+	GreenOnionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	CarrotMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 }
 
 // Called every frame
@@ -49,7 +81,6 @@ void ABaseCharacter::Throw()
 {
 
 }
-
 //void ABaseCharacter::AttackEnd()
 //{
 //
@@ -60,6 +91,16 @@ void ABaseCharacter::GetFruits()
 
 }
 
+
+void ABaseCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+}
+
+void ABaseCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
 bool ABaseCharacter::ConnServer()
 {
 	return true;

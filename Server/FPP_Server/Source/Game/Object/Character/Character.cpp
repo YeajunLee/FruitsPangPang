@@ -13,6 +13,7 @@ Character::Character(OBJTYPE type, STATE state)
 	,hp(maxhp)
 	, mKillCount(0)
 	,mDeathCount(0)
+	,bAi(false)
 {
 	_type = type;
 }
@@ -135,10 +136,12 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
+		cout << " Hurt By GreeenOnion\n";
 		Hurt(10, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_CARROT) : {
+		cout << " Hurt By Carrot\n";
 		Hurt(10, attacker);
 		break;
 	}
@@ -161,51 +164,50 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 void Character::Hurt(const int& damage, const int& attacker)
 {
 	if (hp <= 0) return;	//0일때 다치면 안됨.
+	if (0 > attacker || attacker >= MAX_USER) return;	//이상한얘가 때리는거에 맞으면 안됨.
 	hp = max(hp - damage, 0);
 	send_update_userstatus_packet(_id);
 	cout << _id << "의 이후 hp : " << hp << endl;
 	if (hp <= 0)
 	{
-		if (0 <= attacker && attacker <= MAX_USER)
+		short userDeathcount[8];
+		short userKillcount[8];
+
+		Character* attackerCharacter = reinterpret_cast<Character*>(objects[attacker]);
+		attackerCharacter->mKillCount++;
+		cout << _id << "는 죽음\n";
+		Die();
+
+		for (int i = USER_START; i < MAX_USER; ++i)
 		{
-			short userDeathcount[8];
-			short userKillcount[8];
+			auto character = reinterpret_cast<Character*>(objects[i]);
 
-			Character* attackerCharacter = reinterpret_cast<Character*>(objects[attacker]);
-			attackerCharacter->mKillCount++;
-			Die();
-
-			for(int i = USER_START ; i < MAX_USER;++i)
+			character->state_lock.lock();
+			if (Character::STATE::ST_INGAME == character->_state)
 			{
-				auto character = reinterpret_cast<Character*>(objects[i]);
-
-				character->state_lock.lock();
-				if (Character::STATE::ST_INGAME == character->_state)
-				{
-					character->state_lock.unlock();
-					userDeathcount[i] = character->mDeathCount;
-					userKillcount[i] = character->mKillCount;
-				}
-				else {
-					character->state_lock.unlock();
-					userDeathcount[i] = -1;
-					userKillcount[i] = -1;
-				}
+				character->state_lock.unlock();
+				userDeathcount[i] = character->mDeathCount;
+				userKillcount[i] = character->mKillCount;
 			}
+			else {
+				character->state_lock.unlock();
+				userDeathcount[i] = -1;
+				userKillcount[i] = -1;
+			}
+		}
 
-			for (int i = USER_START; i < MAX_USER; ++i)
+		for (int i = USER_START; i < MAX_USER; ++i)
+		{
+			auto character = reinterpret_cast<Character*>(objects[i]);
+
+			character->state_lock.lock();
+			if (Character::STATE::ST_INGAME == character->_state)
 			{
-				auto character = reinterpret_cast<Character*>(objects[i]);
-
-				character->state_lock.lock();
-				if (Character::STATE::ST_INGAME == character->_state)
-				{
-					character->state_lock.unlock();
-					send_update_score_packet(character->_id, userDeathcount, userKillcount);
-				}
-				else {
-					character->state_lock.unlock();
-				}
+				character->state_lock.unlock();
+				send_update_score_packet(character->_id, userDeathcount, userKillcount);
+			}
+			else {
+				character->state_lock.unlock();
 			}
 		}
 	}

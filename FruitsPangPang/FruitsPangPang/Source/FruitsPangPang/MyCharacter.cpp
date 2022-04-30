@@ -71,24 +71,6 @@ AMyCharacter::AMyCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	GreenOnionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionMesh"));
-	GreenOnionMesh->SetupAttachment(GetRootComponent());
-	ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	if (GreenOnionAsset.Succeeded())
-		GreenOnionMesh->SetStaticMesh(GreenOnionAsset.Object);
-
-	CarrotMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotMesh"));
-	CarrotMesh->SetupAttachment(GetRootComponent());
-	ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
-	if (CarrotAsset.Succeeded())
-		CarrotMesh->SetStaticMesh(CarrotAsset.Object);
-
-	GreenOnionMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
-	GreenOnionMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
-	
-	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
-	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnOverlapEnd);
-
 	GreenOnionBag = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionBag"));
 	GreenOnionBag->SetupAttachment(GetMesh());
 
@@ -110,22 +92,6 @@ void AMyCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
-	
-	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	GreenOnionMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
-	//GreenOnionMesh->AttachTo(GetMesh(), TEXT("GreenOnionSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
-	//CarrotMesh->AttachTo(GetMesh(), TEXT("CarrotSocket"), EAttachLocation::SnapToTargetIncludingScale, false);
-	CarrotMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
-	
-	GreenOnionMesh->SetHiddenInGame(true, false);
-	CarrotMesh->SetHiddenInGame(true, false);
-	
-	GreenOnionMesh->SetGenerateOverlapEvents(true);
-	CarrotMesh->SetGenerateOverlapEvents(true);
-	GreenOnionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	CarrotMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
@@ -593,22 +559,23 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	Super::OnOverlapBegin(OverlappedComp,OtherActor,OtherComp,OtherBodyIndex, bFromSweep,SweepResult);
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
 		{
-			auto p = Cast<AMyCharacter>(OtherActor);
-			if (nullptr != p)
+			auto victim = Cast<ABaseCharacter>(OtherActor);
+			if (nullptr != victim)
 			{
 				TSubclassOf<UDamageType> dmgCauser;
 				dmgCauser = UDamageType::StaticClass();
 				
-				if (!p->GreenOnionMesh->bHiddenInGame)
+				if (!this->GreenOnionMesh->bHiddenInGame)
 				{
 					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
 					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
 				}
-				if (!p->CarrotMesh->bHiddenInGame)
+				if (!this->CarrotMesh->bHiddenInGame)
 				{
 					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
 				}				
@@ -622,6 +589,7 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 
 void AMyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	Super::OnOverlapEnd(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));

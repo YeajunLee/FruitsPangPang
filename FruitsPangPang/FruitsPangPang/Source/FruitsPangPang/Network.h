@@ -77,7 +77,7 @@ public:
 	void process_packet(unsigned char* p);
 	void process_Aipacket(int client_id, unsigned char* p);
 
-	void send_login_packet(SOCKET& sock);
+	void send_login_packet(SOCKET& sock,const char& type);
 	void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
 	void send_spawnobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale, const int& fruitType);
 	void send_anim_packet(SOCKET& sock, AnimType type);
