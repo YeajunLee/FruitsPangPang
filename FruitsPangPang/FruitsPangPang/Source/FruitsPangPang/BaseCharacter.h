@@ -15,6 +15,20 @@ class FRUITSPANGPANG_API ABaseCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
+public:
+	//related Mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* GreenOnionMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+		class UStaticMeshComponent* CarrotMesh;
+public:
+	//related Event
+
+	UFUNCTION()
+		virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,7 +80,7 @@ public:
 	int score;
 public:
 	// ai <-> tree collision check
-	// Ai인데 왜 Base에 있나요? - 수민
+	// bIsUndertheTree - Ai에서 쓰는거같은데 왜 Base에 있나요? - 수민
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
 		bool bIsUndertheTree;
 

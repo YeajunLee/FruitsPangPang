@@ -27,6 +27,17 @@ public:
 	//UFUNCTION(BlueprintCallable)
 	//	void Throw_AI();
 public:
+	// related mesh
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	//	class UStaticMeshComponent* GreenOnionMesh;
+	//
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	//	class UStaticMeshComponent* CarrotMesh;
+
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	//
+	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+public:
 	//related interact
 	
 	virtual	void GetFruits() override;
@@ -45,16 +56,6 @@ public:
 	//related network
 
 	virtual bool ConnServer() override;
-	const char* SERVER_ADDR = "127.0.0.1";
-	const short SERVER_PORT = 4000;
-	SOCKET s_socket;
-	SOCKADDR_IN server_addr;
-	WSA_OVER_EX recv_expover;
-	int		_prev_size;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
-	    //int c_id; //received id from server
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
-		//int overID;	//overlapped I/O use this
 	virtual void recvPacket() override;
 public:
 	//int hp;

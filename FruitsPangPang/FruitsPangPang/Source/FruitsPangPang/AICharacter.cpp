@@ -12,17 +12,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
 AAICharacter::AAICharacter()
-	:_prev_size(0)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
+
 }
 
 // Called when the game starts or when spawned
@@ -184,6 +185,42 @@ void AAICharacter::GetFruits()
 }
 
 
+void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && (OtherActor != this) && OtherComp)
+	{
+		if (GEngine)
+		{
+			auto victim = Cast<ABaseCharacter>(OtherActor);
+			if (nullptr != victim)
+			{
+				TSubclassOf<UDamageType> dmgCauser;
+				dmgCauser = UDamageType::StaticClass();
+
+				if (!this->GreenOnionMesh->bHiddenInGame)
+				{
+					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
+					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
+				}
+				if (!this->CarrotMesh->bHiddenInGame)
+				{
+					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
+				}
+				UGameplayStatics::ApplyDamage(OtherActor, 1, GetInstigatorController(), this, dmgCauser);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+				UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+			}
+		}
+	}
+}
+
+void AAICharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+	}
+}
 
 float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
