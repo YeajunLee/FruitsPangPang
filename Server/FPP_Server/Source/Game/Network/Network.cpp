@@ -419,7 +419,7 @@ void process_packet(int client_id, unsigned char* p)
 			auto OtherPlayer = reinterpret_cast<Character*>(other);
 			if (character->bAi && OtherPlayer->bAi) continue;
 			OtherPlayer->state_lock.lock();
-			if (Character::STATE::ST_INGAME == character->_state)
+			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
 			{
 				OtherPlayer->state_lock.unlock();
 				send_throwfruit_packet(client_id, OtherPlayer->_id,
