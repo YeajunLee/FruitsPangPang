@@ -10,10 +10,12 @@
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h "
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
-
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -24,12 +26,35 @@ AAICharacter::AAICharacter()
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
 
+	collisionBox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("collision1"));
+	collisionBox->SetupAttachment(RootComponent);
+	collisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+	//BananaBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+
+	P_Star1 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle1"));
+	P_Star1->SetupAttachment(RootComponent);
+	P_Star1->bAutoActivate = false;
+	P_Star1->SetRelativeLocation(FVector(50.f, 10.f, 10.f));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset1(TEXT("/Game/Assets/Fruits/Banana/P_Stars.P_Stars"));
+	if (ParticleAsset1.Succeeded())
+	{
+		P_Star1->SetTemplate(ParticleAsset1.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> dizzySoundAsset1(TEXT("/Game/Assets/Fruits/Banana/S_dizzy.S_dizzy"));
+	if (dizzySoundAsset1.Succeeded())
+	{
+		dizzySound1 = dizzySoundAsset1.Object;
+	}
+
+	movement = this->GetCharacterMovement();
 }
 
 // Called when the game starts or when spawned
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -156,11 +181,6 @@ void AAICharacter::Throw()
 	bomb->BombOwner = this;
 	bomb->ProjectileMovementComponent->Activate();
 	
-
-
-
-
-
 }
 
 void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -171,7 +191,7 @@ void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 void AAICharacter::GetFruits()
 {
 	Super::GetFruits();
-	if (OverlapType)
+	if (OverlapType && (OverlapInteractId != -1))
 	{
 		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
@@ -184,6 +204,36 @@ void AAICharacter::GetFruits()
 	}
 }
 
+
+void AAICharacter::OnTimeEnd()
+{
+	bStepBanana = false;
+	movement->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && (OtherActor != this) && OtherActor)
+	{
+		auto banana = Cast<AProjectile>(OtherActor);
+		if (nullptr != banana)
+		{
+			if (banana->_fType == 11)
+			{
+				bStepBanana = true;
+				banana->Destroy();
+				movement->DisableMovement();
+				if (P_Star1 && P_Star1->Template)
+				{
+					P_Star1->ToggleActive();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
+
+			}
+		}
+	}
+}
 
 void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

@@ -28,6 +28,7 @@
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
 #include "Particles/ParticleSystemComponent.h "
+#include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -97,7 +98,11 @@ AMyCharacter::AMyCharacter()
 	}
 
 	
-	
+	static ConstructorHelpers::FObjectFinder<USoundBase> dizzySoundAsset(TEXT("/Game/Assets/Fruits/Banana/S_dizzy.S_dizzy"));
+	if (dizzySoundAsset.Succeeded())
+	{
+		dizzySound = dizzySoundAsset.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -105,6 +110,8 @@ void AMyCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
+
+	
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
@@ -585,6 +592,7 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 				{
 					P_Star->ToggleActive();
 				}
+				UGameplayStatics::PlaySoundAtLocation(this, dizzySound, GetActorLocation());
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,this ,&AMyCharacter::onTimerEnd , 2.5, false);
 				
 			}
