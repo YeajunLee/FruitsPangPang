@@ -18,10 +18,7 @@ Punnet::Punnet()
 	mt19937 rng(rd());
 	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_GREENONION), static_cast<int>(FRUITTYPE::T_HEAL));
 
-	while (1)
-	{
-		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
-	}
+	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
 }
 
 Punnet::~Punnet()
@@ -50,9 +47,6 @@ void Punnet::GenerateFruit()
 	mt19937 rng(rd());
 	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_GREENONION), static_cast<int>(FRUITTYPE::T_HEAL));
 
-	while (1)
-	{
-		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
-	}
+	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
 	cout << "_ftype : " << (int)_ftype << endl;
 }
