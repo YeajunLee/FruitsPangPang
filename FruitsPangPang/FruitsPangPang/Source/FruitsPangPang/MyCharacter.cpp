@@ -501,9 +501,6 @@ void AMyCharacter::Attack()
 {
 	if (!bAttacking)
 	{
-		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount));
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
@@ -740,23 +737,20 @@ void AMyCharacter::Throw()
 	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
 	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	if (nullptr != bomb)
 	{
 		bomb->BombOwner = this;
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), SavedHotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
- 	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
 	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
 	//bomb->DetachFromActor(Detachrules);
-	bomb->ProjectileMovementComponent->Activate();
-
-
 	//
 	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	////	FString::Printf(TEXT("My pos: ")));
@@ -771,13 +765,15 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
-	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
-	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
-	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
-	//bomb->DetachFromActor(Detachrules);
-	bomb->ProjectileMovementComponent->Activate();
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+	}
 }
 
 void AMyCharacter::BananaThrow()
@@ -791,14 +787,14 @@ void AMyCharacter::BananaThrow()
 	FName path = AInventory::ItemCodeToItemBombPath(11);
 	
 	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
+	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
 	if (nullptr != banana)
 	{
 		banana->BombOwner = this;
 		banana->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+		UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
 }
 
@@ -808,14 +804,26 @@ void AMyCharacter::GetFruits()
 	Super::GetFruits();
 	if (OverlapType)
 	{           
-		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
+		}
 	}
 	else{
-		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
+		}
 	}
 }
 
@@ -846,9 +854,8 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CurrentHP -= Damage;
 	*/
 
-	auto projectile = Cast<AProjectile>(DamageCauser);
-
-	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
+	//데미지 입힌게 폭탄일 경우 - 대부분의 경우
+	AProjectile* projectile = Cast<AProjectile>(DamageCauser);
 	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
@@ -862,6 +869,8 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		}
 	}
 
+	//데미지 입힌게 사람인 경우 - 근접무기 공격을 받았을 경우
+	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));

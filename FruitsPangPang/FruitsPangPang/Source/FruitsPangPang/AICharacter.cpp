@@ -178,8 +178,15 @@ void AAICharacter::Throw()
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
-	bomb->ProjectileMovementComponent->Activate();
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! - AI ItemCode : %d"), SavedHotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+	}
 	
 }
 
@@ -191,16 +198,28 @@ void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 void AAICharacter::GetFruits()
 {
 	Super::GetFruits();
-	if (OverlapType && (OverlapInteractId != -1))
+	if (OverlapType)
 	{
-		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Tree"));
+		}
 	}
 	else {
-		//Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		//Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
-		//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Punnet"));
+		}
 	}
 }
 
@@ -215,7 +234,7 @@ void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 {
 	if (OtherActor && (OtherActor != this) && OtherActor)
 	{
-		auto banana = Cast<AProjectile>(OtherActor);
+		AProjectile* banana = Cast<AProjectile>(OtherActor);
 		if (nullptr != banana)
 		{
 			if (banana->_fType == 11)
@@ -241,7 +260,7 @@ void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 	{
 		if (GEngine)
 		{
-			auto victim = Cast<ABaseCharacter>(OtherActor);
+			ABaseCharacter* victim = Cast<ABaseCharacter>(OtherActor);
 			if (nullptr != victim)
 			{
 				TSubclassOf<UDamageType> dmgCauser;
@@ -295,9 +314,9 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	*/
 
 
-	auto projectile = Cast<AProjectile>(DamageCauser);
+	//데미지 입힌게 폭탄일 경우 - 대부분의 경우
+	AProjectile* projectile = Cast<AProjectile>(DamageCauser);
 
-	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
@@ -311,6 +330,8 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		}
 	}
 
+	//데미지 입힌게 사람인 경우 - 근접무기 공격을 받았을 경우
+	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
