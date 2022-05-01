@@ -412,22 +412,23 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	case CS_PACKET_SPAWNOBJ: {
 		cs_packet_spawnobj* packet = reinterpret_cast<cs_packet_spawnobj*>(p);
-
+		Character* character = reinterpret_cast<Character*>(object);
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			if (other->_id == client_id) continue;
-			auto character = reinterpret_cast<Character*>(other);
-			character->state_lock.lock();
+			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+			OtherPlayer->state_lock.lock();
 			if (Character::STATE::ST_INGAME == character->_state)
 			{
-				character->state_lock.unlock();
+				OtherPlayer->state_lock.unlock();
 				send_throwfruit_packet(client_id, character->_id,
 					packet->rx, packet->ry, packet->rz, packet->rw,
 					packet->lx, packet->ly, packet->lz,
 					packet->sx, packet->sy, packet->sz,
 					packet->fruitType);
 			}
-			else character->state_lock.unlock();
+			else OtherPlayer->state_lock.unlock();
 		}
 		break;
 	}

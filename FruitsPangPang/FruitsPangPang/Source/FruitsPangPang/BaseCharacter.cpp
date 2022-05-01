@@ -6,16 +6,19 @@
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 	:hp(PLAYER_HP)
-	,SelectedHotKeySlotNum(0)
-	,SavedHotKeyItemCode(0)
-	,mInventory(nullptr)
-	,OverlapInteract(false)
-	,OverlapInteractId(-1)
-	,OverlapType(true)
-	,_prev_size(0)
-	,c_id(-1)
-	,overID(-1)
-	,killcount(0),deathcount(0),score(0)
+	, SelectedHotKeySlotNum(0)
+	, SavedHotKeyItemCode(0)
+	, mInventory(nullptr)
+	, OverlapInteract(false)
+	, OverlapInteractId(-1)
+	, OverlapType(true)
+	, _prev_size(0)
+	, c_id(-1)
+	, overID(-1)
+	, killcount(0), deathcount(0), score(0)
+	, bIsDie(false)
+	, bStepBanana(false)
+	, bHitbyFruit(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,9 +41,6 @@ ABaseCharacter::ABaseCharacter()
 	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
 	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
 	
-	bIsDie = false;
-	bStepBanana = false;
-	bHitbyFruit = false;
 }
 
 // Called when the game starts or when spawned
