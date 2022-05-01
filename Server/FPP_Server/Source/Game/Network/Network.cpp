@@ -422,7 +422,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (Character::STATE::ST_INGAME == character->_state)
 			{
 				OtherPlayer->state_lock.unlock();
-				send_throwfruit_packet(client_id, character->_id,
+				send_throwfruit_packet(client_id, OtherPlayer->_id,
 					packet->rx, packet->ry, packet->rz, packet->rw,
 					packet->lx, packet->ly, packet->lz,
 					packet->sx, packet->sy, packet->sz,
