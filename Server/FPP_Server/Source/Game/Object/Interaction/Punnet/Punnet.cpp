@@ -21,8 +21,6 @@ Punnet::Punnet()
 	while (1)
 	{
 		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
-		if ((FRUITTYPE::T_BANANA != _ftype))
-			break;
 	}
 }
 
@@ -55,8 +53,6 @@ void Punnet::GenerateFruit()
 	while (1)
 	{
 		_ftype = static_cast<FRUITTYPE>(Punnet(rng));
-		if ((FRUITTYPE::T_BANANA != _ftype))
-			break;
 	}
 	cout << "_ftype : " << (int)_ftype << endl;
 }
