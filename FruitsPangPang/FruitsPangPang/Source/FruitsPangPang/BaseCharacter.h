@@ -60,7 +60,7 @@ public:
 		int SelectedHotKeySlotNum;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
-		int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
+		int SavedHotKeySlotNum;		//Save HotKey's Slot Num When Attack() Because it will be use for Throww() to get Fruits Path
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")

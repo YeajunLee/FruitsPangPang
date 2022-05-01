@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Network\Thread\LogThread\LogThread.cpp" />
     <ClCompile Include="Source\Game\Object\Interaction\Punnet\Punnet.cpp" />
     <ClCompile Include="Source\Game\Object\Interaction\Interaction.cpp" />
     <ClCompile Include="Source\Game\Network\Thread\TimerThread\TimerThread.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Source\Game\Object\Interaction\Tree\Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Game\Network\Thread\LogThread\LogThread.h" />
     <ClInclude Include="Source\Game\Object\Interaction\Punnet\Punnet.h" />
     <ClInclude Include="Source\Game\Object\Interaction\Interaction.h" />
     <ClInclude Include="Source\Game\Network\Thread\TimerThread\TimerThread.h" />

@@ -503,12 +503,13 @@ void AMyCharacter::Attack()
 	{
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			SavedHotKeySlotNum = SelectedHotKeySlotNum;
+			int HotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			
-			if (SavedHotKeyItemCode == 7)
+			if (HotKeyItemCode == 7)
 			{	
 				if (AnimInstance && SlashMontage)
 				{
@@ -518,7 +519,7 @@ void AMyCharacter::Attack()
 					
 				}
 			}
-			else if (SavedHotKeyItemCode == 8)
+			else if (HotKeyItemCode == 8)
 			{
 				if (AnimInstance && StabbingMontage)
 				{
@@ -534,7 +535,7 @@ void AMyCharacter::Attack()
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			
 		}
@@ -728,14 +729,15 @@ void AMyCharacter::DropSwordAnimation()
 void AMyCharacter::Throw()
 {
 
-	if (SelectedHotKeySlotNum == 4) return;
+	if (SavedHotKeySlotNum == 4) return;
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
 	CameraRotate.Pitch += 14;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
+	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	if (nullptr != bomb)
@@ -744,7 +746,7 @@ void AMyCharacter::Throw()
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), SavedHotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);

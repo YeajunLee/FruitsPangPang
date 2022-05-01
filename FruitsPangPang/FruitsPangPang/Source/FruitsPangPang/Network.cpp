@@ -150,18 +150,19 @@ void Network::send_anim_packet(SOCKET& sock, AnimType type)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_spawnobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType)
+void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType, const int& itemSlotNum)
 {
-	cs_packet_spawnobj packet;
-	packet.size = sizeof(cs_packet_spawnobj);
-	packet.type = CS_PACKET_SPAWNOBJ;
+	cs_packet_spawnitemobj packet;
+	packet.size = sizeof(cs_packet_spawnitemobj);
+	packet.type = CS_PACKET_SPAWNITEMOBJ;
 	packet.rx = rotate.Pitch, packet.ry = rotate.Yaw, packet.rz = rotate.Roll, packet.rw = 0.0f;
 	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
 	packet.fruitType = fruitType;
+	packet.itemSlotNum = itemSlotNum;
 
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_spawnobj), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }

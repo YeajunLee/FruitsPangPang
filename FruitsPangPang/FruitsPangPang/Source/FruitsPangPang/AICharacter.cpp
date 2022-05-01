@@ -121,13 +121,12 @@ void AAICharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			bAttacking = true;
-
-			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			SavedHotKeySlotNum = SelectedHotKeySlotNum;
 			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance && ThrowMontage_AI)
@@ -171,10 +170,12 @@ void AAICharacter::Throw()
 	//FRotator aiRotate = GetActorForwardVector().Rotation();
 
 	FTransform trans(ToTarget.Quaternion(), SocketTransform.GetLocation());
-	//Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	//Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), HotKeyItemCode,SavedHotKeySlotNum);
 
-	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
+	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+
+	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
@@ -184,7 +185,7 @@ void AAICharacter::Throw()
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! - AI ItemCode : %d"), SavedHotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! - AI ItemCode : %d"), HotKeyItemCode);
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
 	

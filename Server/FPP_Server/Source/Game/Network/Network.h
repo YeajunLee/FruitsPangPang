@@ -4,7 +4,9 @@
 #include <array>
 #include <chrono>
 #include <mutex>
+#include <string>
 #include <concurrent_priority_queue.h>
+#include <concurrent_queue.h>
 #include "../../../../../Protocol/protocol.h"
 
 extern HANDLE hiocp;
@@ -13,7 +15,9 @@ extern SOCKET s_socket;
 extern std::array<class Object*, MAX_OBJECT> objects;
 extern std::atomic_int loginPlayerCnt;
 extern std::atomic_bool GameActive;
-extern std::atomic_bool CheatGamePlayTime;	
+extern std::atomic_bool CheatGamePlayTime;
+extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
+extern concurrency::concurrent_queue <struct Log> logger;
 
 void error_display(int err_no);
 int Generate_Id();
@@ -88,5 +92,9 @@ struct Timer_Event {
 	}
 };
 
+void FPP_LOG(const char* strLogTxt,...);
 
-extern concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
+struct Log {
+public:
+	std::string logtxt;
+};
