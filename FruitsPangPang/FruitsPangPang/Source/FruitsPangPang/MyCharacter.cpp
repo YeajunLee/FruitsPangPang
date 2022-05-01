@@ -758,7 +758,7 @@ void AMyCharacter::Throw()
 
 void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName& path)
 {
-	rotation.Pitch += 18;
+	rotation.Pitch += 14;
 	FTransform trans(rotation.Quaternion(), location);
 
 
