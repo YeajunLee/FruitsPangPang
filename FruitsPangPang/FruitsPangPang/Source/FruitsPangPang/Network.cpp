@@ -815,17 +815,17 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		int id = packet->id;
 
-		//bool escape = false;
-		//for (auto ai : mAiCharacter)
-		//{
-		//	if (ai == nullptr) continue;
-		//	if (id == ai->c_id)
-		//	{
-		//		escape = true;
-		//		break;
-		//	}
-		//}
-		//if (escape) break;
+		bool escape = false;
+		for (auto ai : mAiCharacter)
+		{
+			if (ai == nullptr) continue;
+			if (id == ai->c_id)
+			{
+				escape = true;
+				break;
+			}
+		}
+		if (escape) break;
 
 
 		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -842,6 +842,17 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 	case SC_PACKET_SPAWNOBJ: {
 		sc_packet_spawnobj* packet = reinterpret_cast<sc_packet_spawnobj*>(p);
 		int other_id = packet->id;
+		bool escape = false;
+		for (auto ai : mAiCharacter)
+		{
+			if (ai == nullptr) continue;
+			if (other_id == ai->c_id)
+			{
+				escape = true;
+				break;
+			}
+		}
+		if (escape) break;
 		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), AInventory::ItemCodeToItemBombPath(packet->fruitType));
 
 
