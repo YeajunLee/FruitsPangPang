@@ -51,6 +51,8 @@ public:
 
 	UParticleSystemComponent* P_Star;
 
+	USoundBase* dizzySound;
+
 
 	FTimerHandle TimerHandle;
 
