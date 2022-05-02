@@ -17,6 +17,7 @@ std::atomic_int loginPlayerCnt;
 std::atomic_bool GameActive = true;
 std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
+concurrency::concurrent_queue <Log> logger;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
 	: _cmd(cmd)
@@ -33,6 +34,19 @@ WSA_OVER_EX::~WSA_OVER_EX()
 
 }
 
+void FPP_LOG(const char* strLogFormat, ...)
+{
+	char buf[1000];
+	Log t;
+	va_list arg;
+	va_start(arg, strLogFormat);
+	ZeroMemory(buf, sizeof(buf));
+	vsprintf_s(buf, strLogFormat, arg);
+	va_end(arg);
+
+	t.logtxt += buf;
+	logger.push(t);
+}
 void error_display(int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -232,6 +246,7 @@ void send_respawn_packet(int player_id, int respawner_id)
 	packet.rz = respawner->rz;
 	packet.rw = respawner->rw;
 
+	FPP_LOG("User[%d]의 리스폰을 User[%d]에게 알립니다.", respawner_id, player_id);
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -384,35 +399,47 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	case CS_PACKET_ANIM: {
 		cs_packet_anim* packet = reinterpret_cast<cs_packet_anim*>(p);
-		cout << client_id << endl;
+		//cout << client_id << endl;
 
-		//switch (packet->animtype)
-		//{
-		//case 0://Throw
-		//{
-			for (auto& other : objects) {
-				if (!other->isPlayer()) break;
-				if (other->_id == client_id) continue;
-				auto character = reinterpret_cast<Character*>(other);
 
-				character->state_lock.lock();
-				if (Character::STATE::ST_INGAME == character->_state)
-				{
-					character->state_lock.unlock();
-					send_anim_packet(character->_id, client_id, packet->animtype);
-				}
-				else character->state_lock.unlock();
+		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
+			if (other->_id == client_id) continue;
+			auto character = reinterpret_cast<Character*>(other);
+
+			character->state_lock.lock();
+			if (Character::STATE::ST_INGAME == character->_state)
+			{
+				character->state_lock.unlock();
+				send_anim_packet(character->_id, client_id, packet->animtype);
 			}
-		//break;
-		//}
-		//}
-		
+			else character->state_lock.unlock();
+		}
+
 
 		break;
 	}
-	case CS_PACKET_SPAWNOBJ: {
-		cs_packet_spawnobj* packet = reinterpret_cast<cs_packet_spawnobj*>(p);
+	case CS_PACKET_SPAWNITEMOBJ: {
+		cs_packet_spawnitemobj* packet = reinterpret_cast<cs_packet_spawnitemobj*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
+		if (packet->itemSlotNum < 0)
+		{
+			cout << "유효하지 않은 item Slot 입니다 : " << packet->itemSlotNum << endl;
+			FPP_LOG("User[%d] 유효하지 않은 item Slot %d", client_id, packet->itemSlotNum);
+			break;
+		}
+
+		if (character->mSlot[packet->itemSlotNum].amount > 0)
+		{
+			character->mSlot[packet->itemSlotNum].amount -= 1;
+			cout << client_id << "번째 유저의" << packet->itemSlotNum << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[packet->itemSlotNum].amount << endl;
+			FPP_LOG("[%d]유저 [%d]번째 슬롯 아이템 1개 감소 ", client_id, packet->itemSlotNum);
+		}
+		else {
+			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함.", client_id, packet->itemSlotNum);
+			break;
+		}
+
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			if (other->_id == client_id) continue;
@@ -444,7 +471,7 @@ void process_packet(int client_id, unsigned char* p)
 
 		}
 		tree->canHarvest = false;
-		
+
 		cout << "과일 받았습니다(나무)" << packet->obj_id << endl;
 		switch (tree->_ttype)
 		{
@@ -457,15 +484,7 @@ void process_packet(int client_id, unsigned char* p)
 			send_update_inventory_packet(client_id, 1);
 			break;
 		}
-		//character->mSlot[0].type = tree->_ftype;
-		//character->mSlot[0].amount++;
-		//send_update_inventory(client_id, 0);
 		tree->interact();
-		//Timer_Event instq;
-		//instq.exec_time = chrono::system_clock::now() + 5000ms;
-		//instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
-		//instq.object_id = packet->tree_id;
-		//timer_queue.push(instq);
 
 		for (auto& other : objects)
 		{
@@ -532,15 +551,22 @@ void process_packet(int client_id, unsigned char* p)
 
 		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		//character->mSlot[packet->slotNum].amount -= packet->Amount;
-		character->mSlot[character->mActivationSlot].amount -= 1;
-		cout << client_id<<"번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
+		if (character->mSlot[character->mActivationSlot].amount > 0)
+		{
+			character->mSlot[character->mActivationSlot].amount -= 1;
+			cout << client_id << "번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
+		}
+		else {
+			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함. - CS_PACKET_USEITEM", client_id, character->mActivationSlot.load());
+		}
+		
 		break;
 	}
 	case CS_PACKET_HIT: {
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		cout << "HurtBy ID:" << packet->attacker_id << endl;
+		if (!(USER_START <= packet->attacker_id && packet->attacker_id < MAX_USER)) break;
 		character->HurtBy(packet->fruitType, packet->attacker_id);
 		break;
 	}

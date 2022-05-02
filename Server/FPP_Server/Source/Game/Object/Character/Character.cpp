@@ -167,6 +167,7 @@ void Character::Hurt(const int& damage, const int& attacker)
 	if (0 > attacker || attacker >= MAX_USER) return;	//이상한얘가 때리는거에 맞으면 안됨.
 	hp = max(hp - damage, 0);
 	send_update_userstatus_packet(_id);
+	FPP_LOG("User[%d] Hit [%d] 남은 hp : %d ", attacker, _id, hp.load());
 	cout << _id << "의 이후 hp : " << hp << endl;
 	if (hp <= 0)
 	{
@@ -175,6 +176,7 @@ void Character::Hurt(const int& damage, const int& attacker)
 
 		Character* attackerCharacter = reinterpret_cast<Character*>(objects[attacker]);
 		attackerCharacter->mKillCount++;
+		FPP_LOG("User[%d] Die ", _id);
 		cout << _id << "는 죽음\n";
 		Die();
 

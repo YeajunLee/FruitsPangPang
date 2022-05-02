@@ -42,6 +42,9 @@
     <ClCompile Include="Source\Game\Object\Interaction\Punnet\Punnet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\Network\Thread\LogThread\LogThread.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Network\Network.h">
@@ -66,6 +69,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Object\Interaction\Punnet\Punnet.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Network\Thread\LogThread\LogThread.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

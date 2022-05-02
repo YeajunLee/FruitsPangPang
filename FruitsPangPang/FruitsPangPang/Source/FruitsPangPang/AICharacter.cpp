@@ -10,10 +10,12 @@
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h "
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
-
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -24,12 +26,35 @@ AAICharacter::AAICharacter()
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
 
+	collisionBox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("collision1"));
+	collisionBox->SetupAttachment(RootComponent);
+	collisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+	//BananaBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+
+	P_Star1 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle1"));
+	P_Star1->SetupAttachment(RootComponent);
+	P_Star1->bAutoActivate = false;
+	P_Star1->SetRelativeLocation(FVector(50.f, 10.f, 10.f));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset1(TEXT("/Game/Assets/Fruits/Banana/P_Stars.P_Stars"));
+	if (ParticleAsset1.Succeeded())
+	{
+		P_Star1->SetTemplate(ParticleAsset1.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> dizzySoundAsset1(TEXT("/Game/Assets/Fruits/Banana/S_dizzy.S_dizzy"));
+	if (dizzySoundAsset1.Succeeded())
+	{
+		dizzySound1 = dizzySoundAsset1.Object;
+	}
+
+	movement = this->GetCharacterMovement();
 }
 
 // Called when the game starts or when spawned
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -96,13 +121,12 @@ void AAICharacter::Attack()
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			bAttacking = true;
-
-			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			SavedHotKeySlotNum = SelectedHotKeySlotNum;
 			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance && ThrowMontage_AI)
@@ -146,21 +170,25 @@ void AAICharacter::Throw()
 	//FRotator aiRotate = GetActorForwardVector().Rotation();
 
 	FTransform trans(ToTarget.Quaternion(), SocketTransform.GetLocation());
-	//Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	//Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), HotKeyItemCode,SavedHotKeySlotNum);
 
-	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
+	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+
+	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
-	bomb->ProjectileMovementComponent->Activate();
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! - AI ItemCode : %d"), HotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+	}
 	
-
-
-
-
-
 }
 
 void AAICharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -173,17 +201,59 @@ void AAICharacter::GetFruits()
 	Super::GetFruits();
 	if (OverlapType)
 	{
-		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Tree"));
+		}
 	}
 	else {
-		//Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		//Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
-		//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Punnet"));
+		}
 	}
 }
 
+
+void AAICharacter::OnTimeEnd()
+{
+	bStepBanana = false;
+	movement->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && (OtherActor != this) && OtherActor)
+	{
+		AProjectile* banana = Cast<AProjectile>(OtherActor);
+		if (nullptr != banana)
+		{
+			if (banana->_fType == 11)
+			{
+				bStepBanana = true;
+				banana->Destroy();
+				movement->DisableMovement();
+				if (P_Star1 && P_Star1->Template)
+				{
+					P_Star1->ToggleActive();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
+
+			}
+		}
+	}
+}
 
 void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -191,7 +261,7 @@ void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 	{
 		if (GEngine)
 		{
-			auto victim = Cast<ABaseCharacter>(OtherActor);
+			ABaseCharacter* victim = Cast<ABaseCharacter>(OtherActor);
 			if (nullptr != victim)
 			{
 				TSubclassOf<UDamageType> dmgCauser;
@@ -245,9 +315,9 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	*/
 
 
-	auto projectile = Cast<AProjectile>(DamageCauser);
+	//데미지 입힌게 폭탄일 경우 - 대부분의 경우
+	AProjectile* projectile = Cast<AProjectile>(DamageCauser);
 
-	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
@@ -261,6 +331,8 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		}
 	}
 
+	//데미지 입힌게 사람인 경우 - 근접무기 공격을 받았을 경우
+	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));

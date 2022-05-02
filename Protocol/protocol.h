@@ -27,7 +27,7 @@ const char INTERACT_TYPE_PUNNET = 2;
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_ANIM = 3;
-const char CS_PACKET_SPAWNOBJ = 4;
+const char CS_PACKET_SPAWNITEMOBJ = 4;
 const char CS_PACKET_GETFRUITS_PUNNET = 5;
 const char CS_PACKET_GETFRUITS_TREE = 6;
 const char CS_PACKET_USEITEM = 7;
@@ -79,13 +79,14 @@ struct cs_packet_anim {
 	char animtype;
 };
 
-struct cs_packet_spawnobj {
+struct cs_packet_spawnitemobj {
 	unsigned char size;
 	char type;
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 	float sx, sy, sz;		//scale
 	int fruitType;			//item code
+	int itemSlotNum;		//inventory slot num
 };
 
 struct cs_packet_getfruits {

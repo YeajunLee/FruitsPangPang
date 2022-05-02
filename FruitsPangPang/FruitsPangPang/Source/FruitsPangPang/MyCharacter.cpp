@@ -28,6 +28,7 @@
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
 #include "Particles/ParticleSystemComponent.h "
+#include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -97,7 +98,11 @@ AMyCharacter::AMyCharacter()
 	}
 
 	
-	
+	static ConstructorHelpers::FObjectFinder<USoundBase> dizzySoundAsset(TEXT("/Game/Assets/Fruits/Banana/S_dizzy.S_dizzy"));
+	if (dizzySoundAsset.Succeeded())
+	{
+		dizzySound = dizzySoundAsset.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -105,6 +110,8 @@ void AMyCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
+
+	
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
@@ -494,17 +501,15 @@ void AMyCharacter::Attack()
 {
 	if (!bAttacking)
 	{
-		//임의, mSlots[0]의 0은 나중에 SelectedHotKey 같은 변수명으로 바뀔 예정.
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("Amount: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount));
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
-			SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			SavedHotKeySlotNum = SelectedHotKeySlotNum;
+			int HotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 			bAttacking = true;
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			
-			if (SavedHotKeyItemCode == 7)
+			if (HotKeyItemCode == 7)
 			{	
 				if (AnimInstance && SlashMontage)
 				{
@@ -514,7 +519,7 @@ void AMyCharacter::Attack()
 					
 				}
 			}
-			else if (SavedHotKeyItemCode == 8)
+			else if (HotKeyItemCode == 8)
 			{
 				if (AnimInstance && StabbingMontage)
 				{
@@ -530,7 +535,7 @@ void AMyCharacter::Attack()
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			
 		}
@@ -585,6 +590,7 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 				{
 					P_Star->ToggleActive();
 				}
+				UGameplayStatics::PlaySoundAtLocation(this, dizzySound, GetActorLocation());
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,this ,&AMyCharacter::onTimerEnd , 2.5, false);
 				
 			}
@@ -723,32 +729,30 @@ void AMyCharacter::DropSwordAnimation()
 void AMyCharacter::Throw()
 {
 
-	if (SelectedHotKeySlotNum == 4) return;
+	if (SavedHotKeySlotNum == 4) return;
 
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
 	CameraRotate.Pitch += 14;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-	FName path = AInventory::ItemCodeToItemBombPath(SavedHotKeyItemCode);
-	Network::GetNetwork()->send_spawnobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), SavedHotKeyItemCode);
+	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
+	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	if (nullptr != bomb)
 	{
 		bomb->BombOwner = this;
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
- 	bomb->BombOwner = this;
 	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
 	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
 	//bomb->DetachFromActor(Detachrules);
-	bomb->ProjectileMovementComponent->Activate();
-
-
 	//
 	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 	////	FString::Printf(TEXT("My pos: ")));
@@ -763,13 +767,15 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	bomb->BombOwner = this;
-	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
-	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
-	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
-	//bomb->DetachFromActor(Detachrules);
-	bomb->ProjectileMovementComponent->Activate();
+	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+	if (nullptr != bomb)
+	{
+		bomb->BombOwner = this;
+		bomb->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+	}
 }
 
 void AMyCharacter::BananaThrow()
@@ -783,14 +789,14 @@ void AMyCharacter::BananaThrow()
 	FName path = AInventory::ItemCodeToItemBombPath(11);
 	
 	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	auto banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
+	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
 	if (nullptr != banana)
 	{
 		banana->BombOwner = this;
 		banana->ProjectileMovementComponent->Activate();
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana error"));
+		UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
 }
 
@@ -800,14 +806,26 @@ void AMyCharacter::GetFruits()
 	Super::GetFruits();
 	if (OverlapType)
 	{           
-		Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
+		}
 	}
 	else{
-		Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-		Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-		UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
+			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
+		}
 	}
 }
 
@@ -838,9 +856,8 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CurrentHP -= Damage;
 	*/
 
-	auto projectile = Cast<AProjectile>(DamageCauser);
-
-	auto DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
+	//데미지 입힌게 폭탄일 경우 - 대부분의 경우
+	AProjectile* projectile = Cast<AProjectile>(DamageCauser);
 	if (projectile != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
@@ -854,6 +871,8 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		}
 	}
 
+	//데미지 입힌게 사람인 경우 - 근접무기 공격을 받았을 경우
+	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));

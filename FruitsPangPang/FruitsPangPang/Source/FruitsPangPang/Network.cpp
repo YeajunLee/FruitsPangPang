@@ -150,18 +150,19 @@ void Network::send_anim_packet(SOCKET& sock, AnimType type)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_spawnobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType)
+void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType, const int& itemSlotNum)
 {
-	cs_packet_spawnobj packet;
-	packet.size = sizeof(cs_packet_spawnobj);
-	packet.type = CS_PACKET_SPAWNOBJ;
+	cs_packet_spawnitemobj packet;
+	packet.size = sizeof(cs_packet_spawnitemobj);
+	packet.type = CS_PACKET_SPAWNITEMOBJ;
 	packet.rx = rotate.Pitch, packet.ry = rotate.Yaw, packet.rz = rotate.Roll, packet.rw = 0.0f;
 	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
 	packet.fruitType = fruitType;
+	packet.itemSlotNum = itemSlotNum;
 
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_spawnobj), &packet);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
 }
@@ -315,11 +316,11 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_MOVE: {
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
 		int move_id = packet->id;
-		if (move_id < MAX_USER)
+		if (USER_START<= move_id && move_id < MAX_USER)
 		{
 			if (move_id == mMyCharacter->c_id)
 			{
-
+				//내가 움직인건 처리하지 않는다.
 			}
 			else if (mOtherCharacter[move_id] != nullptr)
 			{
@@ -327,6 +328,8 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
 			}
+		}else{
+			UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_MOVE id: %d"), move_id);
 		}
 		break;
 	}
@@ -338,7 +341,7 @@ void Network::process_packet(unsigned char* p)
 		{
 		case static_cast<char>(Network::AnimType::Throw): {
 
-			if (anim_character_id < MAX_USER) {
+			if (USER_START<= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
@@ -350,10 +353,13 @@ void Network::process_packet(unsigned char* p)
 					}
 				}
 			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
 			break;
 		}
 		case static_cast<char>(Network::AnimType::PickSword_GreenOnion) : {
-			if (anim_character_id < MAX_USER) {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
@@ -367,10 +373,13 @@ void Network::process_packet(unsigned char* p)
 					}
 				}
 			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
 			break;
 		}
 		case static_cast<char>(Network::AnimType::PickSword_Carrot) : {
-			if (anim_character_id < MAX_USER) {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
@@ -384,20 +393,26 @@ void Network::process_packet(unsigned char* p)
 					}
 				}
 			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
 			break;
 		}
 		case static_cast<char>(Network::AnimType::DropSword) : {
-			if (anim_character_id < MAX_USER) {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(true, false);
 					mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(true, false);
 				}
 			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
 			break;
 		}
 		case static_cast<char>(Network::AnimType::Slash) : {
-			if (anim_character_id < MAX_USER) {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
@@ -410,10 +425,13 @@ void Network::process_packet(unsigned char* p)
 					}
 				}
 			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
 			break;
 		}
 		case static_cast<char>(Network::AnimType::Stab) : {
-			if (anim_character_id < MAX_USER) {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
 					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
@@ -425,6 +443,9 @@ void Network::process_packet(unsigned char* p)
 
 					}
 				}
+			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
 			}
 			break;
 		}
@@ -760,7 +781,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 		//UE_LOG(LogTemp, Log, TEXT("move called"));
 
-		if (move_id < MAX_USER)
+		if (USER_START<= move_id && move_id < MAX_USER)
 		{
 			if (mOtherCharacter[move_id] != nullptr)
 			{
@@ -769,11 +790,14 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
 			}
 		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_MOVE id: %d"), move_id);
+		}
 		break;
 	}
 	case SC_PACKET_ANIM: {
 		sc_packet_anim* packet = reinterpret_cast<sc_packet_anim*>(p);
-		int thrower_character_id = packet->id;
+		int anim_character_id = packet->id;
 
 		//if Ai Move, dump packet
 		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
@@ -782,20 +806,17 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		for (auto ai : mAiCharacter)
 		{
 			if (ai == nullptr) continue;
-			if (thrower_character_id == ai->c_id)
+			if (anim_character_id == ai->c_id)
 			{
 				escape = true;
 				break;
 			}
 		}
 		if (escape) break;
-
-		UE_LOG(LogTemp, Log, TEXT("Anim called"));
 		switch (packet->animtype)
 		{
-			case static_cast<char>(Network::AnimType::Throw) :
-			{
-				if (thrower_character_id < MAX_USER) {
+			case static_cast<char>(Network::AnimType::Throw):{
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
@@ -806,6 +827,100 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 						}
 					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::PickSword_GreenOnion) :{
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
+						{
+							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
+							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
+							mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(false, false);
+
+						}
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::PickSword_Carrot) : {
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
+						{
+							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
+							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
+							mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(false, false);
+
+						}
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::DropSword) : {
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(true, false);
+						mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(true, false);
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::Slash) : {
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
+						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+						if (AnimInstance && mOtherCharacter[packet->id]->SlashMontage)
+						{
+							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->SlashMontage, 2.f);
+							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->SlashMontage);
+
+						}
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::Stab) : {
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
+						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
+						if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
+						{
+							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->StabbingMontage, 2.f);
+							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->StabbingMontage);
+
+						}
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
 				}
 				break;
 			}
@@ -830,10 +945,15 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		}
 		if (escape) break;
 
-
-		mOtherCharacter[id]->GetMesh()->SetVisibility(true);
-		mOtherCharacter[id]->c_id = packet->id;
-		mOtherCharacter[id]->s_connected = true;
+		if (USER_START <= id && id < MAX_USER)
+		{
+			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+			mOtherCharacter[id]->c_id = packet->id;
+			mOtherCharacter[id]->s_connected = true;
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_PUT_OBJECT id: %d"), id);
+		}
 		break;
 	}
 
@@ -879,9 +999,9 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		PacketOwner->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 		int FruitAmount = PacketOwner->mInventory->mSlots[PacketOwner->SelectedHotKeySlotNum].Amount;
-		AAIController* p = Cast<AAIController>(PacketOwner->Controller);
-		if (NULL != p)
-			p->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+		AAIController* AIController = Cast<AAIController>(PacketOwner->Controller);
+		if (nullptr != AIController)
+			AIController->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
 
 		break;
 	}

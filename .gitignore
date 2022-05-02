@@ -101,6 +101,9 @@ Build/Android/res/*/*
 *.idb
 *.recipe
 
+# Server Ignore
+Server/FPP_Server/Log/*
+
 # GrowPlant Ignore
 Test/GrowPlant/Intermediate/*
 Test/GrowPlant/Saved/*

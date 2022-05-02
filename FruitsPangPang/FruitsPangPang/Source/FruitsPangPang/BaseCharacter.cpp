@@ -7,7 +7,7 @@
 ABaseCharacter::ABaseCharacter()
 	:hp(PLAYER_HP)
 	, SelectedHotKeySlotNum(0)
-	, SavedHotKeyItemCode(0)
+	, SavedHotKeySlotNum(0)
 	, mInventory(nullptr)
 	, OverlapInteract(false)
 	, OverlapInteractId(-1)
