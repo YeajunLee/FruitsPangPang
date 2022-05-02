@@ -433,7 +433,7 @@ void process_packet(int client_id, unsigned char* p)
 		{
 			character->mSlot[packet->itemSlotNum].amount -= 1;
 			cout << client_id << "번째 유저의" << packet->itemSlotNum << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[packet->itemSlotNum].amount << endl;
-			FPP_LOG("[%d]유저 [%d]번째 슬롯 아이템 1개 감소 ", client_id, packet->itemSlotNum);
+			FPP_LOG("[%d]유저 [%d]번째 슬롯 아이템 1개 감소 현재 개수: %d", client_id, packet->itemSlotNum, character->mSlot[packet->itemSlotNum].amount);
 		}
 		else {
 			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함.", client_id, packet->itemSlotNum);
@@ -509,6 +509,7 @@ void process_packet(int client_id, unsigned char* p)
 
 		if (!punnet->canHarvest)
 			break;
+		punnet->canHarvest = false;
 
 		cout << "과일 받았습니다(과일상자)" << endl;
 		if (punnet->_ftype == FRUITTYPE::T_HEAL)
@@ -518,17 +519,18 @@ void process_packet(int client_id, unsigned char* p)
 		else if (punnet->_ftype == FRUITTYPE::T_GREENONION)
 		{
 			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
-			send_update_inventory_packet(client_id, 2);
 		}
 		else if (punnet->_ftype == FRUITTYPE::T_CARROT)
 		{
 			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
-			send_update_inventory_packet(client_id, 2);
+		}
+		else if (punnet->_ftype == FRUITTYPE::T_BANANA)
+		{
+			character->UpdateInventorySlotAtIndex(4, punnet->_ftype, 5);
 		}
 		else
 		{
 			character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
-			send_update_inventory_packet(client_id, 3);
 		}
 
 		
@@ -544,7 +546,6 @@ void process_packet(int client_id, unsigned char* p)
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_PUNNET);
 			}
 		}
-		punnet->canHarvest = false;
 		break;
 	}
 	case CS_PACKET_USEITEM: {

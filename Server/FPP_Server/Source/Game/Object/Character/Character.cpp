@@ -79,6 +79,8 @@ void Character::UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode,
 		slot.type = itemcode;
 		slot.amount = amount;
 	}
+
+	send_update_inventory_packet(_id, index);
 }
 
 void Character::Die()
