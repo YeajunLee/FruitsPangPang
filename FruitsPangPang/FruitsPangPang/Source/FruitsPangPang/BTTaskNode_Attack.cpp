@@ -21,7 +21,8 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
     if (nullptr == AICharacter)
         return EBTNodeResult::Failed;
-
+    if (AICharacter->bIsDie)
+        return EBTNodeResult::Failed;
 
     AICharacter->Attack();
     IsAttacking = true;

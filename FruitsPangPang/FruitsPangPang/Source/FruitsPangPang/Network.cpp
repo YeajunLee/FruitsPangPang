@@ -565,6 +565,8 @@ void Network::process_packet(unsigned char* p)
 
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
 			mMyCharacter->bIsDie = true;
+			mMyCharacter->bAttacking = false;
+			mMyCharacter->bLMBDown = false;
 			mMyCharacter->SetActorEnableCollision(false);
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
@@ -767,7 +769,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		//for문으로 하지말고, Map 구조 Key-value 구조를 사용하여 최적화 할 것.
 		// ... 으나! 다른 버그가 터져서 결국 서버에서 판별하기로 결정...
 		bool escape = false;
-		if (PacketOwner->overID != 1) escape = true;
+		if (0 != PacketOwner->overID) break;
 		for (auto ai : mAiCharacter)
 		{
 			if (ai == nullptr) continue;
@@ -802,7 +804,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		//if Ai Move, dump packet
 		//Ai가 움직이는 패킷은 버린다. 어차피 클라 내에서 움직이는거라 패킷으로 안움직여도 된다.
 		bool escape = false;
-		if (PacketOwner->overID != 1) escape = true;
+		if (0 != PacketOwner->overID) break;
 		for (auto ai : mAiCharacter)
 		{
 			if (ai == nullptr) continue;
@@ -933,7 +935,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		int id = packet->id;
 
 		bool escape = false;
-		if (PacketOwner->overID != 1) escape = true;
+		if (0 != PacketOwner->overID) break;
 		for (auto ai : mAiCharacter)
 		{
 			if (ai == nullptr) continue;
@@ -966,7 +968,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		sc_packet_spawnobj* packet = reinterpret_cast<sc_packet_spawnobj*>(p);
 		int other_id = packet->id;
 		bool escape = false;
-		if (PacketOwner->overID != 1) escape = true;
+		if (0 != PacketOwner->overID) break;
 		for (auto ai : mAiCharacter)
 		{
 			if (ai == nullptr) continue;
@@ -1020,6 +1022,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		if (packet->id == PacketOwner->c_id) {
 
 			PacketOwner->bIsDie = true;
+			//PacketOwner->bAttacking = false;
+			//PacketOwner->OnAttackEnd.Broadcast();
 			PacketOwner->SetActorEnableCollision(false);
 		}
 		else if (packet->id < MAX_USER)
