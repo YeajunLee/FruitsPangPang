@@ -20,6 +20,9 @@ EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& Own
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 
 	auto ai = Cast<AAICharacter>(ControllingPawn);
+
+	if (ai->bIsDie)
+		return EBTNodeResult::Failed;
 	ai->GetFruits();
 
 	//int FruitAmount = ai->mInventory->mSlots[ai->SelectedHotKeySlotNum].Amount;

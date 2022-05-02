@@ -565,6 +565,8 @@ void Network::process_packet(unsigned char* p)
 
 			mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
 			mMyCharacter->bIsDie = true;
+			mMyCharacter->bAttacking = false;
+			mMyCharacter->bLMBDown = false;
 			mMyCharacter->SetActorEnableCollision(false);
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
@@ -1020,6 +1022,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		if (packet->id == PacketOwner->c_id) {
 
 			PacketOwner->bIsDie = true;
+			//PacketOwner->bAttacking = false;
+			//PacketOwner->OnAttackEnd.Broadcast();
 			PacketOwner->SetActorEnableCollision(false);
 		}
 		else if (packet->id < MAX_USER)

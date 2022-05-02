@@ -96,6 +96,7 @@ EBTNodeResult::Type UBTTaskNode_FindTreePos::ExecuteTask(UBehaviorTreeComponent&
 	
 	AAICharacter* ai = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 
+	if (ai->bIsDie) EBTNodeResult::Failed;
 	if (!ai->bAttacking)
 		return EBTNodeResult::Succeeded;
 	return EBTNodeResult::Failed;
