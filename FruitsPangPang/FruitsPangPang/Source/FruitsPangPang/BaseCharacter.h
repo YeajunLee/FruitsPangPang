@@ -17,10 +17,10 @@ public:
 	ABaseCharacter();
 public:
 	//related Mesh
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* GreenOnionMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* CarrotMesh;
 public:
 	//related Event

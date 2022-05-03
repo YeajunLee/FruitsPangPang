@@ -16,6 +16,7 @@
 #include "GameResultWidget.h"
 #include "AIController_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
