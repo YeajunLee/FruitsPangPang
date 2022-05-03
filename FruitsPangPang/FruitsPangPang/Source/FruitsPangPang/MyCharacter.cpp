@@ -111,7 +111,6 @@ void AMyCharacter::BeginPlay()
 
 	Super::BeginPlay();
 
-	
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
@@ -223,6 +222,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 		if (GetController()->IsPlayerController()) {
+			SleepEx(0, true);
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 			Network::GetNetwork()->send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
