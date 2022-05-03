@@ -122,7 +122,7 @@ void AAICharacter::Attack()
 		{
 			bAttacking = true;
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
-			mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
+			//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			//if (c_id == Network::GetNetwork()->mId) 
 			{
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
@@ -132,7 +132,7 @@ void AAICharacter::Attack()
 			if (AnimInstance && ThrowMontage_AI)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
-				UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
+				//UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
@@ -181,6 +181,7 @@ void AAICharacter::Throw()
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	if (nullptr != bomb)
 	{
+		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 		bomb->BombOwner = this;
 		bomb->ProjectileMovementComponent->Activate();
 	}
