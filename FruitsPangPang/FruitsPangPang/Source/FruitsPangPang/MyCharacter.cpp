@@ -788,8 +788,8 @@ void AMyCharacter::Throw()
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
+			Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
 			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
-
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();
 		}
