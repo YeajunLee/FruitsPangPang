@@ -83,7 +83,7 @@ public:
 
 	virtual void Jump() override;
 
-	void Throw(const FVector& location, FRotator rotation, const FName& path);
+	void Throw(const FVector& location,FRotator rotation, const int& fruitType);
 	bool bLMBDown;
 	void LMBDown();
 
