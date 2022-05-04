@@ -981,7 +981,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 		}
 		if (escape) break;
-		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), AInventory::ItemCodeToItemBombPath(packet->fruitType));
+
+		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType);
 
 
 
