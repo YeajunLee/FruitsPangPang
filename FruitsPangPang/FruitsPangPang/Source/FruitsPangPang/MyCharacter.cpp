@@ -775,64 +775,56 @@ void AMyCharacter::DropSwordAnimation()
 
 void AMyCharacter::Throw()
 {
-
-	if (SavedHotKeySlotNum == 4) return;
-
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
-	FRotator CameraRotate = FollowCamera->GetComponentRotation();
-	CameraRotate.Pitch += 14;
-	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
-	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
-	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
-	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
-	if (nullptr != bomb)
+	if (SavedHotKeySlotNum == 4)
 	{
-		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
+		FRotator CameraRotate = FollowCamera->GetComponentRotation();
+		CameraRotate.Pitch += 14;
+		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+		FName path = AInventory::ItemCodeToItemBombPath(11);
 
-		bomb->BombOwner = this;
-		bomb->ProjectileMovementComponent->Activate();
+		UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
+		if (nullptr != banana)
+		{
+			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+
+			banana->BombOwner = this;
+			banana->ProjectileMovementComponent->Activate();
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
+		}
+
 	}
-	else {
-
-		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
-		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
-	}
-	//FAttachmentTransformRules attachrules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
-	//bomb->AttachToComponent(this->GetMesh(), attachrules, "BombSocket");
-	//FDetachmentTransformRules Detachrules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative,true);
-	//bomb->DetachFromActor(Detachrules);
-	//
-	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	////	FString::Printf(TEXT("My pos: ")));
-
-
-}
-
-void AMyCharacter::BananaThrow()
-{
-	if (SelectedHotKeySlotNum != 4) return;
-
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
-	FRotator CameraRotate = FollowCamera->GetComponentRotation();
-	CameraRotate.Pitch += 14;
-	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
-	FName path = AInventory::ItemCodeToItemBombPath(11);
-
-	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
-	if (nullptr != banana)
+	else
 	{
-		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 
-		banana->BombOwner = this;
-		banana->ProjectileMovementComponent->Activate();
+		FRotator CameraRotate = FollowCamera->GetComponentRotation();
+		CameraRotate.Pitch += 14;
+		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
+		FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
+		Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+		if (nullptr != bomb)
+		{
+			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+
+			bomb->BombOwner = this;
+			bomb->ProjectileMovementComponent->Activate();
+		}
+		else {
+
+			UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
+			UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+		}
+
 	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
-	}
+
 }
 
 
