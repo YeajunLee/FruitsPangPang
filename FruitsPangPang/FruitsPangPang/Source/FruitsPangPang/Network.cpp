@@ -491,7 +491,7 @@ void Network::process_packet(unsigned char* p)
 		//FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 
-		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), AInventory::ItemCodeToItemBombPath(packet->fruitType));
+		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType);
 
 		//auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
