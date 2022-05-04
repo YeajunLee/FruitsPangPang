@@ -23,24 +23,37 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	GreenOnionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreenOnionMesh"));
-	GreenOnionMesh->SetupAttachment(GetRootComponent());
-	ConstructorHelpers::FObjectFinder<UStaticMesh> GreenOnionAsset(TEXT("/Game/Assets/Fruits/BigGreenOnion/SM_GreenOnion.SM_GreenOnion"));
-	if (GreenOnionAsset.Succeeded())
-		GreenOnionMesh->SetStaticMesh(GreenOnionAsset.Object);
-	
-	CarrotMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotMesh"));
-	CarrotMesh->SetupAttachment(GetRootComponent());
-	ConstructorHelpers::FObjectFinder<UStaticMesh> CarrotAsset(TEXT("/Game/Assets/Fruits/Carrot/SM_Carrot.SM_Carrot"));
-	if (CarrotAsset.Succeeded())
-		CarrotMesh->SetStaticMesh(CarrotAsset.Object);
 
-	GreenOnionMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
-	GreenOnionMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
+	SM_GreenOnion = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_GreenOnion"));
+	SM_GreenOnion->SetupAttachment(GetRootComponent());
 
-	CarrotMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapBegin);
-	CarrotMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::OnOverlapEnd);
+
+	SM_Carrot = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_Carrot"));
+	SM_Carrot->SetupAttachment(GetRootComponent());
+
+	SM_GreenOnion->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::GreenOnionBeginOverlap);
+	SM_GreenOnion->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::GreenOnionEndOverlap);
+
+	SM_Carrot->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::CarrotBeginOverlap);
+	SM_Carrot->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::CarrotEndOverlap);
+
 	
+}
+
+void ABaseCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void ABaseCharacter::GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
+
+void ABaseCharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void ABaseCharacter::CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
 // Called when the game starts or when spawned
@@ -51,19 +64,19 @@ void ABaseCharacter::BeginPlay()
 
 	bIsUndertheTree = false;
 
-	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	GreenOnionMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
-	CarrotMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
+	SM_GreenOnion->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
+	SM_Carrot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));
 	
-	GreenOnionMesh->SetHiddenInGame(true, false);
-	CarrotMesh->SetHiddenInGame(true, false);
+	SM_GreenOnion->SetHiddenInGame(true, false);
+	SM_Carrot->SetHiddenInGame(true, false);
 	
-	GreenOnionMesh->SetGenerateOverlapEvents(true);
-	CarrotMesh->SetGenerateOverlapEvents(true);
-	GreenOnionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	CarrotMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	SM_GreenOnion->SetGenerateOverlapEvents(true);
+	SM_Carrot->SetGenerateOverlapEvents(true);
+	SM_GreenOnion->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	SM_Carrot->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 }
 
 // Called every frame
@@ -94,16 +107,6 @@ void ABaseCharacter::GetFruits()
 
 }
 
-
-void ABaseCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-
-}
-
-void ABaseCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-
-}
 bool ABaseCharacter::ConnServer()
 {
 	return true;
