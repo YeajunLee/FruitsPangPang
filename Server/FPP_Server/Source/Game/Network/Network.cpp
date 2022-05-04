@@ -593,9 +593,9 @@ void process_packet(int client_id, unsigned char* p)
 			instq.object_id = static_cast<int>(packet->x);
 			instq.player_id = static_cast<int>(packet->y);
 			instq.spare = static_cast<int>(packet->z);
-			instq.spare2 = 5;
+			instq.spare2 = 50;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
-			instq.exec_time = chrono::system_clock::now() + 2000ms;
+			instq.exec_time = chrono::system_clock::now() + 200ms;
 			timer_queue.push(instq);
 			break;
 		}
