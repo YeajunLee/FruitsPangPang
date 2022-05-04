@@ -531,7 +531,6 @@ void AMyCharacter::Attack()
 			}
 			else if (AnimInstance && ThrowMontage)
 			{
-				mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
@@ -746,6 +745,8 @@ void AMyCharacter::Throw()
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
+		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 	}
