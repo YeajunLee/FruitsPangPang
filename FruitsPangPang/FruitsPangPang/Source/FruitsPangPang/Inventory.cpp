@@ -215,7 +215,7 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/KiwiBomb.KiwiBomb_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/DM_Apple_BP.DM_Apple_BP_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/mApple/DM_Apple_BP.DM_Apple_BP_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
 	case 5:
@@ -248,7 +248,7 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/Apple/Fruit_Apple.Fruit_Apple_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/mApple/Fruit_Apple.Fruit_Apple_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
 	case 5:
@@ -284,7 +284,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Kiwi_slot.Kiwi_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Apple/Apple_slot.Apple_slot"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/mApple/Apple_slot.Apple_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Watermelon_slot.Watermelon_slot"), NULL, LOAD_None, NULL);

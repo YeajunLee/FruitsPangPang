@@ -312,6 +312,7 @@ void process_packet(int client_id, unsigned char* p)
 		strcpy_s(character->name, packet->name);
 		character->bAi = packet->cType;
 		send_login_ok_packet(client_id);
+		FPP_LOG("플레이어[%d] 접속", client_id);
 
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
@@ -472,7 +473,8 @@ void process_packet(int client_id, unsigned char* p)
 		}
 		tree->canHarvest = false;
 
-		cout << "과일 받았습니다(나무)" << packet->obj_id << endl;
+		//cout << "과일 받았습니다(나무)" << packet->obj_id << endl;
+		FPP_LOG("플레이어[%d]가 [%d]번째 나무에서 [%d]타입의 아이템 획득", client_id, tree->_id, tree->_ftype);
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
@@ -492,7 +494,7 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				//cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
+				cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}

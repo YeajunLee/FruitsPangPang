@@ -8,7 +8,7 @@
 
 void AInGameAiLv::BeginPlay() {
 
-	ConnAi();
+	//ConnAi();
 }
 
 void AInGameAiLv::ConnAi()
@@ -22,8 +22,13 @@ void AInGameAiLv::ConnAi()
 			ai->ConnServer();
 			Network::GetNetwork()->send_login_packet(ai->s_socket, 1);
 			UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Try Conn"), i);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+				FString::Printf(TEXT("server conn")));
 		}
 		++i;
 	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		FString::Printf(TEXT("server conn")));
 	UE_LOG(LogTemp, Log, TEXT("Begin Played"));
 }

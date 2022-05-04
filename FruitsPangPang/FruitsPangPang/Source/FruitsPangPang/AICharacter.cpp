@@ -56,6 +56,13 @@ void AAICharacter::BeginPlay()
 	Super::BeginPlay();
 
 
+	overID = Network::GetNetwork()->getNewId();
+	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
+	Network::GetNetwork()->mAiCharacter[overID] = this;
+	Network::GetNetwork()->init();
+	ConnServer();
+	Network::GetNetwork()->send_login_packet(s_socket, 1);
+
 	FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform spawnLocAndRot{ GetActorLocation() };
@@ -75,9 +82,6 @@ void AAICharacter::BeginPlay()
 	//mInventory->UpdateInventorySlot(itemClass, 5);
 	SelectedHotKeySlotNum = 0;
 
-	overID = Network::GetNetwork()->getNewId();
-	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
-	Network::GetNetwork()->mAiCharacter[overID] = this;
 	//ConnServer();
 
 	bIsUndertheTree = false;

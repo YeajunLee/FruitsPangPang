@@ -129,3 +129,11 @@ Server/FPP_Server/x64/*
 # WhiteList txt File
 !미팅일지.txt
 !후르츠워 기획초안.txt
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang-Win64-DebugGame.exp
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang-Win64-DebugGame.target
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang-Win64-Shipping.exp
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang-Win64-Shipping.target
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang.exp
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPang.target
+FruitsPangPang/FruitsPangPang/Binaries/Win64/FruitsPangPangEditor.target
+FruitsPangPang/FruitsPangPang/Binaries/Win64/UE4Editor.modules
