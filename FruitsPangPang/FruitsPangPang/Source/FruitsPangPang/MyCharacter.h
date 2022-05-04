@@ -135,9 +135,6 @@ public:
 	void AttackEnd();
 
 	UFUNCTION(BlueprintCallable)
-		void BananaThrow();
-
-	UFUNCTION(BlueprintCallable)
 		void GreenOnionAttackStart();
 	UFUNCTION(BlueprintCallable)
 		void GreenOnionAttackEnd();
