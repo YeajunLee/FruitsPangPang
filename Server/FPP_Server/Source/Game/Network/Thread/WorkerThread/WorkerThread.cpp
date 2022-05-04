@@ -183,7 +183,7 @@ void WorkerThread()
 					if (Character::STATE::ST_INGAME == character->_state)
 					{
 						character->state_lock.unlock();
-						//character->Hurt(4);						
+						character->Hurt(1, 0);
 					}
 					else character->state_lock.unlock();
 					//dmg apply
@@ -198,7 +198,7 @@ void WorkerThread()
 				instq.spare = z;
 				instq.spare2 = times - 1;
 				instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
-				instq.exec_time = chrono::system_clock::now() + 2000ms;
+				instq.exec_time = chrono::system_clock::now() + 200ms;
 				timer_queue.push(instq);
 			}
 			delete wsa_ex;

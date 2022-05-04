@@ -260,41 +260,46 @@ void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 	}
 }
 
-void AAICharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+
+void AAICharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	Super::GreenOnionBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
 		{
-			ABaseCharacter* victim = Cast<ABaseCharacter>(OtherActor);
+			auto victim = Cast<ABaseCharacter>(OtherActor);
 			if (nullptr != victim)
 			{
-				TSubclassOf<UDamageType> dmgCauser;
-				dmgCauser = UDamageType::StaticClass();
-
-				if (!this->GreenOnionMesh->bHiddenInGame)
-				{
-					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
-					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
-				}
-				if (!this->CarrotMesh->bHiddenInGame)
-				{
-					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
-				}
-				UGameplayStatics::ApplyDamage(OtherActor, 1, GetInstigatorController(), this, dmgCauser);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-				UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+				DamagedActorCollector.insert({ victim->c_id, victim });				
 			}
 		}
 	}
 }
 
-void AAICharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AAICharacter::GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (GEngine)
+	Super::GreenOnionEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
+}
+
+void AAICharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::GreenOnionBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+		if (GEngine)
+		{
+			auto victim = Cast<ABaseCharacter>(OtherActor);
+			if (nullptr != victim)
+			{
+				DamagedActorCollector.insert({ victim->c_id, victim });
+			}
+		}
 	}
+}
+
+void AAICharacter::CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
 float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

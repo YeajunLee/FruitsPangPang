@@ -83,8 +83,6 @@ AMyCharacter::AMyCharacter()
 	collisionTest = CreateDefaultSubobject < UStaticMeshComponent>(TEXT("Test"));
 	collisionTest->SetupAttachment(GetRootComponent());
 	collisionTest->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnCapsuleOverlapBegin);
-
-	
 	
 	
 	P_Star = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle"));
@@ -110,7 +108,6 @@ void AMyCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
-
 
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
@@ -464,12 +461,12 @@ void AMyCharacter::InteractUp()
 	if (OverlapInteract)
 	{
 		PickSwordAnimation();
-		if (mInventory->mSlots[2].ItemClass.ItemCode == 7 && GreenOnionMesh->bHiddenInGame)
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 7 && SM_GreenOnion->bHiddenInGame)
 		{
 			GreenOnionBag->SetHiddenInGame(false, false);
 			CarrotBag->SetHiddenInGame(true, false);
 		}
-		if (mInventory->mSlots[2].ItemClass.ItemCode == 8 && CarrotMesh->bHiddenInGame)
+		if (mInventory->mSlots[2].ItemClass.ItemCode == 8 && SM_Carrot->bHiddenInGame)
 		{
 			GreenOnionBag->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(false, false);
@@ -597,10 +594,9 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 	}
 }
 
-
-void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AMyCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::OnOverlapBegin(OverlappedComp,OtherActor,OtherComp,OtherBodyIndex, bFromSweep,SweepResult);
+	Super::GreenOnionBeginOverlap(OverlappedComp,OtherActor,OtherComp,OtherBodyIndex, bFromSweep,SweepResult);
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
@@ -608,54 +604,106 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 			auto victim = Cast<ABaseCharacter>(OtherActor);
 			if (nullptr != victim)
 			{
-				TSubclassOf<UDamageType> dmgCauser;
-				dmgCauser = UDamageType::StaticClass();
-				
-				if (!this->GreenOnionMesh->bHiddenInGame)
-				{
-					//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
-					dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
-				}
-				if (!this->CarrotMesh->bHiddenInGame)
-				{
-					dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
-				}				
-				UGameplayStatics::ApplyDamage(OtherActor, 1, GetInstigatorController(), this, dmgCauser);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-				UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+				DamagedActorCollector.insert({ victim->c_id, victim });
+				//TSubclassOf<UDamageType> dmgCauser;
+				//dmgCauser = UDamageType::StaticClass();
+				//
+				//if (!this->SM_GreenOnion->bHiddenInGame)
+				//{
+				//	//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
+				//	dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
+				//}
+				//if (!this->SM_Carrot->bHiddenInGame)
+				//{
+				//	dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
+				//}				
+				//UGameplayStatics::ApplyDamage(OtherActor, 1, GetInstigatorController(), this, dmgCauser);
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+				//UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 			}
 		}
 	}
 }
 
-void AMyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AMyCharacter::GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	Super::OnOverlapEnd(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
-	if (GEngine)
+	Super::GreenOnionEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+	//}
+}
+
+void AMyCharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::GreenOnionBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
+		if (GEngine)
+		{
+			auto victim = Cast<ABaseCharacter>(OtherActor);
+			if (nullptr != victim)
+			{
+				DamagedActorCollector.insert({ victim->c_id, victim });
+			}
+		}
 	}
 }
 
+void AMyCharacter::CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
 
 void AMyCharacter::GreenOnionAttackStart()
 {
-	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void AMyCharacter::GreenOnionAttackEnd()
 {
-	GreenOnionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	for (auto& p : DamagedActorCollector)
+	{
+		auto victim = p.second;
+		TSubclassOf<UDamageType> dmgCauser;
+		dmgCauser = UDamageType::StaticClass();
+		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
+		if (!this->SM_GreenOnion->bHiddenInGame)
+		{
+			//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
+			dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
+		}
+		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+	}
+	DamagedActorCollector.clear();
+	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMyCharacter::CarrotAttackStart()
 {
-	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void AMyCharacter::CarrotAttackEnd()
 {
-	CarrotMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	for (auto& p : DamagedActorCollector)
+	{
+		auto victim = p.second;
+		TSubclassOf<UDamageType> dmgCauser;
+		dmgCauser = UDamageType::StaticClass();
+		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
+		if (!this->SM_Carrot->bHiddenInGame)
+		{
+			dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
+		}
+		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+	}
+	DamagedActorCollector.clear();
+	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMyCharacter::PickSwordAnimation()
@@ -670,16 +718,16 @@ void AMyCharacter::PickSwordAnimation()
 		switch (info.ItemCode)
 		{
 		case 7:
-			GreenOnionMesh->SetHiddenInGame(false, false);
+			SM_GreenOnion->SetHiddenInGame(false, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
-			CarrotMesh->SetHiddenInGame(true, false);
+			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
-			CarrotMesh->SetHiddenInGame(false, false);
+			SM_Carrot->SetHiddenInGame(false, false);
 			CarrotBag->SetHiddenInGame(true, false);
-			GreenOnionMesh->SetHiddenInGame(true, false);
+			SM_GreenOnion->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
@@ -704,16 +752,16 @@ void AMyCharacter::DropSwordAnimation()
 		switch (info.ItemCode)
 		{
 		case 7:
-			GreenOnionMesh->SetHiddenInGame(true, false);
+			SM_GreenOnion->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(false, false);
-			CarrotMesh->SetHiddenInGame(true, false);
+			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
-			CarrotMesh->SetHiddenInGame(true, false);
+			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(false, false);
-			GreenOnionMesh->SetHiddenInGame(true, false);
+			SM_GreenOnion->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
 			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;

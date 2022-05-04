@@ -369,7 +369,7 @@ void Network::process_packet(unsigned char* p)
 					{
 						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
-						mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(false, false);
+						mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(false, false);
 
 					}
 				}
@@ -389,7 +389,7 @@ void Network::process_packet(unsigned char* p)
 					{
 						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
-						mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(false, false);
+						mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(false, false);
 
 					}
 				}
@@ -403,8 +403,8 @@ void Network::process_packet(unsigned char* p)
 			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(true, false);
-					mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(true, false);
+					mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(true, false);
+					mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(true, false);
 				}
 			}
 			else {
@@ -847,7 +847,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 						{
 							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
-							mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(false, false);
+							mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(false, false);
 
 						}
 					}
@@ -867,7 +867,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 						{
 							AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
-							mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(false, false);
+							mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(false, false);
 
 						}
 					}
@@ -881,8 +881,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						mOtherCharacter[packet->id]->GreenOnionMesh->SetHiddenInGame(true, false);
-						mOtherCharacter[packet->id]->CarrotMesh->SetHiddenInGame(true, false);
+						mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(true, false);
+						mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(true, false);
 					}
 				}
 				else {
