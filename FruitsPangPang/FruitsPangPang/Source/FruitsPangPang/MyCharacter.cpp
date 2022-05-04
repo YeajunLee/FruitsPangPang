@@ -762,6 +762,31 @@ void AMyCharacter::Throw()
 
 }
 
+void AMyCharacter::BananaThrow()
+{
+	if (SelectedHotKeySlotNum != 4) return;
+
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
+	FRotator CameraRotate = FollowCamera->GetComponentRotation();
+	CameraRotate.Pitch += 14;
+	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+
+	FName path = AInventory::ItemCodeToItemBombPath(11);
+
+	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
+	if (nullptr != banana)
+	{
+		mInventory->RemoveItemAtSlotIndex(11, 1);
+		banana->BombOwner = this;
+		banana->ProjectileMovementComponent->Activate();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
+	}
+}
+
+
 void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName& path)
 {
 	rotation.Pitch += 14;
@@ -780,27 +805,6 @@ void AMyCharacter::Throw(const FVector& location, FRotator rotation, const FName
 	}
 }
 
-void AMyCharacter::BananaThrow()
-{
-	if (SelectedHotKeySlotNum != 4) return;
-
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
-	FRotator CameraRotate = FollowCamera->GetComponentRotation();
-	CameraRotate.Pitch += 14;
-	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-	FName path = AInventory::ItemCodeToItemBombPath(11);
-	
-	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP,trans);
-	if (nullptr != banana)
-	{
-		banana->BombOwner = this;
-		banana->ProjectileMovementComponent->Activate();
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
-	}
-}
 
 
 void AMyCharacter::GetFruits()

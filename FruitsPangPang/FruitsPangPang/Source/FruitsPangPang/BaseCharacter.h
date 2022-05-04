@@ -96,6 +96,7 @@ public:
 
 public:
 	virtual bool ConnServer();
+	// 112.152.55.49
 	const char* SERVER_ADDR = "127.0.0.1";
 	const short SERVER_PORT = 4000;
 	SOCKET s_socket;
