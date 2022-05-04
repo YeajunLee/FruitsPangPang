@@ -40,7 +40,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "test");
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "test");
 		class UStaticMeshComponent* collisionTest;
 
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction | Mesh")
@@ -67,9 +67,9 @@ public:
 	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)override;
 	
 	//가방에 붙어있는 대파, 당근
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		class UStaticMeshComponent* GreenOnionBag;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		class UStaticMeshComponent* CarrotBag;
 
 	//speed에 따른 애니메이션을 위해
