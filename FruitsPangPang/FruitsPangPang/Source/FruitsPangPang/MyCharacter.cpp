@@ -770,14 +770,15 @@ void AMyCharacter::BananaThrow()
 	FRotator CameraRotate = FollowCamera->GetComponentRotation();
 	CameraRotate.Pitch += 14;
 	FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-
+	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 	FName path = AInventory::ItemCodeToItemBombPath(11);
 
 	UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 	if (nullptr != banana)
 	{
-		mInventory->RemoveItemAtSlotIndex(11, 1);
+		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+
 		banana->BombOwner = this;
 		banana->ProjectileMovementComponent->Activate();
 	}
