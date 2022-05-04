@@ -741,11 +741,12 @@ void AMyCharacter::Throw()
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 	if (nullptr != bomb)
 	{
+		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
+
 		bomb->BombOwner = this;
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {
-		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode : %d"), HotKeyItemCode);
 		UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
