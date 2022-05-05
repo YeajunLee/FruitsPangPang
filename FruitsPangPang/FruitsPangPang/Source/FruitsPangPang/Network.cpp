@@ -461,20 +461,27 @@ void Network::process_packet(unsigned char* p)
 		{
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->c_id = packet->id;
+			mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
+			mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 		}
 		else {
 			FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(packet->x, packet->y, packet->z));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(10020, 12760, 300));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
-			mc->SpawnDefaultController();
-			mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
-			mc->FinishSpawning(trans);
-			mOtherCharacter[id] = mc;
-			mOtherCharacter[id]->c_id = packet->id;
+			if (nullptr != mc)
+			{
+				mc->SpawnDefaultController();
+				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+				mc->FinishSpawning(trans);
+				mOtherCharacter[id] = mc;
+				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+				mOtherCharacter[id]->c_id = packet->id;
+				mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
+				mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+			}
 		}
-		mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
-		mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+
 		break;
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
@@ -951,9 +958,29 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 		if (USER_START <= id && id < MAX_USER)
 		{
-			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
-			mOtherCharacter[id]->c_id = packet->id;
-			mOtherCharacter[id]->s_connected = true;
+			if (nullptr != mOtherCharacter[id])
+			{
+				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+				mOtherCharacter[id]->c_id = packet->id;
+				mOtherCharacter[id]->s_connected = true;
+			}
+			else {
+				FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
+				UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+				FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(10020, 12760, 300));
+				auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
+				if (nullptr != mc)
+				{
+					mc->SpawnDefaultController();
+					mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+					mc->FinishSpawning(trans);
+					mOtherCharacter[id] = mc;
+					mOtherCharacter[id]->GetMesh()->SetVisibility(true);
+					mOtherCharacter[id]->c_id = packet->id;
+					mOtherCharacter[id]->s_connected = true;
+				}
+			}
+
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_PUT_OBJECT id: %d"), id);

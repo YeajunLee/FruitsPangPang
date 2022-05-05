@@ -49,6 +49,8 @@ void Character::recvPacket()
 		int err = WSAGetLastError();
 		if (ERROR_IO_PENDING != err)
 		{
+			_state = Character::STATE::ST_FREE;
+			closesocket(_socket);
 			error_display(err);
 		}
 	}
