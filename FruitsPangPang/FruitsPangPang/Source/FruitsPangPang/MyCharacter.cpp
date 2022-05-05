@@ -801,7 +801,7 @@ void AMyCharacter::Throw()
 	else
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
-
+		
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
 		CameraRotate.Pitch += 14;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
