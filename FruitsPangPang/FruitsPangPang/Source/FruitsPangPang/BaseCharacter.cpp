@@ -64,8 +64,8 @@ void ABaseCharacter::BeginPlay()
 
 	bIsUndertheTree = false;
 
-	//SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	SM_GreenOnion->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionSocket"));
 	SM_Carrot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotSocket"));

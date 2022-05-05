@@ -63,7 +63,6 @@ public:
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];
 	class APunnet* mPunnet[PUNNET_CNT];
-	int WorldCharacterCnt;
 	static std::shared_ptr<class Network> GetNetwork();
 	int mGeneratedID;
 	Network();

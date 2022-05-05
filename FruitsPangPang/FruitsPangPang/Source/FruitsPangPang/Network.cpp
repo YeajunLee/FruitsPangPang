@@ -29,7 +29,6 @@ using namespace std;
 
 Network::Network()
 	: mMyCharacter(nullptr)
-	, WorldCharacterCnt(0)
 	, mGeneratedID(0)
 	,isInit(false)
 {
@@ -76,7 +75,6 @@ void Network::release()
 	if (isInit)
 	{
 		mGeneratedID = 0;
-		WorldCharacterCnt = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mAiCharacter)
 			p = nullptr;
@@ -370,6 +368,7 @@ void Network::process_packet(unsigned char* p)
 						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
 						mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(false, false);
+						mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(true, false);
 
 					}
 				}
@@ -389,6 +388,7 @@ void Network::process_packet(unsigned char* p)
 					{
 						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->PickSwordMontage, 2.f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->PickSwordMontage);
+						mOtherCharacter[packet->id]->SM_GreenOnion->SetHiddenInGame(true, false);
 						mOtherCharacter[packet->id]->SM_Carrot->SetHiddenInGame(false, false);
 
 					}
@@ -514,13 +514,14 @@ void Network::process_packet(unsigned char* p)
 		auto character = Cast<AMyCharacter>(mMyCharacter);
 		if (nullptr != character)
 		{
-			bool firstPick = !character->mInventory->IsSlotValid(2);
 			character->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
 
 			if ((7 == itemClass.ItemCode || 8 == itemClass.ItemCode) && (2 == character->SelectedHotKeySlotNum))
 			{
-				if (firstPick)
-					character->PickSwordAnimation();
+
+				character->PickSwordAnimation();
+					//검을 들고있다면
+					
 			}
 
 		}

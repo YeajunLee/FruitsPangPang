@@ -184,12 +184,6 @@ void AMyCharacter::BeginPlay()
 		//	Network::GetNetwork()->send_login_packet(s_socket);
 		//}
 	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("OtherCharacter Spawn"));
-		Network::GetNetwork()->mOtherCharacter[Network::GetNetwork()->WorldCharacterCnt] = this;
-		Network::GetNetwork()->WorldCharacterCnt++;
-	}
-
 
 }
 
@@ -335,7 +329,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		ChangeSelectedHotKey(4);
 	}
 
-	else if (Key == EKeys::MouseScrollDown)
+	else if (Key == EKeys::MouseScrollUp)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		//SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
@@ -360,7 +354,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			}
 		}
 	}
-	else if (Key == EKeys::MouseScrollUp)
+	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
@@ -541,7 +535,7 @@ void AMyCharacter::Attack()
 void AMyCharacter::AttackEnd()
 {
 	bAttacking = false;
-	if (bLMBDown)
+	if (bLMBDown && (bStepBanana == false))
 	{
 		Attack();
 	}
