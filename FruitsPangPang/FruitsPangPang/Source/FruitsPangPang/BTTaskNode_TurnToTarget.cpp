@@ -22,7 +22,6 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 
-	if (AICharacter->bIsDie) EBTNodeResult::Failed;
 	auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
 	if (nullptr == Target)
 		return EBTNodeResult::Failed;
@@ -37,6 +36,8 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 	//	TargetRot, GetWorld()->GetDeltaSeconds(),
 	//	2.f));
 
+	if (AICharacter->bIsDie) 
+		EBTNodeResult::Failed;
 	return EBTNodeResult::Succeeded;
 }
 

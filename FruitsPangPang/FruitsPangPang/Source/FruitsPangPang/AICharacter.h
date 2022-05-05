@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 		float GroundSpeed_AI;
 
-	UCharacterMovementComponent* movement;
+	//UCharacterMovementComponent* movement;
 	//UFUNCTION(BlueprintCallable)
 	//	void Throw_AI();
 public:
@@ -44,11 +44,11 @@ public:
 	UFUNCTION()
 		void OnTimeEnd();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "collision")
-		class UStaticMeshComponent* collisionBox;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "collision")
+		class UBoxComponent* BananaCollisionBox;
 
 	UFUNCTION()
-		void OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
