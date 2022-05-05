@@ -467,7 +467,7 @@ void Network::process_packet(unsigned char* p)
 		else {
 			FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(10020, 12760, 300));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(10020, 12760, (id + 1) * 140));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
 			if (nullptr != mc)
 			{
