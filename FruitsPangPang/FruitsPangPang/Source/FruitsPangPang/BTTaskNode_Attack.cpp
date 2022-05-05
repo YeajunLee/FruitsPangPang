@@ -6,6 +6,7 @@
 #include "AIController_Custom.h"
 #include "Inventory.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "MyCharacter.h"
 
 UBTTaskNode_Attack::UBTTaskNode_Attack()
 {
@@ -21,7 +22,11 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
     if (nullptr == AICharacter)
         return EBTNodeResult::Failed;
-    if (AICharacter->bIsDie)
+
+    auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+    if (nullptr == Target)
+        return EBTNodeResult::Failed;
+    if (Target->bIsDie)
         return EBTNodeResult::Failed;
 
     AICharacter->Attack();
@@ -34,6 +39,9 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     //----------------------------------------------------------------------------------------------
 
 
+
+    if (AICharacter->bIsDie)
+        return EBTNodeResult::Failed;
     return EBTNodeResult::InProgress;
     // 공격 task는 공격 애니메이션이 끝날 때까지 대기해야 하는 지연 task이므로
     // ExecuteTask의 결과 값을 InProgress로 반환하고, 공격이 끝났을 때 task가 끝났다고 알려주어야 함.

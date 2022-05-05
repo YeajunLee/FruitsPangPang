@@ -1023,6 +1023,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		if (packet->id == PacketOwner->c_id) {
 
 			PacketOwner->bIsDie = true;
+			PacketOwner->GetCharacterMovement()->DisableMovement();
 			//PacketOwner->bAttacking = false;
 			//PacketOwner->OnAttackEnd.Broadcast();
 			PacketOwner->SetActorEnableCollision(false);
@@ -1034,6 +1035,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (true == mOtherCharacter[packet->id]->s_connected)
 				{
 					mOtherCharacter[packet->id]->bIsDie = true;
+					mOtherCharacter[packet->id]->GetCharacterMovement()->DisableMovement();
 					mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 				}
 			}
@@ -1052,6 +1054,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			PacketOwner->GroundSpeed_AI = 0;
 			
 			PacketOwner->bIsDie = false;
+			PacketOwner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			PacketOwner->SetActorEnableCollision(true);
 		}
 		else if (packet->id < MAX_USER)

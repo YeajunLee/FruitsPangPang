@@ -16,6 +16,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AAICharacter::AAICharacter()
@@ -26,9 +27,12 @@ AAICharacter::AAICharacter()
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
 
-	collisionBox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("collision1"));
-	collisionBox->SetupAttachment(RootComponent);
-	collisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+	BananaCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
+	BananaCollisionBox->SetupAttachment(GetMesh());
+	BananaCollisionBox->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
+	BananaCollisionBox->SetRelativeScale3D(FVector(1.2f, 1.2f, 0.4f));
+	BananaCollisionBox->SetMobility(EComponentMobility::Movable);
+	BananaCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBananaBoxOverlapBegin);
 	//BananaBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
 
 	P_Star1 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle1"));
@@ -47,7 +51,7 @@ AAICharacter::AAICharacter()
 		dizzySound1 = dizzySoundAsset1.Object;
 	}
 
-	movement = this->GetCharacterMovement();
+	//movement = this->GetCharacterMovement();
 }
 
 // Called when the game starts or when spawned
@@ -233,10 +237,11 @@ void AAICharacter::GetFruits()
 void AAICharacter::OnTimeEnd()
 {
 	bStepBanana = false;
-	movement->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	//movement->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
-void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AAICharacter::OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && (OtherActor != this) && OtherActor)
 	{
@@ -247,12 +252,13 @@ void AAICharacter::OnBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 			{
 				bStepBanana = true;
 				banana->Destroy();
-				movement->DisableMovement();
+				GetCharacterMovement()->DisableMovement();
 				if (P_Star1 && P_Star1->Template)
 				{
 					P_Star1->ToggleActive();
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
+				
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
 
 			}
