@@ -15,13 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	AInteraction();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interaction | Coliision")
-		class USphereComponent* CollisionVolume;
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interaction | Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interaction | Mesh")
 		class UStaticMeshComponent* Mesh;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interaction | Coliision")
+		class USphereComponent* CollisionVolume;
 
 protected:
 	// Called when the game starts or when spawned

@@ -14,12 +14,12 @@ AInteraction::AInteraction()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionVolume = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionVolume"));
-	RootComponent = CollisionVolume;
-
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(GetRootComponent());
 
+	CollisionVolume = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionVolume"));
+	CollisionVolume->SetupAttachment(GetRootComponent());
+	CollisionVolume->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 }
 
 // Called when the game starts or when spawned
