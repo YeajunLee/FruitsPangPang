@@ -19,7 +19,6 @@ AInteraction::AInteraction()
 
 	CollisionVolume = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionVolume"));
 	CollisionVolume->SetupAttachment(GetRootComponent());
-	CollisionVolume->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 }
 
 // Called when the game starts or when spawned
