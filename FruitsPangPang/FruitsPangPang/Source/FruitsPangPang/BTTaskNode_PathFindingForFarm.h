@@ -7,13 +7,7 @@
 #include <vector>
 #include "BTTaskNode_PathFindingForFarm.generated.h"
 
-class TreeInfo {
-public:
-	class ATree* mTree;
-	bool bIgnored;	//캐릭터한테 막혀있을 경우 ignored가 켜져서 탐색에 사용되지 않을 예정
-	TreeInfo();
-	TreeInfo(class ATree* tree);
-};
+
 /**
  * 
  */
@@ -23,9 +17,6 @@ class FRUITSPANGPANG_API UBTTaskNode_PathFindingForFarm : public UBTTaskNode
 	GENERATED_BODY()
 
 public:
-	std::vector<TreeInfo> trees;
-	float fTreeDistance;
-	int TargetTreeNum;
 	UBTTaskNode_PathFindingForFarm();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

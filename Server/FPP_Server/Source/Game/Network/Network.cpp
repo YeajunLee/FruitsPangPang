@@ -478,7 +478,7 @@ void process_packet(int client_id, unsigned char* p)
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
-			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 10);
+			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 5);
 			send_update_inventory_packet(client_id, 0);
 			break;
 		case TREETYPE::ORANGE:

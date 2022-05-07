@@ -6,9 +6,18 @@
 #include "BaseCharacter.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include <vector>
 #include "AICharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+
+class TreeInfo {
+public:
+	class ATree* mTree;
+	bool bIgnored;	//캐릭터한테 막혀있을 경우 ignored가 켜져서 탐색에 사용되지 않을 예정
+	TreeInfo();
+	TreeInfo(class ATree* tree);
+};
 
 UCLASS()
 class FRUITSPANGPANG_API AAICharacter : public ABaseCharacter
@@ -44,9 +53,11 @@ public:
 	UFUNCTION()
 		void OnTimeEnd();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "collision")
-		class UBoxComponent* BananaCollisionBox;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "collision")
+	//	class UBoxComponent* BananaCollisionBox;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "collision")
+		class UBoxComponent* BananaCollision;
 	UFUNCTION()
 		void OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -59,7 +70,11 @@ public:
 	virtual void CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 public:
 	//related interact
-	
+
+	float fTreeDistance;
+	int TargetTreeNum;
+	std::vector<TreeInfo> trees;
+
 	virtual	void GetFruits() override;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")

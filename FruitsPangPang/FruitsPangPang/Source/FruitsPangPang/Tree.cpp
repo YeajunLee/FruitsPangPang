@@ -7,10 +7,12 @@
 #include "BaseCharacter.h"
 #include "Inventory.h"
 #include "AICharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ATree::ATree()
     : CanHarvest(false)
 {
+
 }
 
 
@@ -29,7 +31,7 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
             player->OverlapInteractId = TreeId;
 
             player->bIsUndertheTree = true;
-        }
+         }
     }
 }
 
@@ -47,6 +49,7 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
             player->OverlapInteractId = -1;
 
             player->bIsUndertheTree = false;
+            UE_LOG(LogTemp, Error, TEXT("[EndOverlap] player Type : %d , treeID : %d"), player->c_id, TreeId);
         }
     }
 }
@@ -58,18 +61,18 @@ void ATree::GenerateFruit(int _FruitType)
     {
         if (false == CanHarvest)
         {
-            FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
-            UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-            FActorSpawnParameters SpawnParams;
-            SpawnParams.Owner = this;
-            FRotator rotator;
-            FVector  SpawnLocation = GetActorLocation();
-            SpawnLocation.Z += 90.0f;
-            mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            SpawnLocation.X -= 45.0f;
-            mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-            SpawnLocation.X += 90.0f;
-            mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+          FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
+          UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+          FActorSpawnParameters SpawnParams;
+          SpawnParams.Owner = this;
+          FRotator rotator;
+          FVector  SpawnLocation = GetActorLocation();
+          SpawnLocation.Z += 90.0f;
+          mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+          SpawnLocation.X -= 45.0f;
+          mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
+          SpawnLocation.X += 90.0f;
+          mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
         }
         CanHarvest = true;
     }

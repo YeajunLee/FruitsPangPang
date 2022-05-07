@@ -11,23 +11,9 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-TreeInfo::TreeInfo():
-	mTree(nullptr)
-	,bIgnored(false)
-{
 
-}
 
-TreeInfo::TreeInfo(ATree* tree) :
-	mTree(tree)
-	,bIgnored(false)
-{
-
-}
-
-UBTTaskNode_PathFindingForFarm::UBTTaskNode_PathFindingForFarm() :
-	TargetTreeNum(-1)
-	, fTreeDistance(TNumericLimits<float>::Max())
+UBTTaskNode_PathFindingForFarm::UBTTaskNode_PathFindingForFarm()
 {
 	NodeName = TEXT("CPP_BTTPathFindingForFarm");
 	bNotifyTick = true;
@@ -45,7 +31,6 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 
 	UWorld* World = ControllingPawn->GetWorld();
 	if (nullptr == World) { 
-		trees.clear();
 		return EBTNodeResult::Failed;
 	}
 
@@ -68,19 +53,15 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 		CollisionQueryParam
 	);
 
-	std::vector<ABaseCharacter*> players;
-	// 오브젝트가 감지가 되면, 그 오브젝트가 Character인지 검사한다.
+	std::vector<TreeInfo>& trees = mAI->trees;
+	int& TargetTreeNum = mAI->TargetTreeNum;
+	float& fTreeDistance = mAI->fTreeDistance;
+	// 오브젝트가 감지가 되면, 그 오브젝트가 tree인지 검사한다.
 	if (bResult)
 	{
 		for (FOverlapResult OverlapResult : OverlapResults)
 		{
-			ABaseCharacter* OtherPlayer = Cast<ABaseCharacter>(OverlapResult.GetActor());
 			ATree* Tree = Cast<ATree>(OverlapResult.GetActor());
-
-			if (nullptr != OtherPlayer)
-			{
-				players.push_back(OtherPlayer);
-			}
 			if (nullptr != Tree)
 			{
 				//trees의 생성자에 Tree를 직접 줘서, 복사,이동이 안일어나게 함.
@@ -98,6 +79,7 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 	//재 탐색해야하기 때문.
 	//재사용을 위한 코드
    TargetTreeNum = -1;
+   fTreeDistance = TNumericLimits<float>::Max();
 	FVector mAILocation = mAI->GetActorLocation();
 
 	for (int i = 0; i < trees.size(); ++i)
@@ -152,6 +134,8 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 			//나무와 나 사이에 적이 있다는 얘기
 			trees[TargetTreeNum].bIgnored = true;
 			//다시 탐색한다.
+			bool bCanNotFindTree = true;
+			fTreeDistance = TNumericLimits<float>::Max();
 			for (int i = 0; i < trees.size(); ++i)
 			{
 				float distance = FVector::DistSquared(mAILocation, trees[i].mTree->GetActorLocation());
@@ -163,8 +147,20 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 					{
 						fTreeDistance = distance;
 						TargetTreeNum = i;
+						bCanNotFindTree = false;
 					}
 				}
+			}
+
+			if (bCanNotFindTree)
+			{
+				//반복문을 다 돌았는데 (모든 나무탐색을 했는데)
+				// 내가 갈 나무가 아무것도 존재하지 않다면
+				//랜덤무브를 해줘야함. 아직 코딩하진않겠음.
+				//현재는 그냥 Failed처리
+				trees.clear();
+				fTreeDistance = TNumericLimits<float>::Max();
+				return EBTNodeResult::Failed;
 			}
 			//재사용을 위한 초기화.
 			fTreeDistance = TNumericLimits<float>::Max();
@@ -172,7 +168,10 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 		else {
 			//방해하는 적이 없다면 탈출해서 나무로 달려간다.
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TreePosKey, trees[TargetTreeNum].mTree);
-			UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), static_cast<AActor*>(trees[TargetTreeNum].mTree));
+			FVector goal = FVector(trees[TargetTreeNum].mTree->GetActorLocation());
+			//goal.Y += 70;
+			//UAIBlueprintHelperLibrary::SimpleMoveToLocation(ControllingPawn->GetController(), goal);
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(ControllingPawn->GetController(), trees[TargetTreeNum].mTree->GetActorLocation());
 			break;
 		}
 	}
@@ -200,7 +199,13 @@ void UBTTaskNode_PathFindingForFarm::TickTask(UBehaviorTreeComponent& OwnerComp,
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	AAICharacter* mAI = Cast<AAICharacter>(ControllingPawn);
 
+	std::vector<TreeInfo>& trees = mAI->trees;
+	int& TargetTreeNum = mAI->TargetTreeNum;
+	float& fTreeDistance = mAI->fTreeDistance;
+	fTreeDistance = TNumericLimits<float>::Max();
+
 	FVector mAILocation = mAI->GetActorLocation();
+
 	//-- 내 자신에서부터 나무로부터 광선을 쏴서 이 사이에 캐릭터가 있는지 확인한다.
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes; // 히트 가능한 오브젝트 유형들.
 	TArray<AActor*> IgnoreActors; // 무시할 액터들.
@@ -225,6 +230,7 @@ void UBTTaskNode_PathFindingForFarm::TickTask(UBehaviorTreeComponent& OwnerComp,
 			trees[TargetTreeNum].bIgnored = true;
 			//다시 탐색한다.
 			bool bCanNotFindTree = true;
+			fTreeDistance = TNumericLimits<float>::Max();
 			for (int i = 0; i < trees.size(); ++i)
 			{
 				float distance = FVector::DistSquared(mAILocation, trees[i].mTree->GetActorLocation());
@@ -249,6 +255,8 @@ void UBTTaskNode_PathFindingForFarm::TickTask(UBehaviorTreeComponent& OwnerComp,
 				//현재는 그냥 Failed처리
 				trees.clear();
 				FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+				fTreeDistance = TNumericLimits<float>::Max();
+				return;
 			}
 			//재사용을 위한 초기화.
 			fTreeDistance = TNumericLimits<float>::Max();
@@ -256,6 +264,10 @@ void UBTTaskNode_PathFindingForFarm::TickTask(UBehaviorTreeComponent& OwnerComp,
 		else {
 			//방해하는 적이 없다면 탈출해서 나무로 달려간다.
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TreePosKey, trees[TargetTreeNum].mTree);
+
+			FVector goal = FVector(trees[TargetTreeNum].mTree->GetActorLocation());
+			goal.Y += 150;
+			//UAIBlueprintHelperLibrary::SimpleMoveToLocation(ControllingPawn->GetController(), goal);
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(ControllingPawn->GetController(), trees[TargetTreeNum].mTree->GetActorLocation());
 			//UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), static_cast<AActor*>(trees[TargetTreeNum].mTree));
 			break;
