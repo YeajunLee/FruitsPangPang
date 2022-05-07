@@ -125,7 +125,7 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 		UKismetSystemLibrary::LineTraceSingleForObjects(
 			mAI->GetWorld()
 			, mAILocation, trees[TargetTreeNum].mTree->GetActorLocation()
-			, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true);
+			, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResult, true);
 
 		ABaseCharacter* BotherPlayer = Cast<ABaseCharacter>(HitResult.GetActor());
 		//------------------------------
@@ -220,7 +220,7 @@ void UBTTaskNode_PathFindingForFarm::TickTask(UBehaviorTreeComponent& OwnerComp,
 		UKismetSystemLibrary::LineTraceSingleForObjects(
 			mAI->GetWorld()
 			, mAILocation, trees[TargetTreeNum].mTree->GetActorLocation()
-			, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true);
+			, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResult, true);
 
 		ABaseCharacter* BotherPlayer = Cast<ABaseCharacter>(HitResult.GetActor());
 		//------------------------------
