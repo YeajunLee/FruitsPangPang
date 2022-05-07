@@ -591,6 +591,7 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 void AMyCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::GreenOnionBeginOverlap(OverlappedComp,OtherActor,OtherComp,OtherBodyIndex, bFromSweep,SweepResult);
+	UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(OtherComp));
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
@@ -662,11 +663,16 @@ void AMyCharacter::GreenOnionAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("GO_AttackEnd"));
+
 		if (!this->SM_GreenOnion->bHiddenInGame)
 		{
 			//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
 			dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
 		}
+		else
+			UE_LOG(LogTemp, Error, TEXT("Daepa is not Equipped %d"), c_id);
+
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
 		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
@@ -688,10 +694,13 @@ void AMyCharacter::CarrotAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("CarrotAttackEnd"));
 		if (!this->SM_Carrot->bHiddenInGame)
 		{
 			dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
 		}
+		else
+			UE_LOG(LogTemp, Error, TEXT("Dangeun is not Equipped %d"), c_id);
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
 		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
@@ -917,7 +926,7 @@ void AMyCharacter::GetFruits()
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
@@ -928,7 +937,7 @@ void AMyCharacter::GetFruits()
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
 			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
@@ -967,13 +976,13 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	AProjectile* projectile = Cast<AProjectile>(DamageCauser);
 	if (projectile != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		//UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
 			if (nullptr != projectile->BombOwner)
 			{
 				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
-				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+				//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
 		}
 	}
@@ -982,7 +991,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		//UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		if (GetController()->IsPlayerController())
 		{
 			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
