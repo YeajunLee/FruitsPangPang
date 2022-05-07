@@ -116,37 +116,37 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 	{
 
 	case static_cast<int>(FRUITTYPE::T_TOMATO) : {
-		Hurt(3, attacker);
+		Hurt(1, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_KIWI) : {
-		Hurt(10, attacker);
+		Hurt(1, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_APPLE) : {
-		Hurt(10, attacker);
+		Hurt(1, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_WATERMELON) : {
-		Hurt(10, attacker);
+		Hurt(5, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PINEAPPLE) : {
-		Hurt(10, attacker);
+		Hurt(5, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PUMPKIN) : {
-		Hurt(10, attacker);
+		Hurt(5, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
 		cout << " Hurt By GreeenOnion\n";
-		Hurt(10, attacker);
+		Hurt(7, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_CARROT) : {
 		cout << " Hurt By Carrot\n";
-		Hurt(10, attacker);
+		Hurt(7, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_NUT) : {
@@ -172,7 +172,7 @@ void Character::Hurt(const int& damage, const int& attacker)
 	hp = max(hp - damage, 0);
 	send_update_userstatus_packet(_id);
 	FPP_LOG("User[%d] Hit [%d] 남은 hp : %d ", attacker, _id, hp.load());
-	cout << _id << "의 이후 hp : " << hp << endl;
+	//cout << _id << "의 이후 hp : " << hp << endl;
 	if (hp <= 0)
 	{
 		short userDeathcount[8];

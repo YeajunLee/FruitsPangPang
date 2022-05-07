@@ -21,22 +21,22 @@ void AInGameLv::BeginPlay() {
 	
 	*/
 
-	//CreateLoadingWidget();
+	CreateLoadingWidget();
 
-	//FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
-	//UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-	//FTransform trans;
+	FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
+	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+	FTransform trans;
 	//trans.SetLocation(trans.GetLocation() + FVector(0, 0, 300));
 	//auto mc = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
 	//mc->SpawnDefaultController();
 	//mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
 	//mc->FinishSpawning(trans);
-	//
-	//trans.SetLocation(trans.GetLocation() + FVector(200, 0, 300));
-	//auto mc1 = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
-	//mc1->SpawnDefaultController();
-	//mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
-	//mc1->FinishSpawning(trans);
+	
+	trans.SetLocation(trans.GetLocation() + FVector(200, 0, 300));
+	auto mc1 = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedCharacterBP, trans);
+	mc1->SpawnDefaultController();
+	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
+	mc1->FinishSpawning(trans);
 	Conn();
 
 	//To Loading ...
@@ -44,7 +44,7 @@ void AInGameLv::BeginPlay() {
 	//To Do SomeThing ...
 
 	//Loading Complete ! Send Complete Packet
-	//Network::GetNetwork()->send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
+	Network::GetNetwork()->send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
 
 }
 

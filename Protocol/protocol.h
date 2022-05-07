@@ -2,7 +2,8 @@
 
 const short GAMESERVER_PORT = 4000;
 const short LOBBYSERVER_PORT = 4100;
-const int MAX_PLAYER_CONN = 2;
+const int MAX_PLAYER_CONN = 6;
+const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
 const int GAMEPLAYTIME_CHEAT_MILLI = 10'000;
@@ -36,6 +37,7 @@ const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
 const char CS_PACKET_POS = 10;
 const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
+const char CS_PACKET_SYNC_BANANA = 13;
 
 const char CS_PACKET_CHEAT = 100;
 
@@ -54,6 +56,7 @@ const char SC_PACKET_UPDATE_SCORE = 13;
 const char SC_PACKET_GAMEWAITING = 14;
 const char SC_PACKET_GAMESTART = 15;
 const char SC_PACKET_GAMEEND = 16;
+const char SC_PACKET_SYNC_BANANA = 17;
 
 const char SC_PACKET_CHEAT_GAMETIME = 100;
 
@@ -87,6 +90,7 @@ struct cs_packet_spawnitemobj {
 	float sx, sy, sz;		//scale
 	int fruitType;			//item code
 	int itemSlotNum;		//inventory slot num
+	int uniquebananaid;		//item id(using banana sync)
 };
 
 struct cs_packet_getfruits {
@@ -138,6 +142,14 @@ struct cs_packet_cheat {
 	char type;
 	char cheatType;
 };
+
+struct cs_packet_sync_banana {
+	unsigned char size;
+	char type;
+	int bananaid;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
+};
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -187,6 +199,7 @@ struct sc_packet_spawnobj {
 	float lx, ly, lz;		//location
 	float sx, sy, sz;		//scale
 	int fruitType;			//item code
+	int uniqueid;			//item id(using banana sync)
 };
 
 struct sc_packet_update_inventory {
@@ -250,7 +263,13 @@ struct sc_packet_gameend {
 	char type;
 };
 
-
+struct sc_packet_sync_banana {
+	unsigned char size;
+	char type;
+	int bananaid;
+	float rx, ry, rz, rw;	//rotate
+	float lx, ly, lz;		//location
+};
 
 
 struct sc_packet_cheat_gametime {

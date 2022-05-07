@@ -202,7 +202,12 @@ void AAICharacter::Throw()
 	//Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), HotKeyItemCode,SavedHotKeySlotNum);
 
 	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
-	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+
+	//혹시 만약에 바나나를 던지는걸 구현할 생각이라면 spawnitemobj_packet의 맨 마지막 인자를 유의미한 값을 넣어야하므로
+	//Mycharacter의 바나나 던지는것을 참고해주세요 - 수민
+	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
+		ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode,
+		SavedHotKeySlotNum, 0);
 
 	FName path = AInventory::ItemCodeToItemBombPathForAI(HotKeyItemCode);
 

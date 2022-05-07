@@ -29,11 +29,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ApplyDamageCPP(AActor* otherActor);
 
+	UFUNCTION(BlueprintCallable)
+		void SyncBananaTransform();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class ABaseCharacter* BombOwner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		int _fType;
+
+	int uniqueID;	//바나나만 쓰는 변수. 바나나 위치 동기화를 위해 서버가 부여해주는 ID
 
 	UPROPERTY(VisibleAnywhere, Category = "default")
 		class UProjectileMovementComponent* ProjectileMovementComponent;

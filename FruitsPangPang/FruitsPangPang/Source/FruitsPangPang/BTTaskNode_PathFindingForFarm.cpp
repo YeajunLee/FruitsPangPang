@@ -36,6 +36,9 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 
 	AAICharacter* mAI = Cast<AAICharacter>(ControllingPawn);
 
+	if (mAI->bIsDie) {
+		return EBTNodeResult::Failed;
+	}
 	//---------------------
 	FVector Center = ControllingPawn->GetActorLocation();
 	float DetectRadius = 10000.0f;

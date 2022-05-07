@@ -97,7 +97,7 @@ void WorkerThread()
 				if (player->_state == Character::STATE::ST_INGAME)
 				{
 
-					cout << "과일나무 생성됐다고 보냅니다" << endl;
+					//cout << "과일나무 생성됐다고 보냅니다" << endl;
 					send_update_interstat_packet(other->_id, client_id - TREEID_START, true,INTERACT_TYPE_TREE, static_cast<int>(tree->_ftype));
 				}
 			}
@@ -107,7 +107,7 @@ void WorkerThread()
 		case CMD_PUNNET_RESPAWN: {
 
 			auto punnet = reinterpret_cast<Punnet*>(objects[client_id]);
-			cout << "바구니 id:" << client_id << endl;
+			//cout << "바구니 id:" << client_id << endl;
 			punnet->canHarvest = true;
 			punnet->GenerateFruit();
 
@@ -118,7 +118,7 @@ void WorkerThread()
 				if (player->_state == Character::STATE::ST_INGAME)
 				{
 
-					cout << "과일바구니 생성됐다고 보냅니다" << endl;
+					//cout << "과일바구니 생성됐다고 보냅니다" << endl;
 					send_update_interstat_packet(other->_id, client_id - PUNNETID_START, true,INTERACT_TYPE_PUNNET, static_cast<int>(punnet->_ftype));
 				}
 			}
@@ -161,12 +161,13 @@ void WorkerThread()
 
 			int x{}, y{}, z{};
 			int r = 300;
-			char times{};
+			int times{}, attacker_id{};
 			memcpy(&x, wsa_ex->getBuf(), sizeof(int));
 			memcpy(&y, wsa_ex->getBuf() + sizeof(int), sizeof(int));
 			memcpy(&z, wsa_ex->getBuf() + sizeof(int) * 2, sizeof(int));
-			memcpy(&times, wsa_ex->getBuf() + sizeof(int) * 3, sizeof(char));
-			cout <<"위치 : 워커스레드"<<  x << "," << y << "," << z << "," << times << endl;
+			memcpy(&times, wsa_ex->getBuf() + sizeof(int) * 3, sizeof(int));
+			memcpy(&attacker_id, wsa_ex->getBuf() + sizeof(int) * 4, sizeof(int));
+			//cout <<"위치 : 워커스레드"<<  x << "," << y << "," << z << ",횟수:" << times <<", 공격자:"<<attacker_id<< endl;
 			if (times <= 0)
 			{
 				delete wsa_ex;
@@ -183,7 +184,7 @@ void WorkerThread()
 					if (Character::STATE::ST_INGAME == character->_state)
 					{
 						character->state_lock.unlock();
-						character->Hurt(1, 0);
+						character->Hurt(1, attacker_id);
 					}
 					else character->state_lock.unlock();
 					//dmg apply
@@ -193,10 +194,11 @@ void WorkerThread()
 			if (0 < times - 1)
 			{
 				Timer_Event instq;
-				instq.object_id = x;
-				instq.player_id = y;
-				instq.spare = z;
-				instq.spare2 = times - 1;
+				instq.x = x;
+				instq.y = y;
+				instq.z = z;
+				instq.object_id = times - 1;
+				instq.player_id = attacker_id;
 				instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
 				instq.exec_time = chrono::system_clock::now() + 200ms;
 				timer_queue.push(instq);
