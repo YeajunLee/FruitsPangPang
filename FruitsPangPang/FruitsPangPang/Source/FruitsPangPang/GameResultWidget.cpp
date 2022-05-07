@@ -62,7 +62,7 @@ void UGameResultWidget::NativePreConstruct()
 
 	for (int i = 0; i < ResultBoard.size(); ++i)
 	{
-		if (i == myid)
+		if (ResultBoard[i].GetCharacter()->c_id == myid)
 		{
 			mTextBlockRank[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
 			mTextBlockName[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
