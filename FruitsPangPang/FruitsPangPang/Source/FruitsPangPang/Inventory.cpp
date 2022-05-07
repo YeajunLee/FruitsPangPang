@@ -215,7 +215,7 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/KiwiBomb.KiwiBomb_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/mApple/DM_Apple_BP.DM_Apple_BP_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/AApple/DM_Apple_BP.DM_Apple_BP_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
 	case 5:
@@ -239,6 +239,39 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	}
 }
 
+const FName AInventory::ItemCodeToItemBombPathForAI(const int& itemCode)
+{
+	switch (itemCode)
+	{
+	case 1:
+		return TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test_AI.Bomb_Test_AI_C'");
+	case 2:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/KiwiBomb_AI.KiwiBomb_AI_C'");
+	case 3:
+		return TEXT("Blueprint'/Game/Assets/Fruits/AApple/DM_Apple_BP.DM_Apple_BP_C'");
+	case 4:
+		return TEXT("Blueprint'/Game/Assets/Fruits/WaterMelon/DM_Watermelon_BP.DM_Watermelon_BP_C'");
+	case 5:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pineapple/DM_Pineapple_BP.DM_Pineapple_BP_C'");
+	case 6:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Pumkin/DM_Pumpkin_BP.DM_Pumpkin_BP_C'");
+	case 7:
+		return TEXT("None");
+	case 8:
+		return TEXT("None");
+	case 9:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Durian/DurianBomb_AI.DurianBomb_AI_C'");
+	case 10:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Nut/NutBomb_AI.NutBomb_AI_C'");
+	case 11:
+		return TEXT("Blueprint'/Game/Assets/Fruits/Banana/BananaBomb.BananaBomb_C'");
+	case 12:
+		return TEXT("None");
+	default:
+		return TEXT("None");
+	}
+}
+
 const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 {
 	switch (itemCode)
@@ -248,7 +281,7 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 	case 2:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Kiwi/Fruit_Kiwi.Fruit_Kiwi_C'");
 	case 3:
-		return TEXT("Blueprint'/Game/Assets/Fruits/mApple/Fruit_Apple.Fruit_Apple_C'");
+		return TEXT("Blueprint'/Game/Assets/Fruits/AApple/Fruit_Apple.Fruit_Apple_C'");
 	case 4:
 		return TEXT("Blueprint'/Game/Assets/Fruits/Watermelon/Fruit_Watermelon.Fruit_Watermelon_C'");
 	case 5:
@@ -284,7 +317,7 @@ UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Kiwi/Kiwi_slot.Kiwi_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
-		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/mApple/Apple_slot.Apple_slot"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/AApple/Apple_slot.Apple_slot"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
 		res = LoadObject<UTexture2D>(NULL, TEXT("/Game/Assets/Fruits/Watermelon/Watermelon_slot.Watermelon_slot"), NULL, LOAD_None, NULL);
