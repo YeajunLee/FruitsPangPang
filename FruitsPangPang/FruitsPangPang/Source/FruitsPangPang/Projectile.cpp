@@ -58,7 +58,7 @@ void AProjectile::ApplyDamageCPP(AActor* otherActor)
 	//UE_LOG(LogTemp, Log, TEXT("ApplyDamage : in apply damage"));
 	if (nullptr != p)
 	{
-		UE_LOG(LogTemp, Log, TEXT("ApplyDamage : ready damage"));
+		//UE_LOG(LogTemp, Log, TEXT("ApplyDamage : ready damage"));
 		//p->TakeDamage(0, FDamageEvent(), nullptr, this);
 		UGameplayStatics::ApplyDamage(otherActor, 1, GetInstigatorController(), this, NULL);
 	}

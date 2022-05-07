@@ -235,7 +235,7 @@ void AAICharacter::GetFruits()
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Tree"));
@@ -246,7 +246,7 @@ void AAICharacter::GetFruits()
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
 			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
-			UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Punnet"));
@@ -357,13 +357,13 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (projectile != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
+		//UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
 		//if (GetController()->IsPlayerController())
 		{
 			if (nullptr != projectile->BombOwner)
 			{
 				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
-				UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
+				//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
 		}
 	}
@@ -372,13 +372,10 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	ABaseCharacter* DMGCauserCharacter = Cast<ABaseCharacter>(DamageCauser);
 	if (nullptr != DMGCauserCharacter)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Take Damage : Not Me Hit"));
-		//if (GetController()->IsPlayerController())
-		{
-			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
-			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
-			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
-		}
+		//UE_LOG(LogTemp, Warning, TEXT("sword attack"));
+		int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
+		Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+		UE_LOG(LogTemp, Warning, TEXT("sword attack, Take Damage : NotifyHit %d"), m_ftype);
 	}
 
 	return Damage;

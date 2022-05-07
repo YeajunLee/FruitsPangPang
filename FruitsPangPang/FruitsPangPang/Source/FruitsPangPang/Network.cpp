@@ -539,7 +539,7 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
+				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
@@ -551,7 +551,7 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
+				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				mPunnet[packet->objNum]->HarvestFruit();
 			}
 
@@ -579,7 +579,7 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->SetActorEnableCollision(false);
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
-			UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
+			//UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
 
 		}
 		else if (packet->id < MAX_USER)
@@ -849,7 +849,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+						//UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 						{
@@ -869,7 +869,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
+						//UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 						{
@@ -921,7 +921,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
+						//UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
 						{
@@ -969,7 +969,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 				UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 				FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(10020, 12760, 300));
-				auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
+				auto mc = mAiCharacter[0]->GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedInventoryBP, trans);
 				if (nullptr != mc)
 				{
 					mc->SpawnDefaultController();
@@ -1027,7 +1027,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		FItemInfo itemClass;
 		itemClass.ItemCode = packet->itemCode;
 		itemClass.IndexOfHotKeySlot = packet->slotNum;
-		UE_LOG(LogTemp, Error, TEXT("slot Num : %d"), packet->slotNum);
+		//UE_LOG(LogTemp, Error, TEXT("slot Num : %d"), packet->slotNum);
 		itemClass.Name = AInventory::ItemCodeToItemName(packet->itemCode);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(packet->itemCode);
 		PacketOwner->mInventory->UpdateInventorySlot(itemClass, packet->itemAmount);
@@ -1115,7 +1115,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
+				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				Game->mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
@@ -1129,7 +1129,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
+				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				Game->mPunnet[packet->objNum]->HarvestFruit();
 			}
 

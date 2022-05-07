@@ -28,8 +28,11 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
         return EBTNodeResult::Failed;
     if (Target->bIsDie)
         return EBTNodeResult::Failed;
+    if (AICharacter->bIsDie)
+        return EBTNodeResult::Failed;
 
-    AICharacter->Attack();
+    if(AICharacter->bStepBanana == false)
+        AICharacter->Attack();
     IsAttacking = true;
     AICharacter->OnAttackEnd.AddLambda([this]()->void { IsAttacking = false; });
 
@@ -38,10 +41,6 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
     //----------------------------------------------------------------------------------------------
 
-
-
-    if (AICharacter->bIsDie)
-        return EBTNodeResult::Failed;
     return EBTNodeResult::InProgress;
     // 공격 task는 공격 애니메이션이 끝날 때까지 대기해야 하는 지연 task이므로
     // ExecuteTask의 결과 값을 InProgress로 반환하고, 공격이 끝났을 때 task가 끝났다고 알려주어야 함.

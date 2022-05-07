@@ -49,7 +49,7 @@ void ATree::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Other
             player->OverlapInteractId = -1;
 
             player->bIsUndertheTree = false;
-            UE_LOG(LogTemp, Error, TEXT("[EndOverlap] player Type : %d , treeID : %d"), player->c_id, TreeId);
+           // UE_LOG(LogTemp, Error, TEXT("[EndOverlap] player Type : %d , treeID : %d"), player->c_id, TreeId);
         }
     }
 }
