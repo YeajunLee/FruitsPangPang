@@ -204,7 +204,7 @@ void AAICharacter::Throw()
 	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
 
-	FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
+	FName path = AInventory::ItemCodeToItemBombPathForAI(HotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);

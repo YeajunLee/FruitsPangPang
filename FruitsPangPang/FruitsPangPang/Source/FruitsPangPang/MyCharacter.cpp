@@ -874,6 +874,48 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 }
 
 
+void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType)
+{
+
+	FName path = AInventory::ItemCodeToItemBombPathForAI(fruitType);
+	if (11 == fruitType)
+	{
+		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
+		FRotator CameraRotate = FollowCamera->GetComponentRotation();
+		CameraRotate.Pitch += 14;
+		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+		//FName path = AInventory::ItemCodeToItemBombPath(11);
+
+		UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
+		if (nullptr != banana)
+		{
+			banana->BombOwner = this;
+			banana->ProjectileMovementComponent->Activate();
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
+		}
+
+	}
+	else {
+		rotation.Pitch += 14;
+		FTransform trans(rotation.Quaternion(), location);
+		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
+		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
+		if (nullptr != bomb)
+		{
+			bomb->BombOwner = this;
+			bomb->ProjectileMovementComponent->Activate();
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
+		}
+	}
+
+
+}
+
 
 void AMyCharacter::GetFruits()
 {
