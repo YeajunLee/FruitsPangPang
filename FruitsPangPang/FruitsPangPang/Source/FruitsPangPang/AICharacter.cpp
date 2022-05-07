@@ -18,6 +18,20 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 
+TreeInfo::TreeInfo() :
+	mTree(nullptr)
+	, bIgnored(false)
+{
+
+}
+
+TreeInfo::TreeInfo(ATree* tree) :
+	mTree(tree)
+	, bIgnored(false)
+{
+
+}
+
 // Sets default values
 AAICharacter::AAICharacter()
 {
@@ -27,13 +41,20 @@ AAICharacter::AAICharacter()
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
 
-	BananaCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
-	BananaCollisionBox->SetupAttachment(GetMesh());
-	BananaCollisionBox->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
-	BananaCollisionBox->SetRelativeScale3D(FVector(1.2f, 1.2f, 0.4f));
-	BananaCollisionBox->SetMobility(EComponentMobility::Movable);
-	BananaCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBananaBoxOverlapBegin);
+	//BananaCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("BananaCollisionBox"));
+	//BananaCollisionBox->SetupAttachment(GetMesh());
+	//BananaCollisionBox->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
+	//BananaCollisionBox->SetRelativeScale3D(FVector(1.2f, 1.2f, 0.4f));
+	//BananaCollisionBox->SetMobility(EComponentMobility::Movable);
+	//BananaCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBananaBoxOverlapBegin);
 	//BananaBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
+
+	BananaCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BananaCollision"));;
+	BananaCollision->SetupAttachment(GetMesh());
+	BananaCollision->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
+	BananaCollision->SetRelativeScale3D(FVector(1.2f, 1.2f, 0.4f));
+	BananaCollision->SetMobility(EComponentMobility::Movable);
+	BananaCollision->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBananaBoxOverlapBegin);
 
 	P_Star1 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StarParticle1"));
 	P_Star1->SetupAttachment(RootComponent);

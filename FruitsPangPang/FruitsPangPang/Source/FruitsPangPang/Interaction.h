@@ -19,8 +19,7 @@ public:
 		class UStaticMeshComponent* Mesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interaction | Coliision")
-		class USphereComponent* CollisionVolume;
-
+		class UBoxComponent* BoxCollision;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

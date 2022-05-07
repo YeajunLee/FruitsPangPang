@@ -3,6 +3,7 @@
 
 #include "Interaction.h"
 #include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Engine/World.h"
@@ -17,8 +18,11 @@ AInteraction::AInteraction()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(GetRootComponent());
 
-	CollisionVolume = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionVolume"));
-	CollisionVolume->SetupAttachment(GetRootComponent());
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCollision->SetupAttachment(Mesh);
+
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AInteraction::OnOverlapBegin);
+	BoxCollision->OnComponentEndOverlap.AddDynamic(this, &AInteraction::OnOverlapEnd);
 }
 
 // Called when the game starts or when spawned
@@ -28,8 +32,8 @@ void AInteraction::BeginPlay()
 
 	//AddDynamic can't find intellisense but dont care bout that. 
 	//인텔리센스에 확인 안되는 것 뿐이지 컴파일엔 상관없음
-	CollisionVolume->OnComponentBeginOverlap.AddDynamic(this, &AInteraction::OnOverlapBegin);
-	CollisionVolume->OnComponentEndOverlap.AddDynamic(this, &AInteraction::OnOverlapEnd);
+	//CollisionVolume->OnComponentBeginOverlap.AddDynamic(this, &AInteraction::OnOverlapBegin);
+	//CollisionVolume->OnComponentEndOverlap.AddDynamic(this, &AInteraction::OnOverlapEnd);
 
 }
 
