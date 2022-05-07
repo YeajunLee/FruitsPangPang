@@ -48,10 +48,11 @@ void TimerThread()
 					{
 						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 						wsa_ex->setCmd(CMD_DURIAN_DMG);
-						memcpy(wsa_ex->getBuf(), &is_already.object_id, sizeof(int));
-						memcpy(wsa_ex->getBuf() + sizeof(int), &is_already.player_id, sizeof(int));
-						memcpy(wsa_ex->getBuf() + sizeof(int) + sizeof(int), &is_already.spare, sizeof(int));
-						memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &is_already.spare2, sizeof(char));
+						memcpy(wsa_ex->getBuf(), &is_already.x, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int), &is_already.y, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int) * 2, &is_already.z, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &is_already.object_id, sizeof(int));
+						memcpy(wsa_ex->getBuf() + sizeof(int) * 4, &is_already.player_id, sizeof(int));
 						PostQueuedCompletionStatus(hiocp, 1, is_already.object_id, &wsa_ex->getWsaOver());
 					}
 					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT)
@@ -110,10 +111,11 @@ void TimerThread()
 				{
 					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 					wsa_ex->setCmd(CMD_DURIAN_DMG);
-					memcpy(wsa_ex->getBuf(), &exec_event.object_id, sizeof(int));
-					memcpy(wsa_ex->getBuf() + sizeof(int), &exec_event.player_id, sizeof(int));
-					memcpy(wsa_ex->getBuf() + sizeof(int) + sizeof(int), &exec_event.spare, sizeof(int));
-					memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &exec_event.spare2, sizeof(char));
+					memcpy(wsa_ex->getBuf(), &exec_event.x, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int), &exec_event.y, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int) * 2, &exec_event.z, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int) * 3, &exec_event.object_id, sizeof(int));
+					memcpy(wsa_ex->getBuf() + sizeof(int) * 4, &exec_event.player_id, sizeof(int));
 					PostQueuedCompletionStatus(hiocp, 1, exec_event.object_id, &wsa_ex->getWsaOver());
 				}
 				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_GAME_WAIT)

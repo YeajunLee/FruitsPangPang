@@ -79,7 +79,6 @@ int Generate_Id()
 	return -1;
 }
 
-
 void Disconnect(int c_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[c_id]);
@@ -152,11 +151,12 @@ void send_anim_packet(int player_id, int animCharacter_id, char animtype)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_throwfruit_packet(int thrower_character_id, int other_character_id,
-	float rx, float ry, float rz, float rw,	//rotate
-	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz,	//scale
-	int fruittype	//item code
+void send_throwfruit_packet(const int& thrower_character_id, const int& other_character_id,
+	const float& rx, const float& ry, const float& rz, const float& rw,	//rotate
+	const float& lx, const float& ly, const float& lz,	//location
+	const float& sx, const float& sy, const float& sz,	//scale
+	const int& fruittype,	//item code
+	const int& uniqueid	//item unique id ( using banana sync )
 )
 {
 	auto player = reinterpret_cast<Character*>(objects[other_character_id]);
@@ -168,6 +168,7 @@ void send_throwfruit_packet(int thrower_character_id, int other_character_id,
 	packet.lx = lx, packet.ly = ly, packet.lz = lz;
 	packet.sx = sx, packet.sy = sy, packet.sz = sz;
 	packet.fruitType = fruittype;
+	packet.uniqueid = uniqueid;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -297,6 +298,21 @@ void send_cheat_changegametime_packet(int player_id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_CHEAT_GAMETIME;
 	packet.milliseconds = GAMEPLAYTIME_CHEAT_MILLI;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_sync_banana(const int& player_id, 
+	const float& rx, const float& ry, const float& rz, const float& rw,
+	const float& lx, const float& ly, const float& lz,
+	const int& uniqueid)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_sync_banana packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_SYNC_BANANA;
+	packet.rx = rx, packet.ry = ry, packet.rz = rz, packet.rw = rw;
+	packet.lx = lx, packet.ly = ly, packet.lz = lz;
+	packet.bananaid = uniqueid;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -440,7 +456,9 @@ void process_packet(int client_id, unsigned char* p)
 			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함.", client_id, packet->itemSlotNum);
 			break;
 		}
-
+		int uniqueID = 0;
+		if (packet->fruitType == static_cast<int>(FRUITTYPE::T_BANANA))
+			uniqueID = character->_id * 10000000 + packet->uniquebananaid;
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			if (other->_id == client_id) continue;
@@ -454,7 +472,7 @@ void process_packet(int client_id, unsigned char* p)
 					packet->rx, packet->ry, packet->rz, packet->rw,
 					packet->lx, packet->ly, packet->lz,
 					packet->sx, packet->sy, packet->sz,
-					packet->fruitType);
+					packet->fruitType, uniqueID);
 			}
 			else OtherPlayer->state_lock.unlock();
 		}
@@ -478,7 +496,7 @@ void process_packet(int client_id, unsigned char* p)
 		switch (tree->_ttype)
 		{
 		case TREETYPE::GREEN:
-			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 5);
+			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 10);
 			send_update_inventory_packet(client_id, 0);
 			break;
 		case TREETYPE::ORANGE:
@@ -494,7 +512,7 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
+				//cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
 			}
 		}
@@ -513,7 +531,7 @@ void process_packet(int client_id, unsigned char* p)
 			break;
 		punnet->canHarvest = false;
 
-		cout << "과일 받았습니다(과일상자)" << endl;
+		//cout << "과일 받았습니다(과일상자)" << endl;
 		if (punnet->_ftype == FRUITTYPE::T_HEAL)
 		{
 			character->Heal(10);
@@ -528,7 +546,7 @@ void process_packet(int client_id, unsigned char* p)
 		}
 		else if (punnet->_ftype == FRUITTYPE::T_BANANA)
 		{
-			character->UpdateInventorySlotAtIndex(4, punnet->_ftype, 5);
+			character->UpdateInventorySlotAtIndex(4, punnet->_ftype, 3);
 		}
 		else
 		{
@@ -544,7 +562,7 @@ void process_packet(int client_id, unsigned char* p)
 			auto player = reinterpret_cast<Character*>(other);
 			if (player->_state == Character::STATE::ST_INGAME)
 			{
-				cout << "과일박스 먹었다고 보냅니다" <<packet->obj_id<<"," << endl;
+				//cout << "과일박스 먹었다고 보냅니다" <<packet->obj_id<<"," << endl;
 				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_PUNNET);
 			}
 		}
@@ -557,7 +575,7 @@ void process_packet(int client_id, unsigned char* p)
 		if (character->mSlot[character->mActivationSlot].amount > 0)
 		{
 			character->mSlot[character->mActivationSlot].amount -= 1;
-			cout << client_id << "번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
+			//cout << client_id << "번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
 		}
 		else {
 			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함. - CS_PACKET_USEITEM", client_id, character->mActivationSlot.load());
@@ -568,7 +586,7 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_HIT: {
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
-		cout << "HurtBy ID:" << packet->attacker_id << endl;
+		//cout << "HurtBy ID:" << packet->attacker_id << endl;
 		if (!(USER_START <= packet->attacker_id && packet->attacker_id < MAX_USER)) break;
 		character->HurtBy(packet->fruitType, packet->attacker_id);
 		break;
@@ -590,10 +608,11 @@ void process_packet(int client_id, unsigned char* p)
 
 			cout << "위치 : 네트워크 패킷" << packet->x << "," << packet->y << "," << packet->z  << endl;
 			Timer_Event instq;
-			instq.object_id = static_cast<int>(packet->x);
-			instq.player_id = static_cast<int>(packet->y);
-			instq.spare = static_cast<int>(packet->z);
-			instq.spare2 = 50;
+			instq.x = static_cast<int>(packet->x);
+			instq.y = static_cast<int>(packet->y);
+			instq.z = static_cast<int>(packet->z);
+			instq.object_id = 50;	//터지는 횟수
+			instq.player_id = client_id;	//터트린 사람(공격자)
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_DURIAN_DMG;
 			instq.exec_time = chrono::system_clock::now() + 200ms;
 			timer_queue.push(instq);
@@ -682,6 +701,31 @@ void process_packet(int client_id, unsigned char* p)
 
 
 
+		break;
+	}
+	case CS_PACKET_SYNC_BANANA: {
+		cs_packet_sync_banana* packet = reinterpret_cast<cs_packet_sync_banana*>(p);
+		Character* character = reinterpret_cast<Character*>(object);
+
+		int uniqueID = character->_id * 100000000 + packet->bananaid;
+
+		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
+			if (other->_id == client_id) continue;
+			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+			OtherPlayer->state_lock.lock();
+			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
+			{
+				OtherPlayer->state_lock.unlock();
+				send_sync_banana(OtherPlayer->_id,
+					packet->rx, packet->ry, packet->rz, packet->rw,
+					packet->lx, packet->ly, packet->lz,
+					uniqueID
+				);
+			}
+			else OtherPlayer->state_lock.unlock();
+		}
 		break;
 	}
 	}

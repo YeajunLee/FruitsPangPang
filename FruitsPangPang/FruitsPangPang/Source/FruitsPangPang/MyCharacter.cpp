@@ -791,7 +791,10 @@ void AMyCharacter::Throw()
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
-			Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+			banana->uniqueID = Network::GetNetwork()->getNewBananaId();
+			Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
+				FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(),
+				HotKeyItemCode, SavedHotKeySlotNum, banana->uniqueID);
 			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();
@@ -810,7 +813,10 @@ void AMyCharacter::Throw()
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
-		Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), HotKeyItemCode, SavedHotKeySlotNum);
+		Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation()
+			, FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), 
+			HotKeyItemCode, SavedHotKeySlotNum,0);
+
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 		if (nullptr != bomb)
@@ -831,7 +837,7 @@ void AMyCharacter::Throw()
 }
 
 
-void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& fruitType)
+void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& fruitType, const int& fruitid)
 {
 	
 	FName path = AInventory::ItemCodeToItemBombPath(fruitType);
@@ -847,6 +853,7 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
+			banana->uniqueID = fruitid;
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();
 		}
@@ -874,7 +881,7 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 }
 
 
-void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType)
+void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType, const int& fruitid)
 {
 
 	FName path = AInventory::ItemCodeToItemBombPathForAI(fruitType);
@@ -890,6 +897,7 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
+			banana->uniqueID = fruitid;
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();
 		}

@@ -7,6 +7,7 @@
 #include <string>
 #include <concurrent_priority_queue.h>
 #include <concurrent_queue.h>
+#include "../Utility/Lock/FPPLock.h"
 #include "../../../../../Protocol/protocol.h"
 
 extern HANDLE hiocp;
@@ -26,11 +27,12 @@ void process_packet(int client_id, unsigned char* p);
 void send_login_ok_packet(int player_id);
 void send_move_packet(int player_id, int mover_id, float value);
 void send_anim_packet(int player_id, int animCharacter_id, char animtype);
-void send_throwfruit_packet(int thrower_character_id, int other_character_id,
-	float rx, float ry, float rz, float rw,	//rotate
-	float lx, float ly, float lz,	//location
-	float sx, float sy, float sz,	//scale
-	int fruittype	//item code
+void send_throwfruit_packet(const int& thrower_character_id, const int& other_character_id,
+	const float& rx, const float& ry, const float& rz, const float& rw,	//rotate
+	const float& lx, const float& ly, const float& lz,	//location
+	const float& sx, const float& sy, const float& sz,	//scale
+	const int& fruittype,	//item code
+	const int& uniqueid	//item unique id ( using banana sync )
 );
 void send_update_inventory_packet(int player_id, short slotNum);
 void send_update_interstat_packet(const int& player_id, const int& object_id, const bool& CanHarvest, const int& interactType, const int& FruitType = -1);
@@ -44,6 +46,11 @@ void send_gamewaiting_packet(int player_id);
 void send_gamestart_packet(int player_id);
 void send_gameend_packet(int player_id);
 void send_cheat_changegametime_packet(int player_id);
+void send_sync_banana(const int& player_id,
+	const float& rx, const float& ry, const float& rz, const float& rw,	//rotate
+	const float& lx, const float& ly, const float& lz,	//location
+	const int& uniqueid	//item unique id ( using banana sync )
+);
 
 enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, //Basic
@@ -81,8 +88,9 @@ struct Timer_Event {
 	};
 	int object_id;
 	int player_id;
-	int spare;
-	char spare2;
+	int x;
+	int y;
+	int z;
 	std::chrono::system_clock::time_point exec_time;
 	TIMER_TYPE type;
 

@@ -17,6 +17,7 @@
 #include "AIController_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -31,6 +32,7 @@ Network::Network()
 	: mMyCharacter(nullptr)
 	, mGeneratedID(0)
 	,isInit(false)
+	,mSyncBananaID(0)
 {
 	for (auto& p : mTree)
 		p = nullptr;
@@ -80,7 +82,7 @@ void Network::release()
 			p = nullptr;
 		for (auto& p : mOtherCharacter)
 			p = nullptr;
-
+		mSyncBananaID = 0;
 		WSACleanup();
 		isInit = false;
 	}
@@ -92,6 +94,14 @@ const int Network::getNewId()
 {
 	int Newid = mGeneratedID;
 	mGeneratedID++;
+
+	return Newid;
+}
+
+const int Network::getNewBananaId()
+{
+	int Newid = mSyncBananaID;
+	mSyncBananaID++;
 
 	return Newid;
 }
@@ -149,7 +159,8 @@ void Network::send_anim_packet(SOCKET& sock, AnimType type)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale, const int& fruitType, const int& itemSlotNum)
+void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale,
+	const int& fruitType, const int& itemSlotNum, const int& uniqueid)
 {
 	cs_packet_spawnitemobj packet;
 	packet.size = sizeof(cs_packet_spawnitemobj);
@@ -159,7 +170,7 @@ void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, cons
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
 	packet.fruitType = fruitType;
 	packet.itemSlotNum = itemSlotNum;
-
+	packet.uniquebananaid = uniqueid;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
@@ -285,6 +296,19 @@ void Network::send_Cheat(SOCKET& sock, const int& cheatNum)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
+void Network::send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid)
+{
+	cs_packet_sync_banana packet;
+	packet.size = sizeof(cs_packet_sync_banana);
+	packet.type = CS_PACKET_SYNC_BANANA;
+	packet.bananaid = bananaid;
+	packet.rx = rotate.Pitch, packet.ry = rotate.Yaw, packet.rz = rotate.Roll, packet.rw = 0.0f;
+	packet.lx = locate.X, packet.ly = locate.Y, packet.lz = locate.Z;
+
+
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
 
 void Network::process_packet(unsigned char* p)
 {
@@ -498,7 +522,7 @@ void Network::process_packet(unsigned char* p)
 		//FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 
-		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType);
+		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType,packet->uniqueid);
 
 		//auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
@@ -681,6 +705,27 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_CHEAT_GAMETIME: {
 		sc_packet_cheat_gametime* packet = reinterpret_cast<sc_packet_cheat_gametime*>(p);
 		mMyCharacter->mMainWidget->fRemainTime = packet->milliseconds / 1000;
+		break;
+	}
+	case SC_PACKET_SYNC_BANANA: {
+		sc_packet_sync_banana* packet = reinterpret_cast<sc_packet_sync_banana*>(p);
+		TArray<AActor*> actors;
+		UGameplayStatics::GetAllActorsOfClass(mMyCharacter->GetWorld(), AProjectile::StaticClass(), actors);
+		for (auto& actor : actors)
+		{
+			AProjectile* banana = Cast<AProjectile>(actor);
+			if (nullptr != banana)
+			{
+				if (banana->_fType == 11)
+				{
+					if (banana->uniqueID == packet->bananaid)
+					{
+						banana->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+						banana->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
+					}
+				}
+			}
+		}
 		break;
 	}
 	}
@@ -1010,7 +1055,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		}
 		if (escape) break;
 
-		mOtherCharacter[other_id]->ThrowInAIMode(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType);
+		mOtherCharacter[other_id]->ThrowInAIMode(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType, packet->uniqueid);
 
 
 
@@ -1133,6 +1178,27 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				Game->mPunnet[packet->objNum]->HarvestFruit();
 			}
 
+		}
+		break;
+	}
+	case SC_PACKET_SYNC_BANANA: {
+		sc_packet_sync_banana* packet = reinterpret_cast<sc_packet_sync_banana*>(p);
+		TArray<AActor*> actors;
+		UGameplayStatics::GetAllActorsOfClass(mAiCharacter[0]->GetWorld(), AProjectile::StaticClass(), actors);
+		for (auto& actor : actors)
+		{
+			AProjectile* banana = Cast<AProjectile>(actor);
+			if (nullptr != banana)
+			{
+				if (banana->_fType == 11)
+				{
+					if (banana->uniqueID == packet->bananaid)
+					{
+						banana->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+						banana->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
+					}
+				}
+			}
 		}
 		break;
 	}

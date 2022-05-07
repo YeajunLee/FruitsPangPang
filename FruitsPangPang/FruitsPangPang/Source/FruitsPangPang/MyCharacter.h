@@ -83,8 +83,9 @@ public:
 
 	virtual void Jump() override;
 
-	void Throw(const FVector& location,FRotator rotation, const int& fruitType);
-	void ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType);
+	//fruitid is using sync banana
+	void Throw(const FVector& location,FRotator rotation, const int& fruitType, const int& fruitid);
+	void ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType, const int& fruitid);
 	bool bLMBDown;
 	void LMBDown();
 

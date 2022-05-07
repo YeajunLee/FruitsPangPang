@@ -64,6 +64,7 @@ public:
 	class ATree* mTree[TREE_CNT];
 	class APunnet* mPunnet[PUNNET_CNT];
 	static std::shared_ptr<class Network> GetNetwork();
+	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
 	Network();
 	~Network();
@@ -72,6 +73,7 @@ private:
 
 public:
 	const int getNewId();
+	const int getNewBananaId();
 	void release();
 	bool init();
 	void process_packet(unsigned char* p);
@@ -79,7 +81,8 @@ public:
 
 	void send_login_packet(SOCKET& sock,const char& type);
 	void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
-	void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale, const int& fruitType,const int& itemSlotNum);
+	void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale,
+		const int& fruitType,const int& itemSlotNum, const int& uniqueid);//uniqueid is sync for banana
 	void send_anim_packet(SOCKET& sock, AnimType type);
 	void send_getfruits_tree_packet(SOCKET& sock, const int& treeId);
 	void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId);
@@ -90,5 +93,6 @@ public:
 	void send_respawn_packet(SOCKET& sock,const char& WannaRespawn);
 	void send_PreGameSettingComplete_packet(SOCKET& sock);
 	void send_Cheat(SOCKET& sock,const int& cheatNum);
+	void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid);
 
 };

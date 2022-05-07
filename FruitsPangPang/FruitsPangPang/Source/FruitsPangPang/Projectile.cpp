@@ -63,3 +63,16 @@ void AProjectile::ApplyDamageCPP(AActor* otherActor)
 		UGameplayStatics::ApplyDamage(otherActor, 1, GetInstigatorController(), this, NULL);
 	}
 }
+
+void AProjectile::SyncBananaTransform()
+{
+	if (BombOwner != nullptr)
+	{
+		if (BombOwner->GetController()->IsPlayerController())
+		{
+			Network::GetNetwork()->send_sync_banana(BombOwner->s_socket, GetActorLocation(), GetActorRotation(), uniqueID);
+			//send packet
+		}
+		//Ai전용 패킷이 없음.
+	}
+}
