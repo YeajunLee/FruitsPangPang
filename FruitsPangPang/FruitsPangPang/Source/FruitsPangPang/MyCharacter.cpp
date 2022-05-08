@@ -37,6 +37,8 @@
 AMyCharacter::AMyCharacter()
 	:s_connected(false)
 	, bInteractDown(false)
+	, bIsMoving(false)
+	, ServerStoreGroundSpeed(0)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -216,9 +218,14 @@ void AMyCharacter::Tick(float DeltaTime)
 			SleepEx(0, true);
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
+
 			Network::GetNetwork()->send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
+		}
+		else {
+			
+			GroundSpeedd = ServerStoreGroundSpeed;
 		}
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		//	FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));

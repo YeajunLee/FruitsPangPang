@@ -81,6 +81,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
 		float GroundSpeedd;
 
+	float ServerStoreGroundSpeed;
 	virtual void Jump() override;
 
 	//fruitid is using sync banana
@@ -135,6 +136,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 		bool bAttacking;
 
+	bool bIsMoving;
 	void Attack();
 	virtual void Throw() override;
 
