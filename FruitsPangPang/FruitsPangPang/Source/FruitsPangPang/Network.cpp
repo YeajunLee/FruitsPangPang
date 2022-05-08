@@ -586,8 +586,8 @@ void Network::process_packet(unsigned char* p)
 		sc_packet_update_userstatus* packet = reinterpret_cast<sc_packet_update_userstatus*>(p);
 		mMyCharacter->hp = packet->hp;
 		mMyCharacter->mInventory->mMainWidget->UpdateHpBar();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("My HP: %d "), mMyCharacter->hp));
 		break;
 	}
 	case SC_PACKET_DIE: {
@@ -1168,8 +1168,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 			if (packet->useType == INTERACT_TYPE_TREE)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-					FString::Printf(TEXT("My HP: %d "), Game->mTree[packet->objNum]->TreeId));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+				//	FString::Printf(TEXT("My HP: %d "), Game->mTree[packet->objNum]->TreeId));
 				Game->mTree[packet->objNum]->HarvestFruit();
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)

@@ -232,35 +232,37 @@ void Character::Respawn(const int& RespawnSpot)
 {
 	hp = maxhp;
 	rx = 0, ry = 0, rz = 0, rw = 1;
+
+	random_device rd;
+	mt19937 rng(rd());
+	uniform_int_distribution<int> RespawnControl(-50, 50);
 	switch (RespawnSpot)
 	{
 	case 0:
-		x = 18090, y = 17480, z = 100;
+		x = 18090 + RespawnControl(rng), y = 17480 + RespawnControl(rng), z = 100;
 		break;
 	case 1:
-		x = 9880, y = 18390, z = 100;
+		x = 9880 + RespawnControl(rng), y = 18390 + RespawnControl(rng), z = 100;
 		break;
 	case 2:
-		x = 2200, y = 18140, z = 100;
+		x = 2200 + RespawnControl(rng), y = 18140 + RespawnControl(rng), z = 100;
 		break;
 	case 3:
-		x = 18350, y = 9610, z = 100;
+		x = 18350 + RespawnControl(rng), y = 9610 + RespawnControl(rng), z = 100;
 		break;
 	case 4:
-		x = 1750, y = 10220, z = 100;
+		x = 1750 + RespawnControl(rng), y = 10220 + RespawnControl(rng), z = 100;
 		break;
 	case 5:
-		x = 17980, y = 1780, z = 100;
+		x = 17980 + RespawnControl(rng), y = 1780 + RespawnControl(rng), z = 100;
 		break;
 	case 6:
-		x = 9730, y = 1620, z = 100;
+		x = 9730 + RespawnControl(rng), y = 1620 + RespawnControl(rng), z = 100;
 		break;
 	case 7:
-		x = 1990, y = 1740, z = 100;
+		x = 1990 + RespawnControl(rng), y = 1740 + RespawnControl(rng), z = 100;
 		break;
 	case 8:	{
-		random_device rd;
-		mt19937 rng(rd());
 		uniform_int_distribution<int> randomRespawn(0, 7);
 		Respawn(randomRespawn(rng));
 		break; 
