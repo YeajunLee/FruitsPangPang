@@ -116,19 +116,19 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 	{
 
 	case static_cast<int>(FRUITTYPE::T_TOMATO) : {
-		Hurt(1, attacker);
+		Hurt(3, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_KIWI) : {
-		Hurt(1, attacker);
+		Hurt(3, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_APPLE) : {
-		Hurt(1, attacker);
+		Hurt(4, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_WATERMELON) : {
-		Hurt(5, attacker);
+		Hurt(10, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PINEAPPLE) : {
@@ -136,7 +136,7 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PUMPKIN) : {
-		Hurt(5, attacker);
+		Hurt(8, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {

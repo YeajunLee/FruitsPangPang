@@ -668,7 +668,7 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_cheat* packet = reinterpret_cast<cs_packet_cheat*>(p);
 		switch (packet->cheatType)
 		{
-		case 0: {
+		case CHEAT_TYPE_GAMETIME: {
 			if (CheatGamePlayTime)
 				break;
 			CheatGamePlayTime = true;
@@ -694,13 +694,36 @@ void process_packet(int client_id, unsigned char* p)
 			}
 
 			break;
-
+		}
+		case CHEAT_TYPE_GIVEITEM: {
+			auto character = reinterpret_cast<Character*>(object);
+			switch (packet->itemType)
+			{
+			case static_cast<char>(FRUITTYPE::T_TOMATO):
+			case static_cast<char>(FRUITTYPE::T_KIWI):
+			case static_cast<char>(FRUITTYPE::T_APPLE):
+				character->UpdateInventorySlotAtIndex(0, static_cast<FRUITTYPE>(packet->itemType), 1);
+				break;
+			case static_cast<char>(FRUITTYPE::T_WATERMELON):
+			case static_cast<char>(FRUITTYPE::T_PINEAPPLE):
+			case static_cast<char>(FRUITTYPE::T_PUMPKIN):
+				character->UpdateInventorySlotAtIndex(1, static_cast<FRUITTYPE>(packet->itemType), 1);
+				break;
+			case static_cast<char>(FRUITTYPE::T_GREENONION):
+			case static_cast<char>(FRUITTYPE::T_CARROT):
+				character->UpdateInventorySlotAtIndex(2, static_cast<FRUITTYPE>(packet->itemType), 1);
+				break;
+			case static_cast<char>(FRUITTYPE::T_DURIAN):
+			case static_cast<char>(FRUITTYPE::T_NUT):
+				character->UpdateInventorySlotAtIndex(3, static_cast<FRUITTYPE>(packet->itemType), 1);
+				break;
+			case static_cast<char>(FRUITTYPE::T_BANANA):
+				character->UpdateInventorySlotAtIndex(4, static_cast<FRUITTYPE>(packet->itemType), 1);
+				break;
+			}
+			break;
 		}
 		}
-
-
-
-
 		break;
 	}
 	case CS_PACKET_SYNC_BANANA: {

@@ -387,7 +387,51 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::P)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, 0);
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GAMETIME);
+	}
+	else if (Key == EKeys::Six)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 1);
+	}
+	else if (Key == EKeys::Seven)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 2);
+	}
+	else if (Key == EKeys::Eight)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 3);
+	}
+	else if (Key == EKeys::Y)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 4);
+	}
+	else if (Key == EKeys::U)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 5);
+	}
+	else if (Key == EKeys::I)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 6);
+	}
+	else if (Key == EKeys::H)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 7);
+	}
+	else if (Key == EKeys::J)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 8);
+	}
+	else if (Key == EKeys::N)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 9);
+	}
+	else if (Key == EKeys::M)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 10);
+	}
+	else if (Key == EKeys::Comma)
+	{
+		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 11);
 	}
 }
 
