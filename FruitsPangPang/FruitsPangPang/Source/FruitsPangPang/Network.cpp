@@ -284,13 +284,13 @@ void Network::send_PreGameSettingComplete_packet(SOCKET& sock)
 }
 
 
-void Network::send_Cheat(SOCKET& sock, const int& cheatNum)
+void Network::send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType)
 {
 	cs_packet_cheat packet;
 	packet.size = sizeof(cs_packet_cheat);
 	packet.type = CS_PACKET_CHEAT;
 	packet.cheatType = cheatNum;
-
+	packet.itemType = FruitType;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
@@ -699,7 +699,10 @@ void Network::process_packet(unsigned char* p)
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
 		auto GameResultWGT = CreateWidget<UGameResultWidget>(mMyCharacter->GetWorld(), WidgetClass);
 		GameResultWGT->mScoreWidget = mMyCharacter->mInventory->mMainWidget->mScoreWidget;
-		GameResultWGT->AddToViewport();
+		GameResultWGT->AddToViewport();			
+		mMyCharacter->DisableInput(mMyCharacter->GetWorld()->GetFirstPlayerController());
+		mMyCharacter->bAttacking = false;
+		mMyCharacter->bLMBDown = false;
 		break;
 
 	}	
@@ -1202,6 +1205,11 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 		}
 		break;
+	}
+	case SC_PACKET_GAMEEND: {
+		PacketOwner->GetController()->UnPossess();
+		break;
+
 	}
 	default: {
 		//Unknwon Packet Error

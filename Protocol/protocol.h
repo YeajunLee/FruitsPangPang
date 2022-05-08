@@ -2,7 +2,7 @@
 
 const short GAMESERVER_PORT = 4000;
 const short LOBBYSERVER_PORT = 4100;
-const int MAX_PLAYER_CONN = 6;
+const int MAX_PLAYER_CONN = 8;
 const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
@@ -40,6 +40,8 @@ const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
 
 const char CS_PACKET_CHEAT = 100;
+const char CHEAT_TYPE_GAMETIME = 0;
+const char CHEAT_TYPE_GIVEITEM = 1;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -137,12 +139,6 @@ struct cs_packet_pregamesettingcomplete {
 	char type;
 };
 
-struct cs_packet_cheat {
-	unsigned char size;
-	char type;
-	char cheatType;
-};
-
 struct cs_packet_sync_banana {
 	unsigned char size;
 	char type;
@@ -150,6 +146,14 @@ struct cs_packet_sync_banana {
 	float rx, ry, rz, rw;	//rotate
 	float lx, ly, lz;		//location
 };
+
+struct cs_packet_cheat {
+	unsigned char size;
+	char type;
+	char cheatType;
+	char itemType;
+};
+
 //-------------------- server to client
 struct sc_packet_login_ok {
 	unsigned char size;

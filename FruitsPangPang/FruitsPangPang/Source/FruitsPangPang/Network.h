@@ -92,7 +92,7 @@ public:
 	void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type);
 	void send_respawn_packet(SOCKET& sock,const char& WannaRespawn);
 	void send_PreGameSettingComplete_packet(SOCKET& sock);
-	void send_Cheat(SOCKET& sock,const int& cheatNum);
+	void send_Cheat(SOCKET& sock,const char& cheatNum,const char& FruitType = 0);
 	void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid);
 
 };
