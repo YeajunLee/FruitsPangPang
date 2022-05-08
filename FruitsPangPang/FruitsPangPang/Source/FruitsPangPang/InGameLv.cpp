@@ -4,6 +4,7 @@
 #include "InGameLv.h"
 #include "Network.h"
 #include "MyCharacter.h"
+#include "Blueprint/UserWidget.h"
 
 
 void AInGameLv::BeginPlay() {
@@ -21,7 +22,15 @@ void AInGameLv::BeginPlay() {
 	
 	*/
 
-	CreateLoadingWidget();
+	//FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MLoadingWidget.MLoadingWidget_C'"));
+	//auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	//if (nullptr == WidgetClass)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MLoadingWidget.MLoadingWidget_C'"));
+	//	return;
+	//}
+	//UUserWidget* LoadingWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	//LoadingWidget->AddToViewport();
 
 	FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -36,7 +45,9 @@ void AInGameLv::BeginPlay() {
 	auto mc1 = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedCharacterBP, trans);
 	mc1->SpawnDefaultController();
 	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
+	//mc1->mLoadingWidget = LoadingWidget;
 	mc1->FinishSpawning(trans);
+	CreateLoadingWidget();
 	Conn();
 
 	//To Loading ...
@@ -63,6 +74,7 @@ void AInGameLv::Conn()
 
 void AInGameLv::CreateLoadingWidget()
 {
+
 	if(nullptr != Network::GetNetwork()->mMyCharacter)
 		Network::GetNetwork()->mMyCharacter->MakeLoadingHUD();
 

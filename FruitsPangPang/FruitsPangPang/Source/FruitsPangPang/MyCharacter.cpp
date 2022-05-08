@@ -125,8 +125,8 @@ void AMyCharacter::BeginPlay()
 	if (GetController()->IsPlayerController())
 	{
 		Network::GetNetwork()->mMyCharacter = this;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			FString::Printf(TEXT("other id ")));		
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
+		//	FString::Printf(TEXT("other id ")));		
 		/*
 			Setting Actor Params Before SpawnActor's BeginPlay
 		*/
@@ -674,7 +674,7 @@ void AMyCharacter::GreenOnionAttackEnd()
 			UE_LOG(LogTemp, Error, TEXT("Daepa is not Equipped %d"), c_id);
 
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
 		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 	}
 	DamagedActorCollector.clear();
@@ -702,7 +702,7 @@ void AMyCharacter::CarrotAttackEnd()
 		else
 			UE_LOG(LogTemp, Error, TEXT("Dangeun is not Equipped %d"), c_id);
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
 		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 	}
 	DamagedActorCollector.clear();

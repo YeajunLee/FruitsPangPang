@@ -127,6 +127,8 @@ void AAICharacter::Tick(float DeltaTime)
 
 	auto pos = GetTransform().GetLocation();
 	auto rot = GetTransform().GetRotation();
+	if(overID == 0)
+		SleepEx(0, true);
 	Network::GetNetwork()->send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
 
 	//Update GroundSpeedd (22-04-05)
