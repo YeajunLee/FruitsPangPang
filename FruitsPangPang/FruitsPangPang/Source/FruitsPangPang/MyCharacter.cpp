@@ -222,6 +222,8 @@ void AMyCharacter::Tick(float DeltaTime)
 			Network::GetNetwork()->send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
+			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+			GroundSpeedd = CharXYVelocity;
 		}
 		else {
 			
@@ -239,8 +241,6 @@ void AMyCharacter::Tick(float DeltaTime)
 		}
 
 		//Update GroundSpeedd (22-04-05)
-		float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
-		GroundSpeedd = CharXYVelocity;
 		
 	}
 
