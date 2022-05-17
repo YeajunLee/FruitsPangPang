@@ -9,11 +9,13 @@
 #include <concurrent_queue.h>
 #include "../Utility/Lock/FPPLock.h"
 #include "../../../../../Protocol/protocol.h"
+#include "../../../../../Protocol/ServerProtocol.h"
 
 extern HANDLE hiocp;
 extern SOCKET s_socket;
 
 extern std::array<class Object*, MAX_OBJECT> objects;
+extern class Server* mServer;
 extern std::atomic_int loginPlayerCnt;
 extern std::atomic_bool GameActive;
 extern std::atomic_bool CheatGamePlayTime;
@@ -24,6 +26,7 @@ void error_display(int err_no);
 int Generate_Id();
 void Disconnect(int id);
 void process_packet(int client_id, unsigned char* p);
+void process_packet_for_Server(unsigned char* p);
 void send_login_ok_packet(int player_id);
 void send_move_packet(int player_id, int mover_id, float value);
 void send_anim_packet(int player_id, int animCharacter_id, char animtype);
@@ -53,7 +56,7 @@ void send_sync_banana(const int& player_id,
 );
 
 enum COMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, //Basic
+	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, //Basic
 	CMD_TREE_RESPAWN, CMD_PUNNET_RESPAWN, CMD_PLAYER_RESPAWN, //Respawn
 	CMD_DURIAN_DMG, //Damage
 	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END //Game Cycle

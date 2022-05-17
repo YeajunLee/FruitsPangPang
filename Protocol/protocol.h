@@ -39,7 +39,7 @@ const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
 
-const char CS_PACKET_CHEAT = 100;
+const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
 const char CHEAT_TYPE_GIVEITEM = 1;
 

@@ -7,6 +7,7 @@
 #include "Game/Object/Object.h"
 #include "Game/Object/Character/Character.h"
 #include "Game/Object/Character/Player/Player.h"
+#include "Game/Server/Server.h"
 
 #pragma comment (lib,"WS2_32.lib")
 #pragma comment (lib,"MSWSock.lib")
@@ -49,10 +50,19 @@ int main()
 		objects[i] = new Player();
 
 	}
+	for (int i = 0; i < MAX_SERVER; ++i)
+	{
+		servers[i] = new Server();
+	}
 	std::cout << "Creating Worker Threads\n";
 	vector<thread> worker_threads;
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
+
+
+	ShellExecute(NULL, TEXT("open"), TEXT("D:\\sumin\\Graduation\\GraduationProject\\Server\\FPP_Server\\x64\\Debug\\FPP_Server.exe"), NULL, NULL, SW_SHOW);
+
+
 	for (auto& th : worker_threads)
 		th.join();
 
