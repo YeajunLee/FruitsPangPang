@@ -6,9 +6,18 @@
 #include "BaseCharacter.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include <vector>
 #include "AI_SwordCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+
+class PunnetInfo {
+public:
+	class APunnet* mPunnet;
+	bool bIgnored;
+	PunnetInfo();
+	PunnetInfo(class APunnet* punnet);
+};
 
 UCLASS()
 class FRUITSPANGPANG_API AAI_SwordCharacter : public ABaseCharacter
@@ -43,7 +52,12 @@ public:
 
 public:
 	//related interact
+
 	virtual	void GetFruits() override;
+
+	float ClosestPunnetDistance;
+	int TargetPunnetIndex;
+	std::vector<PunnetInfo> punnets;
 
 protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

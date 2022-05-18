@@ -25,6 +25,8 @@ void APunnet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
             player->OverlapInteract = true;
             player->OverlapInteractId = PunnetId;
             player->OverlapType = false;
+
+            player->bIsUnderthePunnet = true;
         }
     }
 }
@@ -41,6 +43,8 @@ void APunnet::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
             player->OverlapInteract = false;
             player->OverlapInteractId = -1;
             player->OverlapType = false;
+
+            player->bIsUnderthePunnet = false;
         }
     }
 }

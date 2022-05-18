@@ -20,6 +20,8 @@ public:
 
 	static const FName SwordTargetKey;
 
+	static FName PunnetKey;
+
 
 private:
 	UPROPERTY();

@@ -8,6 +8,8 @@
 
 const FName AAI_Sword_Controller_Custom::SwordTargetKey(TEXT("SwordTarget"));
 
+FName AAI_Sword_Controller_Custom::PunnetKey(TEXT("Punnet"));
+
 
 AAI_Sword_Controller_Custom::AAI_Sword_Controller_Custom()
 {
