@@ -148,18 +148,17 @@ void AAICharacter::Attack()
 {
 	if (!bAttacking)
 	{
+		AnimInstance = GetMesh()->GetAnimInstance();
+		
 		//Play Throw Montage	
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			bAttacking = true;
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
 			//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-			//if (c_id == Network::GetNetwork()->mId) 
-			{
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
-			}
-			AnimInstance = GetMesh()->GetAnimInstance();
+			//if (c_id == Network::GetNetwork()->mId) 		
+			//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+			
 			if (AnimInstance && ThrowMontage_AI)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
@@ -167,11 +166,13 @@ void AAICharacter::Attack()
 
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
-			}
+				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
 
-			//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
-			AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
+			}
 		}
+
+		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
+		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
 	}
 
 	
