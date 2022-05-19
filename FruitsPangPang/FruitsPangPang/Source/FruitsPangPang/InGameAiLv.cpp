@@ -28,7 +28,7 @@ void AInGameAiLv::ConnAi()
 			mc1->AutoPossessPlayer = EAutoReceiveInput::Disabled;
 			mc1->bIsDie = true;
 			mc1->FinishSpawning(trans);
-			Network::GetNetwork()->send_PreGameSettingComplete_packet(mc1->s_socket);
+			send_PreGameSettingComplete_packet(mc1->s_socket);
 		}
 	}
 	//int i = 0;

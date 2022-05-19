@@ -98,7 +98,9 @@ public:
 	class UMainWidget* MakeMainHUD();
 	class UUserWidget* mLoadingWidget;
 	class UUserWidget* mWaitingWidget;
+	class UUserWidget* mLoginWidget;
 	void MakeLoadingHUD();
+	void MakeLoginHUD();
 public:
 	//Player Stats
 
@@ -106,8 +108,11 @@ public:
 public:
 	//related Network
 	bool s_connected;	//server_connected;
-	virtual bool ConnServer() override;	
+	virtual bool ConnServer() override;
 	virtual void recvPacket() override;
+
+	virtual bool ConnLobbyServer() override;
+	virtual void recvLobbyPacket() override;
 
 public:
 	// related interact

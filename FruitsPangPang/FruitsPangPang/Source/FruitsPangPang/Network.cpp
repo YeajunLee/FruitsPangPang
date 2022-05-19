@@ -23,7 +23,8 @@
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 //#endif
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
-void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 void CALLBACK recv_Aicallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
 using namespace std;
@@ -118,7 +119,7 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void Network::send_login_packet(SOCKET& sock,const char& type)
+void send_login_packet(SOCKET& sock,const char& type)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
@@ -131,7 +132,7 @@ void Network::send_login_packet(SOCKET& sock,const char& type)
 
 
 
-void Network::send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
+void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
 {
 	cs_packet_move packet;
 	packet.size = sizeof(cs_packet_move);
@@ -148,7 +149,7 @@ void Network::send_move_packet(SOCKET& sock, const float& x, const float& y, con
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_anim_packet(SOCKET& sock, AnimType type)
+void send_anim_packet(SOCKET& sock, Network::AnimType type)
 {
 	cs_packet_anim packet;
 	packet.size = sizeof(cs_packet_anim);
@@ -159,7 +160,7 @@ void Network::send_anim_packet(SOCKET& sock, AnimType type)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale,
+void send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale,
 	const int& fruitType, const int& itemSlotNum, const int& uniqueid)
 {
 	cs_packet_spawnitemobj packet;
@@ -177,7 +178,7 @@ void Network::send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, cons
 
 }
 
-void Network::send_getfruits_tree_packet(SOCKET& sock, const int& treeId)
+void send_getfruits_tree_packet(SOCKET& sock, const int& treeId)
 {
 	if (treeId == -1)
 	{
@@ -194,7 +195,7 @@ void Network::send_getfruits_tree_packet(SOCKET& sock, const int& treeId)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId)
+void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId)
 {
 	if (punnetId == -1)
 	{
@@ -210,7 +211,7 @@ void Network::send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount)
+void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount)
 {
 	cs_packet_useitem packet;
 	packet.size = sizeof(cs_packet_useitem);
@@ -222,7 +223,7 @@ void Network::send_useitem_packet(SOCKET& sock, const int& slotNum, const int& a
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType)
+void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType)
 {
 	cs_packet_hit packet;
 	packet.size = sizeof(cs_packet_hit);
@@ -234,7 +235,7 @@ void Network::send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const i
 
 }
 
-void Network::send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
+void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
 {
 
 	cs_packet_change_hotkeyslot packet;
@@ -246,7 +247,7 @@ void Network::send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type)
+void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type)
 {
 	cs_packet_pos packet;
 	packet.size = sizeof(cs_packet_pos);
@@ -260,7 +261,7 @@ void Network::send_pos_packet(SOCKET& sock, const float& x, const float& y, cons
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_respawn_packet(SOCKET& sock,const char& WannaRespawn)
+void send_respawn_packet(SOCKET& sock,const char& WannaRespawn)
 {
 	cs_packet_select_respawn packet;
 	packet.size = sizeof(cs_packet_select_respawn);
@@ -272,7 +273,7 @@ void Network::send_respawn_packet(SOCKET& sock,const char& WannaRespawn)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_PreGameSettingComplete_packet(SOCKET& sock)
+void send_PreGameSettingComplete_packet(SOCKET& sock)
 {
 	cs_packet_pregamesettingcomplete packet;
 	packet.size = sizeof(cs_packet_pregamesettingcomplete);
@@ -284,7 +285,7 @@ void Network::send_PreGameSettingComplete_packet(SOCKET& sock)
 }
 
 
-void Network::send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType)
+void send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType)
 {
 	cs_packet_cheat packet;
 	packet.size = sizeof(cs_packet_cheat);
@@ -296,7 +297,7 @@ void Network::send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitTy
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void Network::send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid)
+void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid)
 {
 	cs_packet_sync_banana packet;
 	packet.size = sizeof(cs_packet_sync_banana);
@@ -735,13 +736,25 @@ void Network::process_packet(unsigned char* p)
 	}
 }
 
+void Network::process_LobbyPacket(unsigned char* p)
+{
+
+	unsigned char Type = p[1];
+	switch (Type) {
+	case LC_PACKET_LOGIN_OK: {
+		lc_packet_login_ok* packet = reinterpret_cast<lc_packet_login_ok*>(p);
+		mMyCharacter->mWaitingWidget->RemoveFromParent();
+		break;
+	}
+	}
+}
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag)
 {
 	//cout << "send_callback is called" << endl;
 	WSA_OVER_EX* once_exp = reinterpret_cast<WSA_OVER_EX*>(send_over);
 	delete once_exp;
 }
-void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
+void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 
@@ -763,6 +776,30 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 		memcpy(over->getBuf(), packet, to_process_data);
 	}
 	Network::GetNetwork()->mMyCharacter->recvPacket();
+}
+
+void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
+{
+	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
+
+	if (nullptr == Network::GetNetwork()->mMyCharacter) return;
+
+	int to_process_data = num_bytes + Network::GetNetwork()->mMyCharacter->l_prev_size;
+	unsigned char* packet = over->getBuf();
+	int packet_size = packet[0];
+	while (packet_size <= to_process_data) {
+		Network::GetNetwork()->process_LobbyPacket(packet);
+		to_process_data -= packet_size;
+		packet += packet_size;
+		if (to_process_data > 0) packet_size = packet[0];
+		else break;
+	}
+	Network::GetNetwork()->mMyCharacter->l_prev_size = to_process_data;
+	if (to_process_data > 0)
+	{
+		memcpy(over->getBuf(), packet, to_process_data);
+	}
+	Network::GetNetwork()->mMyCharacter->recvLobbyPacket();
 }
 
 

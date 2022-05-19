@@ -62,6 +62,10 @@ const char SC_PACKET_SYNC_BANANA = 17;
 
 const char SC_PACKET_CHEAT_GAMETIME = 100;
 
+
+const char LC_PACKET_LOGIN_OK = 1;
+
+
 #pragma pack (push, 1)
 struct cs_packet_login {
 	unsigned char size;
@@ -154,7 +158,7 @@ struct cs_packet_cheat {
 	char itemType;
 };
 
-//-------------------- server to client
+//-------------------- Gameserver to client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
@@ -280,5 +284,14 @@ struct sc_packet_cheat_gametime {
 	unsigned char size;
 	char type;
 	int milliseconds;
+};
+
+
+//--------------LobbyServer to Client
+
+struct lc_packet_login_ok {
+	unsigned char size;
+	char type;
+	int		id;
 };
 #pragma pack(pop)

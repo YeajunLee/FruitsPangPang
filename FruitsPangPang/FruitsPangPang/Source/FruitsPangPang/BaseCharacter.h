@@ -101,10 +101,12 @@ public:
 		bool bIsUndertheTree;
 
 public:
-	virtual bool ConnServer();
 	// 112.152.55.49
 	const char* SERVER_ADDR = "127.0.0.1";
-	const short SERVER_PORT = 4000;
+
+public:
+	//Game Server
+	virtual bool ConnServer();
 	SOCKET s_socket;
 	SOCKADDR_IN server_addr;
 	WSA_OVER_EX recv_expover;
@@ -114,4 +116,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
 		int overID;	//overlapped I/O use this
 	virtual void recvPacket();
+public:
+	//Lobby Server
+	virtual bool ConnLobbyServer();
+	SOCKET l_socket;	//lobby socket
+	SOCKADDR_IN l_server_addr;
+	WSA_OVER_EX l_recv_expover;
+	int		l_prev_size;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
+		int l_c_id; //received id from server
+	virtual void recvLobbyPacket();
 };

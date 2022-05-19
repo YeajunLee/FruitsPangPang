@@ -43,7 +43,7 @@ void AProjectile::durianPacket(const FVector& pos)
 	{
 		if (BombOwner->GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_pos_packet(BombOwner->s_socket,pos.X, pos.Y, pos.Z, POS_TYPE_DURIAN);
+			send_pos_packet(BombOwner->s_socket,pos.X, pos.Y, pos.Z, POS_TYPE_DURIAN);
 			//send packet
 		}
 		//Ai전용 패킷이 없음.
@@ -70,7 +70,7 @@ void AProjectile::SyncBananaTransform()
 	{
 		if (BombOwner->GetController()->IsPlayerController())
 		{
-			Network::GetNetwork()->send_sync_banana(BombOwner->s_socket, GetActorLocation(), GetActorRotation(), uniqueID);
+			send_sync_banana(BombOwner->s_socket, GetActorLocation(), GetActorRotation(), uniqueID);
 			//send packet
 		}
 		//Ai전용 패킷이 없음.
