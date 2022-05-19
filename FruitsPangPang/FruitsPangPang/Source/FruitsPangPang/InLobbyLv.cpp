@@ -59,8 +59,10 @@ void AInLobbyLv::Conn()
 	if (nullptr != player)
 	{
 		player->ConnLobbyServer();
-		send_login_packet(player->s_socket, 0);
+		player->MakeLoginHUD();
+		//send_login_packet(player->s_socket, 0);
 		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
+
 	}
 	UE_LOG(LogTemp, Log, TEXT("Begin Played"));
 }

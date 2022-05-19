@@ -99,6 +99,7 @@ public:
 	class UUserWidget* mLoadingWidget;
 	class UUserWidget* mWaitingWidget;
 	class UUserWidget* mLoginWidget;
+	class UUserWidget* mMatchWidget;
 	void MakeLoadingHUD();
 	void MakeLoginHUD();
 public:
