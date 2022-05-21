@@ -2,7 +2,8 @@
 
 
 #include "BTService_SwordDetect.h"
-#include "AI_SwordCharacter.h"
+//#include "AI_SwordCharacter.h"
+#include "AICharacter.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"

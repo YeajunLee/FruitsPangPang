@@ -18,19 +18,19 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 
-PunnetInfo::PunnetInfo()
-	:mPunnet(nullptr)
-	,bIgnored(false)
-{
-
-}
-
-PunnetInfo::PunnetInfo(APunnet* punnet)
-	:mPunnet(punnet)
-	,bIgnored(false)
-{
-
-}
+//PunnetInfo::PunnetInfo()
+//	:mPunnet(nullptr)
+//	,bIgnored(false)
+//{
+//
+//}
+//
+//PunnetInfo::PunnetInfo(APunnet* punnet)
+//	:mPunnet(punnet)
+//	,bIgnored(false)
+//{
+//
+//}
 
 
 // Sets default values

@@ -21,6 +21,10 @@ public:
 	static const FName SwordTargetKey;
 
 	static FName PunnetKey;
+	static FName PunnetItemKey;
+
+public:
+	int SavedItemCode;
 
 
 private:

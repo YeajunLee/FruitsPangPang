@@ -32,6 +32,20 @@ TreeInfo::TreeInfo(ATree* tree) :
 
 }
 
+PunnetInfo::PunnetInfo()
+	:mPunnet(nullptr)
+	, bIgnored(false)
+{
+
+}
+
+PunnetInfo::PunnetInfo(APunnet* punnet)
+	:mPunnet(punnet)
+	, bIgnored(false)
+{
+
+}
+
 // Sets default values
 AAICharacter::AAICharacter()
 {
@@ -167,8 +181,8 @@ void AAICharacter::Attack()
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-
 			}
+
 		}
 
 		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.

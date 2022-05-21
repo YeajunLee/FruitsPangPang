@@ -2,7 +2,8 @@
 
 
 #include "BTTask_SwordAttack.h"
-#include "AI_SwordCharacter.h"
+//#include "AI_SwordCharacter.h"
+#include "AICharacter.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "MyCharacter.h"
@@ -19,7 +20,7 @@ EBTNodeResult::Type UBTTask_SwordAttack::ExecuteTask(UBehaviorTreeComponent& Own
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	AAI_SwordCharacter* swordAI = Cast<AAI_SwordCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	AAICharacter* swordAI = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == swordAI)
 		return EBTNodeResult::Failed;
 
@@ -45,7 +46,7 @@ void UBTTask_SwordAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AAI_SwordCharacter* swordAI = Cast<AAI_SwordCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	AAICharacter* swordAI = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == swordAI)
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 

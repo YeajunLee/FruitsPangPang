@@ -5,7 +5,8 @@
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
-#include "AI_SwordCharacter.h"
+//#include "AI_SwordCharacter.h"
+#include "AICharacter.h"
 #include "MyCharacter.h"
 #include "Punnet.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
@@ -30,7 +31,7 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
-	AAI_SwordCharacter* swordAI = Cast<AAI_SwordCharacter>(ControllingPawn);
+	auto swordAI = Cast<AAICharacter>(ControllingPawn);
 	if (swordAI->bIsDie) {
 		return EBTNodeResult::Failed;
 	}

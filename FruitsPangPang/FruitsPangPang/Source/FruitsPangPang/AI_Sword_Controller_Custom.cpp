@@ -9,9 +9,12 @@
 const FName AAI_Sword_Controller_Custom::SwordTargetKey(TEXT("SwordTarget"));
 
 FName AAI_Sword_Controller_Custom::PunnetKey(TEXT("Punnet"));
+FName AAI_Sword_Controller_Custom::PunnetItemKey(TEXT("PunnetItem"));
+
 
 
 AAI_Sword_Controller_Custom::AAI_Sword_Controller_Custom()
+	:SavedItemCode{-1}
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("BlackboardData'/Game/Character/AICharacter/SwordAI/BB_SwordAI.BB_SwordAI'"));
 	
