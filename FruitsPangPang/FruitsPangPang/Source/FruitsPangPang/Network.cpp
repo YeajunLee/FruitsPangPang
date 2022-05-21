@@ -15,6 +15,7 @@
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
 #include "AIController_Custom.h"
+#include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -1084,6 +1085,11 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		AAIController* AIController = Cast<AAIController>(PacketOwner->Controller);
 		if (nullptr != AIController)
 			AIController->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+
+		//sword_ai
+		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(PacketOwner->Controller);
+		if (swordAIController && (packet->itemCode == 7 || packet->itemCode == 8)) // update when ItemCode is only 7 or 8
+			swordAIController->SavedItemCode = packet->itemCode;
 
 		break;
 	}

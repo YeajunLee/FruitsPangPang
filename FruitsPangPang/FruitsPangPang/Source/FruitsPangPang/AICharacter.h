@@ -19,6 +19,14 @@ public:
 	TreeInfo(class ATree* tree);
 };
 
+class PunnetInfo {
+public:
+	class APunnet* mPunnet;
+	bool bIgnored;
+	PunnetInfo();
+	PunnetInfo(class APunnet* punnet);
+};
+
 UCLASS()
 class FRUITSPANGPANG_API AAICharacter : public ABaseCharacter
 {
@@ -71,9 +79,15 @@ public:
 public:
 	//related interact
 
+	// Tree
 	float fTreeDistance;
 	int TargetTreeNum;
 	std::vector<TreeInfo> trees;
+
+	// Punnet
+	float ClosestPunnetDistance;
+	int TargetPunnetIndex;
+	std::vector<PunnetInfo> punnets;
 
 	virtual	void GetFruits() override;
 
@@ -92,29 +106,14 @@ public:
 
 	virtual bool ConnServer() override;
 	virtual void recvPacket() override;
-public:
-	//int hp;
-public:
-	//related inventory
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
-	//	int SelectedHotKeySlotNum;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
-	//	int SavedHotKeyItemCode;		//Save HotKey's ItemCode When Attack() Because it will be use for Throww() to get Fruits Path
-
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	//	class AInventory* mInventory;
-
 
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "tree")
 		class ATree* mTree;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
-	//	bool bIsUndertheTree;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "punnet")
+		class APunnet* mPunnet;
 
 public:
 	//related attack
@@ -122,6 +121,15 @@ public:
 		bool bAttacking;
 
 	void Attack();
+
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void GreenOnionAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackStart();
+	UFUNCTION(BlueprintCallable)
+		void CarrotAttackEnd();
 
 	virtual void Throw() override;
 
@@ -141,6 +149,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* AnimThrowMontage_AI;
+
+	//sword ai
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* SlashMontage_AI;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UAnimMontage* StabMontage_AI;
 
 protected:
 	// Called when the game starts or when spawned

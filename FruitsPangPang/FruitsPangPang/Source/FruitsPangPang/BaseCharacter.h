@@ -100,6 +100,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
 		bool bIsUndertheTree;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "punnet")
+		bool bIsUnderthePunnet;
+
 public:
 	virtual bool ConnServer();
 	// 112.152.55.49
