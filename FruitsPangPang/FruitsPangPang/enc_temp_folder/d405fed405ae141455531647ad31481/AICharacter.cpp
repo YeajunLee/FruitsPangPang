@@ -3,7 +3,6 @@
 
 #include "AICharacter.h"
 #include "AIController_Custom.h"
-#include "AI_Sword_Controller_Custom.h"
 #include "Inventory.h"
 #include "Projectile.h"
 #include "Tree.h"
@@ -170,11 +169,32 @@ void AAICharacter::Attack()
 		{
 			bAttacking = true;
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
+			int HotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+			UE_LOG(LogTemp, Log, TEXT("%d"), HotKeyItemCode);
 			//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			//if (c_id == Network::GetNetwork()->mId) 		
 			//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+
+			if (HotKeyItemCode == 7)
+			{
+				if (AnimInstance && SlashMontage_AI)
+				{
+					AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
+					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
+				}
+			}
+			else if (HotKeyItemCode == 8)
+			{
+				if (AnimInstance && StabMontage_AI)
+				{
+					AnimInstance->Montage_Play(StabMontage_AI, 1.2f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
+					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
+				}
+			}
 			
-			if (AnimInstance && ThrowMontage_AI)
+			else if (AnimInstance && ThrowMontage_AI)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
 				//UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
@@ -183,33 +203,7 @@ void AAICharacter::Attack()
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
 			}
-		}
-		
-		//Sword AI
-		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(GetController());
-		if (swordAIController->SavedItemCode == 7) //대파
-		{
-			//PickSwordAnimation();
-			SM_GreenOnion->SetHiddenInGame(false);
-			SM_Carrot->SetHiddenInGame(true);
-			if (AnimInstance && SlashMontage_AI)
-			{
-				AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
-			}
-		}
-		else if (swordAIController->SavedItemCode == 8) //당근
-		{
-			//PickSwordAnimation();
-			SM_GreenOnion->SetHiddenInGame(true);
-			SM_Carrot->SetHiddenInGame(false);
-			if (AnimInstance && StabMontage_AI)
-			{
-				AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
-				AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
-			}
+
 		}
 
 		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
@@ -360,7 +354,7 @@ void AAICharacter::GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AAc
 
 void AAICharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::CarrotBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	Super::GreenOnionBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
@@ -373,67 +367,9 @@ void AAICharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActo
 		}
 	}
 }
+
 void AAICharacter::CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-}
-
-void AAICharacter::GreenOnionAttackStart()
-{
-	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-}
-
-void AAICharacter::GreenOnionAttackEnd()
-{
-	for (auto& p : DamagedActorCollector)
-	{
-		auto victim = p.second;
-		TSubclassOf<UDamageType> dmgCauser;
-		dmgCauser = UDamageType::StaticClass();
-		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("GO_AttackEnd"));
-
-		if (!this->SM_GreenOnion->bHiddenInGame)
-		{
-			//원래는 피해감소 옵션이지만, 사용하지 않으니 내 입맛대로 fruitType을 보내주도록 한다.
-			dmgCauser.GetDefaultObject()->DamageFalloff = 7.0f;
-		}
-		else
-			UE_LOG(LogTemp, Error, TEXT("Daepa is not Equipped %d"), c_id);
-
-		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
-	}
-	DamagedActorCollector.clear();
-	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AAICharacter::CarrotAttackStart()
-{
-	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-}
-
-void AAICharacter::CarrotAttackEnd()
-{
-	for (auto& p : DamagedActorCollector)
-	{
-		auto victim = p.second;
-		TSubclassOf<UDamageType> dmgCauser;
-		dmgCauser = UDamageType::StaticClass();
-		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("CarrotAttackEnd"));
-		if (!this->SM_Carrot->bHiddenInGame)
-		{
-			dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
-		}
-		else
-			UE_LOG(LogTemp, Error, TEXT("Dangeun is not Equipped %d"), c_id);
-		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
-	}
-	DamagedActorCollector.clear();
-	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

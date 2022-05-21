@@ -122,15 +122,6 @@ public:
 
 	void Attack();
 
-	UFUNCTION(BlueprintCallable)
-		void GreenOnionAttackStart();
-	UFUNCTION(BlueprintCallable)
-		void GreenOnionAttackEnd();
-	UFUNCTION(BlueprintCallable)
-		void CarrotAttackStart();
-	UFUNCTION(BlueprintCallable)
-		void CarrotAttackEnd();
-
 	virtual void Throw() override;
 
 	//UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Delegate")
