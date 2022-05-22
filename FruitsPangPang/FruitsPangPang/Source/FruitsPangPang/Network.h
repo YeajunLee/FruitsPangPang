@@ -48,6 +48,7 @@ public:
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
+
 	UPROPERTY()
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];

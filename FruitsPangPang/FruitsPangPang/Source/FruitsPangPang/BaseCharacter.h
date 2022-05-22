@@ -100,6 +100,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "tree")
 		bool bIsUndertheTree;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "punnet")
+		bool bIsUnderthePunnet;
+
 public:
 	// 112.152.55.49
 	const char* SERVER_ADDR = "127.0.0.1";
