@@ -19,9 +19,13 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-		class UButton* MatchButton;
+		class UButton* MatchforAI;
+	UPROPERTY(meta = (BindWidget))
+		class UButton* MatchforPlayer;
 
 
 	UFUNCTION()
-		void TryMatching();
+		void TryMatchingPlayer();
+	UFUNCTION()
+		void TryMatchingAI();
 };

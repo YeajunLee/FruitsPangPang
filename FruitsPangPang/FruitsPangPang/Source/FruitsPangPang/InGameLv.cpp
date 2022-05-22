@@ -45,7 +45,7 @@ void AInGameLv::BeginPlay() {
 	auto mc1 = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedCharacterBP, trans);
 	mc1->SpawnDefaultController();
 	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
-	//mc1->mLoadingWidget = LoadingWidget;
+	mc1->GameState = 1;
 	mc1->FinishSpawning(trans);
 	CreateLoadingWidget();
 	Conn();

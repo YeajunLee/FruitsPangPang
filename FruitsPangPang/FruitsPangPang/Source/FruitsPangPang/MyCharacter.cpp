@@ -39,6 +39,7 @@ AMyCharacter::AMyCharacter()
 	, bInteractDown(false)
 	, bIsMoving(false)
 	, ServerStoreGroundSpeed(0)
+	, GameState(-1)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -197,9 +198,9 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory = nullptr;
 	}
 
+	closesocket(l_socket);
 	closesocket(s_socket);
 	Network::GetNetwork()->release();
-	//Network::GetNetwork().reset();
 }
 
 // Called every frame
@@ -488,12 +489,18 @@ void AMyCharacter::InteractDown()
 {
 	if (OverlapInteract)
 	{
-		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
+		switch (GameState)
 		{
+		case 0:
+			InteractNpc();
+			break;
+		case 1:
 			GetFruits();
-			
-
-		}
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("Player's GameState is: '%d' UnExpected Value !!"),GameState);
+			break;
+		}	
 		bInteractDown = true;
 	}
 
@@ -518,6 +525,46 @@ void AMyCharacter::InteractUp()
 		}
 	}
 	bInteractDown = false;
+}
+
+
+void AMyCharacter::GetFruits()
+{
+	Super::GetFruits();
+	if (OverlapType)
+	{
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
+		}
+	}
+	else {
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			send_getfruits_punnet_packet(s_socket, OverlapInteractId);
+			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
+		}
+	}
+}
+
+
+void AMyCharacter::InteractNpc()
+{
+	switch (OverlapInteractId)
+	{
+	case 0:
+		ShowMatchHUD();
+		break;
+	}
 }
 
 void AMyCharacter::LMBDown()
@@ -976,38 +1023,7 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 }
 
 
-void AMyCharacter::GetFruits()
-{
-	Super::GetFruits();
-	if (OverlapType)
-	{           
-		if (OverlapInteractId != -1)
-		{
-			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-			send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
-		}
-	}
-	else{
-		if (OverlapInteractId != -1)
-		{
-			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-			send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
-		}
-	}
-}
 
-void AMyCharacter::SendHitPacket()
-{
-
-}
 
 float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -1129,17 +1145,50 @@ void AMyCharacter::MakeLoadingHUD()
 	mLoadingWidget->AddToViewport();
 }
 
-void AMyCharacter::MakeLoginHUD()
+void AMyCharacter::ShowLoginHUD()
 {
-	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MLoginWidget.MLoginWidget_C'"));
-	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-	if (nullptr == WidgetClass)
+	if (!IsValid(mLoginWidget))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MLoginWidget.MLoginWidget_C'"));
-		return;
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MLoginWidget.MLoginWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MLoginWidget.MLoginWidget_C'"));
+			return;
+		}
+		mLoginWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 	}
-	mLoginWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(true);
+	}
 	mLoginWidget->AddToViewport();
+}
+
+void AMyCharacter::ShowMatchHUD()
+{
+	if (!IsValid(mMatchWidget))
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
+			return;
+		}
+		mMatchWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	}
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(true);
+	}
+	mMatchWidget->AddToViewport();
 }
 
 

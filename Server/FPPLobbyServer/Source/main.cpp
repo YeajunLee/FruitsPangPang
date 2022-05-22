@@ -58,9 +58,9 @@ int main()
 	vector<thread> worker_threads;
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
-
-
-	ShellExecute(NULL, TEXT("open"), TEXT("D:\\sumin\\Graduation\\GraduationProject\\Server\\FPP_Server\\x64\\Debug\\FPP_Server.exe"), NULL, NULL, SW_SHOW);
+	//D:\\sumin\\Graduation\\GraduationProject\\Server\\FPP_Server\\x64\\Debug\\FPP_Server.exe
+	
+	//ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), NULL, NULL, SW_SHOW);
 
 
 	for (auto& th : worker_threads)

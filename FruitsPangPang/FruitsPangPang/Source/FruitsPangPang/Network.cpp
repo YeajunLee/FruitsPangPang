@@ -744,25 +744,14 @@ void Network::process_LobbyPacket(unsigned char* p)
 	case LC_PACKET_LOGIN_OK: {
 		lc_packet_login_ok* packet = reinterpret_cast<lc_packet_login_ok*>(p);
 		mMyCharacter->mLoginWidget->RemoveFromParent();
-
-		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
-		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		if (nullptr == WidgetClass)
+		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+		mMyCharacter->mMainWidget->bActivate = true;
+		FInputModeGameOnly gamemode;
+		if (nullptr != controller)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MGameMatchWidget.MGameMatchWidget'"));
-			return;
+			controller->SetInputMode(gamemode);
+			controller->SetShowMouseCursor(false);
 		}
-		mMyCharacter->mMatchWidget = CreateWidget<UUserWidget>(mMyCharacter->GetWorld(), WidgetClass);
-		mMyCharacter->mMatchWidget->AddToViewport();
-
-		//auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
-		//mMyCharacter->mMainWidget->bActivate = true;
-		//FInputModeGameOnly gamemode;
-		//if (nullptr != controller)
-		//{
-		//	controller->SetInputMode(gamemode);
-		//	controller->SetShowMouseCursor(false);
-		//}
 		break;
 	}
 	}

@@ -10,7 +10,8 @@
 
 void UGameMatchWidget::NativePreConstruct()
 {
-	MatchButton->OnClicked.AddDynamic(this, &UGameMatchWidget::TryMatching);
+	MatchforPlayer->OnClicked.AddDynamic(this, &UGameMatchWidget::TryMatchingPlayer);
+	MatchforAI->OnClicked.AddDynamic(this, &UGameMatchWidget::TryMatchingAI);
 }
 
 void UGameMatchWidget::NativeDestruct()
@@ -19,7 +20,14 @@ void UGameMatchWidget::NativeDestruct()
 }
 
 
-void UGameMatchWidget::TryMatching()
+void UGameMatchWidget::TryMatchingPlayer()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), FName("FruitsPangPangMap_Player"));
 }
+
+
+void UGameMatchWidget::TryMatchingAI()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("FruitsPangPangMap_AI"));
+}
+

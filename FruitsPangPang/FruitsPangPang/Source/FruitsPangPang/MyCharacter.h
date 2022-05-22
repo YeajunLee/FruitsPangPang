@@ -94,18 +94,27 @@ public:
 		void LMBUp();
 public:
 	//related HUD
-	class UMainWidget* mMainWidget;
+	//UPROPERTY()를 사용하면 GC로인한 (garbage collector) Dangling pointer가  일어나지않는다
+	UPROPERTY()
+		class UMainWidget* mMainWidget;
+	UPROPERTY()
+		class UUserWidget* mLoadingWidget;
+	UPROPERTY()
+		class UUserWidget* mWaitingWidget;
+	UPROPERTY()
+		class UUserWidget* mLoginWidget;
+	UPROPERTY()
+		class UUserWidget* mMatchWidget;
 	class UMainWidget* MakeMainHUD();
-	class UUserWidget* mLoadingWidget;
-	class UUserWidget* mWaitingWidget;
-	class UUserWidget* mLoginWidget;
-	class UUserWidget* mMatchWidget;
 	void MakeLoadingHUD();
-	void MakeLoginHUD();
+	void ShowLoginHUD();
+	void ShowMatchHUD();
 public:
 	//Player Stats
-
-
+	int GameState;	// -1 = INVALID , 0 = Lobby, 1 = InGame
+public:
+	//related Lobby
+	void InteractNpc();
 public:
 	//related Network
 	bool s_connected;	//server_connected;
@@ -131,10 +140,6 @@ protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
-	//related attack
-	UFUNCTION(BlueprintCallable)
-		void SendHitPacket();
-
 	//short hp;
 	// -- hit event
 
