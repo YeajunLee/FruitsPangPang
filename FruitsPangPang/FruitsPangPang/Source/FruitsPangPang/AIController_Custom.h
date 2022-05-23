@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include <vector>
 #include "AIController_Custom.generated.h"
 
 /**

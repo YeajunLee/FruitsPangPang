@@ -31,7 +31,7 @@ void ATree::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
             player->OverlapInteractId = TreeId;
 
             player->bIsUndertheTree = true;
-         }
+        }
     }
 }
 
