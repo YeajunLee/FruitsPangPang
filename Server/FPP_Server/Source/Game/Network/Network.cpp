@@ -7,12 +7,14 @@
 #include "../Object/Interaction/Interaction.h"
 #include "../Object/Interaction/Tree/Tree.h"
 #include "../Object/Interaction/Punnet/Punnet.h"
+#include "../Server/Server.h"
 
 using namespace std;
 HANDLE hiocp;
 SOCKET s_socket;
 
 std::array<Object*, MAX_OBJECT> objects;
+Server* mServer;
 std::atomic_int loginPlayerCnt;
 std::atomic_bool GameActive = true;
 std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
@@ -47,6 +49,8 @@ void FPP_LOG(const char* strLogFormat, ...)
 	t.logtxt += buf;
 	logger.push(t);
 }
+
+
 void error_display(int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -749,6 +753,29 @@ void process_packet(int client_id, unsigned char* p)
 			}
 			else OtherPlayer->state_lock.unlock();
 		}
+		break;
+	}
+	}
+}
+
+void process_packet_for_Server(unsigned char* p)
+{
+
+	unsigned char packet_type = p[1];
+
+	switch (packet_type) {
+	case LG_PACKET_LOGIN_OK: {
+		lg_packet_login_ok* packet = reinterpret_cast<lg_packet_login_ok*>(p);
+
+
+		cout << "로비서버와 연결 완료\n";
+
+		lg_packet_login_ok spacket;
+		memset(&spacket, 0, sizeof(spacket));
+		spacket.size = sizeof(spacket);
+		spacket.type = LG_PACKET_LOGIN_OK;
+		mServer->sendPacket(&spacket, sizeof(spacket));
+
 		break;
 	}
 	}

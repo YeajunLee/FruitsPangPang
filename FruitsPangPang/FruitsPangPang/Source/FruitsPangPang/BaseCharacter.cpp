@@ -112,7 +112,17 @@ bool ABaseCharacter::ConnServer()
 	return true;
 }
 
+bool ABaseCharacter::ConnLobbyServer()
+{
+	return true;
+}
+
 void ABaseCharacter::recvPacket()
 {
 	
+}
+
+void ABaseCharacter::recvLobbyPacket()
+{
+
 }

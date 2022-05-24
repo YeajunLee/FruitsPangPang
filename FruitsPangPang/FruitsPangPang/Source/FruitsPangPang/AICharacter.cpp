@@ -101,7 +101,7 @@ void AAICharacter::BeginPlay()
 	Network::GetNetwork()->mAiCharacter[overID] = this;
 	Network::GetNetwork()->init();
 	ConnServer();
-	Network::GetNetwork()->send_login_packet(s_socket, 1);
+	send_login_packet(s_socket, 1);
 
 	FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -144,7 +144,7 @@ void AAICharacter::Tick(float DeltaTime)
 	auto rot = GetTransform().GetRotation();
 	if(overID == 0)
 		SleepEx(0, true);
-	Network::GetNetwork()->send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
+	send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
 
 	//Update GroundSpeedd (22-04-05)
 	float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
@@ -172,7 +172,7 @@ void AAICharacter::Attack()
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
 			//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
 			//if (c_id == Network::GetNetwork()->mId) 		
-			//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+			//send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			
 			if (AnimInstance && ThrowMontage_AI)
 			{
@@ -181,7 +181,7 @@ void AAICharacter::Attack()
 
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
+				send_anim_packet(s_socket, Network::AnimType::Throw);
 			}
 		}
 		
@@ -196,7 +196,7 @@ void AAICharacter::Attack()
 			{
 				AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
+				send_anim_packet(s_socket, Network::AnimType::Slash);
 			}
 		}
 		else if (swordAIController->SavedItemCode == 8) //당근
@@ -208,7 +208,7 @@ void AAICharacter::Attack()
 			{
 				AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
+				send_anim_packet(s_socket, Network::AnimType::Stab);
 			}
 		}
 
@@ -243,13 +243,13 @@ void AAICharacter::Throw()
 	//FRotator aiRotate = GetActorForwardVector().Rotation();
 
 	FTransform trans(ToTarget.Quaternion(), SocketTransform.GetLocation());
-	//Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), HotKeyItemCode,SavedHotKeySlotNum);
+	//send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator(), SocketTransform.GetScale3D(), HotKeyItemCode,SavedHotKeySlotNum);
 
 	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 
 	//혹시 만약에 바나나를 던지는걸 구현할 생각이라면 spawnitemobj_packet의 맨 마지막 인자를 유의미한 값을 넣어야하므로
 	//Mycharacter의 바나나 던지는것을 참고해주세요 - 수민
-	Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
+	send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
 		ToTarget, SocketTransform.GetScale3D(), HotKeyItemCode,
 		SavedHotKeySlotNum, 0);
 
@@ -283,7 +283,7 @@ void AAICharacter::GetFruits()
 		if (OverlapInteractId != -1)
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			send_getfruits_tree_packet(s_socket, OverlapInteractId);
 			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
@@ -294,7 +294,7 @@ void AAICharacter::GetFruits()
 		if (OverlapInteractId != -1)
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket,OverlapInteractId);
+			send_getfruits_punnet_packet(s_socket,OverlapInteractId);
 			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
@@ -469,7 +469,7 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		{
 			if (nullptr != projectile->BombOwner)
 			{
-				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
+				send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
 				//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
 		}
@@ -481,7 +481,7 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("sword attack"));
 		int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
-		Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+		send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
 		UE_LOG(LogTemp, Warning, TEXT("sword attack, Take Damage : NotifyHit %d"), m_ftype);
 	}
 

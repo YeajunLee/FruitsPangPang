@@ -31,14 +31,14 @@ void URespawnWidget::NativeDestruct()
 void URespawnWidget::BClick0_0()
 {
 	if(nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket,0);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket,0);
 	UE_LOG(LogTemp, Log, TEXT("0,0"));
 }
 
 void URespawnWidget::BClick1_0()
 {
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 1);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 1);
 	UE_LOG(LogTemp, Log, TEXT("1,0"));
 }
 
@@ -46,7 +46,7 @@ void URespawnWidget::BClick2_0()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 2);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 2);
 	UE_LOG(LogTemp, Log, TEXT("2,0"));
 }
 
@@ -54,7 +54,7 @@ void URespawnWidget::BClick0_1()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 3);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 3);
 	UE_LOG(LogTemp, Log, TEXT("0,1"));
 }
 
@@ -62,7 +62,7 @@ void URespawnWidget::BClick1_1()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 8);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 8);
 	UE_LOG(LogTemp, Log, TEXT("1,1"));
 }
 
@@ -70,7 +70,7 @@ void URespawnWidget::BClick2_1()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 4);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 4);
 	UE_LOG(LogTemp, Log, TEXT("2,1"));
 }
 
@@ -78,7 +78,7 @@ void URespawnWidget::BClick0_2()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 5);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 5);
 	UE_LOG(LogTemp, Log, TEXT("0,2"));
 }
 
@@ -86,7 +86,7 @@ void URespawnWidget::BClick1_2()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 6);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 6);
 	UE_LOG(LogTemp, Log, TEXT("1,2"));
 }
 
@@ -94,6 +94,6 @@ void URespawnWidget::BClick2_2()
 {
 
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		Network::GetNetwork()->send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 7);
+		send_respawn_packet(Network::GetNetwork()->mMyCharacter->s_socket, 7);
 	UE_LOG(LogTemp, Log, TEXT("2,2"));
 }

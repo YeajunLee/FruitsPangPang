@@ -48,6 +48,9 @@
     <ClCompile Include="Source\Game\Utility\Lock\FPPLock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\Server\Server.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Network\Network.h">
@@ -78,6 +81,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Utility\Lock\FPPLock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Server\Server.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -61,7 +61,7 @@ void AAI_SwordCharacter::BeginPlay()
 	Network::GetNetwork()->mAISwordCharacter[overID] = this;
 	Network::GetNetwork()->init();
 	ConnServer();
-	Network::GetNetwork()->send_login_packet(s_socket, 1);*/
+	send_login_packet(s_socket, 1);*/
 
 	FName path = TEXT("Blueprint'/Game/Inventory/Inventory_BP.Inventory_BP_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -111,7 +111,7 @@ void AAI_SwordCharacter::Attack()
 		{
 			AnimInstance->Montage_Play(StabMontage_AI, 1.7f);
 			AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
+			send_anim_packet(s_socket, Network::AnimType::Stab);
 
 		}
 
@@ -126,7 +126,7 @@ void AAI_SwordCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
+					send_anim_packet(s_socket, Network::AnimType::Slash);
 
 				}
 			}
@@ -135,7 +135,7 @@ void AAI_SwordCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(StabMontage_AI, 1.2f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
+					send_anim_packet(s_socket, Network::AnimType::Stab);
 
 				}
 			}
@@ -158,7 +158,7 @@ void AAI_SwordCharacter::GetFruits()
 		if (OverlapInteractId != -1)
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			send_getfruits_tree_packet(s_socket, OverlapInteractId);
 			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
@@ -169,7 +169,7 @@ void AAI_SwordCharacter::GetFruits()
 		if (OverlapInteractId != -1)
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
+			send_getfruits_punnet_packet(s_socket, OverlapInteractId);
 			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
@@ -264,7 +264,7 @@ float AAI_SwordCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 		{
 			if (nullptr != projectile->BombOwner)
 			{
-				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
+				send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
 				//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
 		}
@@ -276,7 +276,7 @@ float AAI_SwordCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("sword attack"));
 		int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
-		Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+		send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
 		UE_LOG(LogTemp, Warning, TEXT("sword attack, Take Damage : NotifyHit %d"), m_ftype);
 	}
 

@@ -9,6 +9,7 @@
 #include "Game/Object/Interaction/Tree/Tree.h"
 #include "Game/Object/Interaction/Punnet/Punnet.h"
 #include "Game/Object/Character/Character.h"
+#include "Game/Server/Server.h"
 
 #pragma comment (lib,"WS2_32.lib")
 #pragma comment (lib,"MSWSock.lib")
@@ -18,9 +19,12 @@ using namespace std;
 
 int main()
 {
+
 	wcout.imbue(locale("korean"));
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
+
+
 	s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -74,6 +78,53 @@ int main()
 	thread logger_thread{ LogThread };
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
+
+
+	//-----------------
+	mServer = new Server();
+	mServer->_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	ZeroMemory(&mServer->server_addr, sizeof(mServer->server_addr));
+	mServer->server_addr.sin_family = AF_INET;
+	mServer->server_addr.sin_port = htons(LOBBYSERVER_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &mServer->server_addr.sin_addr);
+	mServer->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(mServer->wsa_ex_recv.getBuf());
+	mServer->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
+	mServer->wsa_ex_recv.setCmd(CMD_SERVER_RECV);
+	ZeroMemory(&mServer->wsa_ex_recv.getWsaOver(), sizeof(mServer->wsa_ex_recv.getWsaOver()));
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mServer->_socket), hiocp, 1, 0);
+
+	int rt = connect(mServer->_socket, reinterpret_cast<sockaddr*>(&mServer->server_addr), sizeof(mServer->server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		error_display(err_num);
+		system("pause");
+		//exit(0);
+		closesocket(mServer->_socket);
+		return false;
+	}
+
+	DWORD recv_flag = 0;
+	int ret = WSARecv(mServer->_socket, &mServer->wsa_ex_recv.getWsaBuf(), 1, NULL, &recv_flag, &mServer->wsa_ex_recv.getWsaOver(), NULL);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
+
+	gl_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = GL_PACKET_LOGIN;
+	mServer->sendPacket(&packet, sizeof(packet));
+
+
+	//--------------------------------------------
+
+
 	for (auto& th : worker_threads)
 		th.join();
 

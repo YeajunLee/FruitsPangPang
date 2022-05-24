@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Server\Server.cpp" />
     <ClCompile Include="Source\Game\Object\Character\Npc\Npc.cpp" />
     <ClCompile Include="Source\Game\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\Game\Object\Object.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Game\Server\Server.h" />
     <ClInclude Include="Source\Game\Object\Character\Npc\Npc.h" />
     <ClInclude Include="Source\Game\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\Game\Object\Object.h" />

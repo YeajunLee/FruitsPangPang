@@ -45,7 +45,7 @@ void AInGameLv::BeginPlay() {
 	auto mc1 = GetWorld()->SpawnActorDeferred<AMyCharacter>(GeneratedCharacterBP, trans);
 	mc1->SpawnDefaultController();
 	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
-	//mc1->mLoadingWidget = LoadingWidget;
+	mc1->GameState = 1;
 	mc1->FinishSpawning(trans);
 	CreateLoadingWidget();
 	Conn();
@@ -55,7 +55,7 @@ void AInGameLv::BeginPlay() {
 	//To Do SomeThing ...
 
 	//Loading Complete ! Send Complete Packet
-	Network::GetNetwork()->send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
+	send_PreGameSettingComplete_packet(Network::GetNetwork()->mMyCharacter->s_socket);
 
 }
 
@@ -66,7 +66,7 @@ void AInGameLv::Conn()
 	if (nullptr != player)
 	{
 		player->ConnServer();
-		Network::GetNetwork()->send_login_packet(player->s_socket, 0);
+		send_login_packet(player->s_socket, 0);
 		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 	}
 	UE_LOG(LogTemp, Log, TEXT("Begin Played"));

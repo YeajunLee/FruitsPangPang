@@ -39,6 +39,7 @@ AMyCharacter::AMyCharacter()
 	, bInteractDown(false)
 	, bIsMoving(false)
 	, ServerStoreGroundSpeed(0)
+	, GameState(-1)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -183,7 +184,7 @@ void AMyCharacter::BeginPlay()
 		//if (Network::GetNetwork()->init())
 		//{
 		//	//Network::GetNetwork()->C_Recv();
-		//	Network::GetNetwork()->send_login_packet(s_socket);
+		//	send_login_packet(s_socket);
 		//}
 	}
 
@@ -197,9 +198,9 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory = nullptr;
 	}
 
+	closesocket(l_socket);
 	closesocket(s_socket);
 	Network::GetNetwork()->release();
-	//Network::GetNetwork().reset();
 }
 
 // Called every frame
@@ -219,7 +220,7 @@ void AMyCharacter::Tick(float DeltaTime)
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 
-			Network::GetNetwork()->send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
+			send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
@@ -284,7 +285,7 @@ void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
 	{
 		mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 		mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-		Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+		send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 	}
 }
 
@@ -349,7 +350,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+			send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 			
 			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(SelectedHotKeySlotNum))
 			{
@@ -372,7 +373,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			Network::GetNetwork()->send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+			send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(2))
 			{
 				PickSwordAnimation();
@@ -387,51 +388,51 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::P)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GAMETIME);
+		send_Cheat(s_socket, CHEAT_TYPE_GAMETIME);
 	}
 	else if (Key == EKeys::Six)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 1);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 1);
 	}
 	else if (Key == EKeys::Seven)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 2);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 2);
 	}
 	else if (Key == EKeys::Eight)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 3);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 3);
 	}
 	else if (Key == EKeys::Y)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 4);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 4);
 	}
 	else if (Key == EKeys::U)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 5);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 5);
 	}
 	else if (Key == EKeys::I)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 6);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 6);
 	}
 	else if (Key == EKeys::H)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 7);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 7);
 	}
 	else if (Key == EKeys::J)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 8);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 8);
 	}
 	else if (Key == EKeys::N)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 9);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 9);
 	}
 	else if (Key == EKeys::M)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 10);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 10);
 	}
 	else if (Key == EKeys::Comma)
 	{
-		Network::GetNetwork()->send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 11);
+		send_Cheat(s_socket, CHEAT_TYPE_GIVEITEM, 11);
 	}
 }
 
@@ -450,7 +451,7 @@ void AMyCharacter::MoveForward(float value)
 		//auto pos = GetTransform().GetLocation();
 		//auto rot = GetTransform().GetRotation();
 		//
-		//Network::GetNetwork()->send_move_packet(pos.X,pos.Y,pos.Z,rot, GroundSpeed,MOVE_FORWARD);
+		//send_move_packet(pos.X,pos.Y,pos.Z,rot, GroundSpeed,MOVE_FORWARD);
 
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 		//	FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
@@ -488,12 +489,18 @@ void AMyCharacter::InteractDown()
 {
 	if (OverlapInteract)
 	{
-		//if (Network::GetNetwork()->mTree[OverlapTreeId]->CanHarvest)
+		switch (GameState)
 		{
+		case 0:
+			InteractNpc();
+			break;
+		case 1:
 			GetFruits();
-			
-
-		}
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("Player's GameState is: '%d' UnExpected Value !!"),GameState);
+			break;
+		}	
 		bInteractDown = true;
 	}
 
@@ -518,6 +525,46 @@ void AMyCharacter::InteractUp()
 		}
 	}
 	bInteractDown = false;
+}
+
+
+void AMyCharacter::GetFruits()
+{
+	Super::GetFruits();
+	if (OverlapType)
+	{
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
+			send_getfruits_tree_packet(s_socket, OverlapInteractId);
+			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
+		}
+	}
+	else {
+		if (OverlapInteractId != -1)
+		{
+			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
+			send_getfruits_punnet_packet(s_socket, OverlapInteractId);
+			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
+		}
+	}
+}
+
+
+void AMyCharacter::InteractNpc()
+{
+	switch (OverlapInteractId)
+	{
+	case 0:
+		ShowMatchHUD();
+		break;
+	}
 }
 
 void AMyCharacter::LMBDown()
@@ -557,7 +604,7 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(SlashMontage, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage);
-					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Slash);
+					send_anim_packet(s_socket, Network::AnimType::Slash);
 					
 				}
 			}
@@ -567,7 +614,7 @@ void AMyCharacter::Attack()
 				{
 					AnimInstance->Montage_Play(StabbingMontage, 1.2f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabbingMontage);
-					Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Stab);
+					send_anim_packet(s_socket, Network::AnimType::Stab);
 					
 				}
 			}
@@ -575,8 +622,8 @@ void AMyCharacter::Attack()
 			{
 				AnimInstance->Montage_Play(ThrowMontage, 2.f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage);
-				Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::Throw);
-				//Network::GetNetwork()->send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+				send_anim_packet(s_socket, Network::AnimType::Throw);
+				//send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
 			}
 			
 		}
@@ -776,14 +823,14 @@ void AMyCharacter::PickSwordAnimation()
 			GreenOnionBag->SetHiddenInGame(true, false);
 			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(true, false);
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			SM_Carrot->SetHiddenInGame(false, false);
 			CarrotBag->SetHiddenInGame(true, false);
 			SM_GreenOnion->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}		
 		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
@@ -810,21 +857,21 @@ void AMyCharacter::DropSwordAnimation()
 			GreenOnionBag->SetHiddenInGame(false, false);
 			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(true, false);
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
 			SM_Carrot->SetHiddenInGame(true, false);
 			CarrotBag->SetHiddenInGame(false, false);
 			SM_GreenOnion->SetHiddenInGame(true, false);
 			GreenOnionBag->SetHiddenInGame(true, false);
-			Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}
 		AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
 		AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
 	}
 
-	Network::GetNetwork()->send_anim_packet(s_socket, Network::AnimType::DropSword);
+	send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
 void AMyCharacter::Throw()
@@ -843,7 +890,7 @@ void AMyCharacter::Throw()
 		if (nullptr != banana)
 		{
 			banana->uniqueID = Network::GetNetwork()->getNewBananaId();
-			Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
+			send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
 				FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(),
 				HotKeyItemCode, SavedHotKeySlotNum, banana->uniqueID);
 			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
@@ -864,7 +911,7 @@ void AMyCharacter::Throw()
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
-		Network::GetNetwork()->send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation()
+		send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation()
 			, FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(), 
 			HotKeyItemCode, SavedHotKeySlotNum,0);
 
@@ -976,38 +1023,7 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 }
 
 
-void AMyCharacter::GetFruits()
-{
-	Super::GetFruits();
-	if (OverlapType)
-	{           
-		if (OverlapInteractId != -1)
-		{
-			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
-		}
-	}
-	else{
-		if (OverlapInteractId != -1)
-		{
-			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
-			Network::GetNetwork()->send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
-		}
-	}
-}
 
-void AMyCharacter::SendHitPacket()
-{
-
-}
 
 float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -1040,7 +1056,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		{
 			if (nullptr != projectile->BombOwner)
 			{
-				Network::GetNetwork()->send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
+				send_hitmyself_packet(s_socket, projectile->BombOwner->c_id, projectile->_fType);
 				//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit"));
 			}
 		}
@@ -1054,7 +1070,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		if (GetController()->IsPlayerController())
 		{
 			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
-			Network::GetNetwork()->send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
+			send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
 			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
 		}
 	}
@@ -1129,6 +1145,52 @@ void AMyCharacter::MakeLoadingHUD()
 	mLoadingWidget->AddToViewport();
 }
 
+void AMyCharacter::ShowLoginHUD()
+{
+	if (!IsValid(mLoginWidget))
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MLoginWidget.MLoginWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MLoginWidget.MLoginWidget_C'"));
+			return;
+		}
+		mLoginWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	}
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(true);
+	}
+	mLoginWidget->AddToViewport();
+}
+
+void AMyCharacter::ShowMatchHUD()
+{
+	if (!IsValid(mMatchWidget))
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		if (nullptr == WidgetClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
+			return;
+		}
+		mMatchWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	}
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(true);
+	}
+	mMatchWidget->AddToViewport();
+}
+
 
 
 
@@ -1173,7 +1235,7 @@ bool AMyCharacter::ConnServer()
 	recv_expover.setId(static_cast<unsigned char>(overID));
 
 	DWORD recv_flag = 0;
-	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
+	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_Gamecallback);
 	if (SOCKET_ERROR == ret)
 	{
 		int err = WSAGetLastError();
@@ -1195,7 +1257,70 @@ void AMyCharacter::recvPacket()
 	recv_expover.getWsaBuf().buf = reinterpret_cast<char*>(recv_expover.getBuf() + _prev_size);
 	recv_expover.getWsaBuf().len = BUFSIZE - _prev_size;
 
-	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_callback);
+	int ret = WSARecv(s_socket, &recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &recv_expover.getWsaOver(), recv_Gamecallback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
+}
+
+
+
+
+bool AMyCharacter::ConnLobbyServer()
+{
+	Super::ConnLobbyServer();
+	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	ZeroMemory(&l_server_addr, sizeof(l_server_addr));
+	l_server_addr.sin_family = AF_INET;
+	l_server_addr.sin_port = htons(LOBBYSERVER_PORT);
+
+	inet_pton(AF_INET, SERVER_ADDR, &l_server_addr.sin_addr);
+	int rt = connect(l_socket, reinterpret_cast<sockaddr*>(&l_server_addr), sizeof(l_server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		//error_display(err_num);
+		//system("pause");
+		UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//exit(0);
+		closesocket(l_socket);
+		return false;
+	}
+
+	l_recv_expover.setId(static_cast<unsigned char>(0));
+
+	DWORD recv_flag = 0;
+	int ret = WSARecv(l_socket, &l_recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.getWsaOver(), recv_Lobbycallback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			return false;
+		}
+	}
+	return true;
+}
+
+
+void AMyCharacter::recvLobbyPacket()
+{
+	Super::recvLobbyPacket();
+	DWORD recv_flag = 0;
+	ZeroMemory(&l_recv_expover.getWsaOver(), sizeof(l_recv_expover.getWsaOver()));
+
+	l_recv_expover.getWsaBuf().buf = reinterpret_cast<char*>(l_recv_expover.getBuf() + l_prev_size);
+	l_recv_expover.getWsaBuf().len = BUFSIZE - l_prev_size;
+
+	int ret = WSARecv(l_socket, &l_recv_expover.getWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.getWsaOver(), recv_Lobbycallback);
 	if (SOCKET_ERROR == ret)
 	{
 		int err = WSAGetLastError();
