@@ -205,6 +205,11 @@ void process_packet(int client_id, unsigned char* p)
 	case CL_PACKET_MATCH_REQUEST: {
 		cl_packet_match_request* packet = reinterpret_cast<cl_packet_match_request*>(p);
 		bool bAllServerNotActivate = true;
+		short AmountOfTryMatchingPlayer = 1;
+
+		if (-1 != packet->amount)	//ai일경우 packet이 -1이 아니다.
+			AmountOfTryMatchingPlayer = packet->amount;
+
 		for (auto& server : servers) {
 			GameServer* gameserver = reinterpret_cast<GameServer*>(server);
 			gameserver->state_lock.lock();
@@ -212,12 +217,13 @@ void process_packet(int client_id, unsigned char* p)
 			{
 				gameserver->state_lock.unlock();
 				bAllServerNotActivate = false;	//게임서버가 1개라도 켜져있으므로 false 
-				bool res = gameserver->Match(object->_id);
+				bool res = gameserver->Match(object->_id, AmountOfTryMatchingPlayer);
 				if (!res)
 				{
 					cout << "매칭실패 매칭 재시도\n";
 					Timer_Event instq;
 					instq.player_id = object->_id;
+					instq.object_id = AmountOfTryMatchingPlayer;
 					instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
 					instq.exec_time = chrono::system_clock::now() + 1000ms;
 
@@ -250,6 +256,7 @@ void process_packet(int client_id, unsigned char* p)
 			cout << "서버 열린곳이 없음. 매칭 재시도\n";
 			Timer_Event instq;
 			instq.player_id = object->_id;
+			instq.object_id = AmountOfTryMatchingPlayer;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
 			instq.exec_time = chrono::system_clock::now() + 1000ms;
 

@@ -110,17 +110,20 @@ void WorkerThread()
 			break;
 		}
 		case CMD_MATCH_REQUEST: {
+			int AmountOfTryMatchingPlayer = 1;
+			memcpy(&AmountOfTryMatchingPlayer, wsa_ex->getBuf(), sizeof(int));
 			for (auto& server : servers) {
 				GameServer* gameserver = reinterpret_cast<GameServer*>(server);
 				gameserver->state_lock.lock();
 				if (gameserver->_state == Server::STATE::ST_MATHCING)
 				{
 					gameserver->state_lock.unlock();
-					bool res = gameserver->Match(client_id);
+					bool res = gameserver->Match(client_id, AmountOfTryMatchingPlayer);
 					if (!res)
 					{
 						Timer_Event instq;
 						instq.player_id = client_id;
+						instq.object_id = AmountOfTryMatchingPlayer;
 						instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
 						instq.exec_time = chrono::system_clock::now() + 1000ms;
 

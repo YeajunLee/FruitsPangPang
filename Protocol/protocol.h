@@ -2,7 +2,7 @@
 
 const short GAMESERVER_PORT = 4000;
 const short LOBBYSERVER_PORT = 4100;
-const int MAX_PLAYER_CONN = 2;
+const int MAX_PLAYER_CONN = 7;
 const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
@@ -163,6 +163,7 @@ struct cs_packet_cheat {
 struct cl_packet_match_request {
 	unsigned char size;
 	char type;
+	short amount;		//AI Amount
 };
 
 //-------------------- Gameserver to client

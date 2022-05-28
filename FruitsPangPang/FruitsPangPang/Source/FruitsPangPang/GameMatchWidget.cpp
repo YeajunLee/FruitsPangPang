@@ -36,7 +36,8 @@ void UGameMatchWidget::TryMatchingPlayer()
 
 void UGameMatchWidget::TryMatchingAI()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("FruitsPangPangMap_AI"));
+	Network::GetNetwork()->mGameMode = 1;
+	send_match_request(Network::GetNetwork()->mMyCharacter->l_socket, ACTIVE_AI_CNT);
 }
 
 void UGameMatchWidget::UpdatePlayerCntText(const int& cnt)

@@ -313,12 +313,12 @@ void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotat
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void send_match_request(SOCKET& sock)
+void send_match_request(SOCKET& sock, const short& Amount)
 {
 	cl_packet_match_request packet;
 	packet.size = sizeof(cl_packet_match_request);
 	packet.type = CL_PACKET_MATCH_REQUEST;
-
+	packet.amount = Amount;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
@@ -770,7 +770,15 @@ void Network::process_LobbyPacket(unsigned char* p)
 	case LC_PACKET_MATCH_RESPONSE: {
 		lc_packet_match_response* packet = reinterpret_cast<lc_packet_match_response*>(p);
 		GameServerPort = packet->port;
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));
+		switch (mGameMode)
+		{
+		case 0:
+			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));
+			break;
+		case 1:
+			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_AI"));
+			break;
+		}
 		break;
 	}
 	case LC_PACKET_MATCH_UPDATE: {

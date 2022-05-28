@@ -13,6 +13,8 @@ public:
 
 	std::array<int, 8> CurrentMatchingPlayer;
 	short mServerPort;
-	bool Match(const int& player_id);
+	bool isAIEntered;
+	int SaveAI_id;
+	bool Match(const int& player_id,const short& amount = 1);
 };
 
