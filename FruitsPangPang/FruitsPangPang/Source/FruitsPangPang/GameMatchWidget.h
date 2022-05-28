@@ -22,10 +22,18 @@ public:
 		class UButton* MatchforAI;
 	UPROPERTY(meta = (BindWidget))
 		class UButton* MatchforPlayer;
+	UPROPERTY(meta = (BindWidget))
+		class UOverlay* mMatchWaitOverlay;
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* MatchingText;
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* CurrentMatchingPlayerCnt;
 
 
 	UFUNCTION()
 		void TryMatchingPlayer();
 	UFUNCTION()
 		void TryMatchingAI();
+
+	void UpdatePlayerCntText(const int& cnt);
 };

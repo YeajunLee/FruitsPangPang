@@ -4,6 +4,7 @@
 #include "../../../Object/Character/Character.h"
 #include "../../../Object/Character/Player/Player.h"
 #include "../../../Server/Server.h"
+#include "../../../Server/GameServer/GameServer.h"
 
 using namespace std;
 
@@ -106,6 +107,32 @@ void WorkerThread()
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 			*(reinterpret_cast<SOCKET*>(wsa_ex->getBuf())) = c_socket;
 			AcceptEx(s_socket, c_socket, wsa_ex->getBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->getWsaOver());
+			break;
+		}
+		case CMD_MATCH_REQUEST: {
+			for (auto& server : servers) {
+				GameServer* gameserver = reinterpret_cast<GameServer*>(server);
+				gameserver->state_lock.lock();
+				if (gameserver->_state == Server::STATE::ST_MATHCING)
+				{
+					gameserver->state_lock.unlock();
+					bool res = gameserver->Match(client_id);
+					if (!res)
+					{
+						Timer_Event instq;
+						instq.player_id = client_id;
+						instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
+						instq.exec_time = chrono::system_clock::now() + 1000ms;
+
+						timer_queue.push(instq);
+					}
+
+				}
+				else {
+					gameserver->state_lock.unlock();
+				}
+			}
+			delete wsa_ex;
 			break;
 		}
 		}

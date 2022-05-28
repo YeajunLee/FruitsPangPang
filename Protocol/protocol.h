@@ -2,7 +2,7 @@
 
 const short GAMESERVER_PORT = 4000;
 const short LOBBYSERVER_PORT = 4100;
-const int MAX_PLAYER_CONN = 7;
+const int MAX_PLAYER_CONN = 2;
 const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
@@ -38,6 +38,7 @@ const char CS_PACKET_POS = 10;
 const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
+const char CL_PACKET_MATCH_REQUEST = 14;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -64,7 +65,8 @@ const char SC_PACKET_CHEAT_GAMETIME = 100;
 
 
 const char LC_PACKET_LOGIN_OK = 1;
-
+const char LC_PACKET_MATCH_RESPONSE = 2;
+const char LC_PACKET_MATCH_UPDATE = 3;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -156,6 +158,11 @@ struct cs_packet_cheat {
 	char type;
 	char cheatType;
 	char itemType;
+};
+//-------------------- client to LobbyServer
+struct cl_packet_match_request {
+	unsigned char size;
+	char type;
 };
 
 //-------------------- Gameserver to client
@@ -293,5 +300,17 @@ struct lc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+};
+
+struct lc_packet_match_response {
+	unsigned char size;
+	char type;
+	short port;
+};
+
+struct lc_packet_match_update {
+	unsigned char size;
+	char type;
+	int playercnt;
 };
 #pragma pack(pop)

@@ -4,6 +4,7 @@
 #include <array>
 #include <chrono>
 #include <mutex>
+#include <concurrent_priority_queue.h>
 #include "../../../../../Protocol/protocol.h"
 #include "../../../../../Protocol/ServerProtocol.h"
 
@@ -12,18 +13,36 @@ extern SOCKET s_socket;
 
 extern std::array<class Object*, MAX_OBJECT> objects;
 extern std::array<class Server*, MAX_SERVER> servers;
+extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 void error_display(int err_no);
 int Generate_Id();
 int Generate_ServerId();
 void process_packet(int client_id, unsigned char* p);
 void process_packet_for_Server(int client_id, unsigned char* p);
 
-void send_login_ok_packet(int player_id);
+void send_login_ok_packet(const int& player_id);
+void send_enter_ingame_packet(const int& player_id,const short& server_port);
+void send_match_update_packet(const int& player_id, const int& player_cnt);
 
+struct Timer_Event {
+	enum class TIMER_TYPE 
+	{
+		TYPE_MATCH_REQUEST
+	};
+	int object_id;
+	int player_id;
+	std::chrono::system_clock::time_point exec_time;
+	TIMER_TYPE type;
+	constexpr bool operator < (const Timer_Event& R) const
+	{
+		return (exec_time > R.exec_time);
+	}
+};
 
 enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV,//Basic
-	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END //Game Cycle
+	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, //Game Cycle
+	CMD_MATCH_REQUEST
 };
 
 class WSA_OVER_EX {

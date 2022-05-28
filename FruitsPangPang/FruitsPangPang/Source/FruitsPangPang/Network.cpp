@@ -14,6 +14,7 @@
 #include "MainWidget.h"
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
+#include "GameMatchWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -311,6 +312,17 @@ void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotat
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
+
+void send_match_request(SOCKET& sock)
+{
+	cl_packet_match_request packet;
+	packet.size = sizeof(cl_packet_match_request);
+	packet.type = CL_PACKET_MATCH_REQUEST;
+
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
 
 void Network::process_packet(unsigned char* p)
 {
@@ -753,6 +765,18 @@ void Network::process_LobbyPacket(unsigned char* p)
 			controller->SetInputMode(gamemode);
 			controller->SetShowMouseCursor(false);
 		}
+		break;
+	}
+	case LC_PACKET_MATCH_RESPONSE: {
+		lc_packet_match_response* packet = reinterpret_cast<lc_packet_match_response*>(p);
+		GameServerPort = packet->port;
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));
+		break;
+	}
+	case LC_PACKET_MATCH_UPDATE: {
+		lc_packet_match_update* packet = reinterpret_cast<lc_packet_match_update*>(p);
+		if(mMyCharacter->mMatchWidget != nullptr)
+			mMyCharacter->mMatchWidget->UpdatePlayerCntText(packet->playercnt);
 		break;
 	}
 	}

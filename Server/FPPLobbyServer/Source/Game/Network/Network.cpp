@@ -4,6 +4,7 @@
 #include "../Object/Character/Character.h"
 #include "../Object/Character/Player/Player.h"
 #include "../Server/Server.h"
+#include "../Server/GameServer/GameServer.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ HANDLE hiocp;
 SOCKET s_socket;
 std::array<Object*, MAX_OBJECT> objects;
 std::array<Server*, MAX_SERVER> servers;
-
+concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
 	: _cmd(cmd)
@@ -86,7 +87,7 @@ int Generate_ServerId()
 	cout << "Server ID is Over the MAX_SERVER" << endl;
 	return -1;
 }
-void send_login_ok_packet(int player_id)
+void send_login_ok_packet(const int& player_id)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
 	sc_packet_login_ok packet;
@@ -95,6 +96,30 @@ void send_login_ok_packet(int player_id)
 	packet.id = player_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_LOGIN_OK;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_enter_ingame_packet(const int& player_id, const short& server_port)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_match_response packet;
+	memset(&packet, 0, sizeof(lc_packet_match_response));
+
+	packet.port = server_port;
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_MATCH_RESPONSE;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_match_update_packet(const int& player_id, const int& player_cnt)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_match_update packet;
+	memset(&packet, 0, sizeof(lc_packet_match_update));
+
+	packet.playercnt = player_cnt;
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_MATCH_UPDATE;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -136,32 +161,102 @@ void process_packet(int client_id, unsigned char* p)
 
 		gl_packet_login* packet = reinterpret_cast<gl_packet_login*>(p);
 		Player* character = reinterpret_cast<Player*>(object);
-		int newid = Generate_ServerId();
-		Server* server = servers[newid];	//state == USING
-		server->_id = newid;
-		server->_socket = character->_socket;	
-		server->_prev_size = 0;
-		server->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(server->wsa_server_recv.getBuf());
-		server->wsa_server_recv.getWsaBuf().len = BUFSIZE;
-		server->wsa_server_recv.setID(newid);
-		server->wsa_server_recv.setCmd(CMD_SERVER_RECV);	//이제 서버관련 패킷은 따로 처리 해준다.
-		ZeroMemory(&server->wsa_server_recv.getWsaOver(), sizeof(server->wsa_server_recv.getWsaOver()));
-
-		server->recvPacket();
-		//server assign end
-
-		//clear character
-		character->state_lock.lock();
-		character->_state = Player::STATE::ST_FREE;
-		character->state_lock.unlock();
-		character->_socket = NULL;
-		//clear character end
-		lg_packet_login_ok spacket;
-		memset(&spacket, 0, sizeof(spacket));
-		spacket.size = sizeof(spacket);
-		spacket.type = LG_PACKET_LOGIN_OK;
-		server->sendPacket(&spacket, sizeof(spacket));
 		
+		for (auto& server : servers)
+		{
+			GameServer* gameserver = reinterpret_cast<GameServer*>(server);
+			if (gameserver->mServerPort == packet->port)
+			{
+				server->_socket = character->_socket;
+				server->_prev_size = 0;
+				server->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(server->wsa_server_recv.getBuf());
+				server->wsa_server_recv.getWsaBuf().len = BUFSIZE;
+				server->wsa_server_recv.setID(server->_id);
+				server->wsa_server_recv.setCmd(CMD_SERVER_RECV);	//이제 서버관련 패킷은 따로 처리 해준다.
+				ZeroMemory(&server->wsa_server_recv.getWsaOver(), sizeof(server->wsa_server_recv.getWsaOver()));
+
+				//GameServer* gameserver = reinterpret_cast<GameServer*>(server);
+				//gameserver->mServerPort = 4100 + newid;	//포트넘버
+
+				server->recvPacket();
+				server->state_lock.lock();
+				server->_state = Server::STATE::ST_MATHCING;
+				server->state_lock.unlock();
+				//server assign end
+
+				//clear character
+				character->state_lock.lock();
+				character->_state = Player::STATE::ST_FREE;
+				character->state_lock.unlock();
+				character->_socket = NULL;
+				//clear character end
+				lg_packet_login_ok spacket;
+				memset(&spacket, 0, sizeof(spacket));
+				spacket.size = sizeof(spacket);
+				spacket.type = LG_PACKET_LOGIN_OK;
+				server->sendPacket(&spacket, sizeof(spacket));
+			}
+		}
+
+
+
+		break;
+	}
+	case CL_PACKET_MATCH_REQUEST: {
+		cl_packet_match_request* packet = reinterpret_cast<cl_packet_match_request*>(p);
+		bool bAllServerNotActivate = true;
+		for (auto& server : servers) {
+			GameServer* gameserver = reinterpret_cast<GameServer*>(server);
+			gameserver->state_lock.lock();
+			if (gameserver->_state == Server::STATE::ST_MATHCING)
+			{
+				gameserver->state_lock.unlock();
+				bAllServerNotActivate = false;	//게임서버가 1개라도 켜져있으므로 false 
+				bool res = gameserver->Match(object->_id);
+				if (!res)
+				{
+					cout << "매칭실패 매칭 재시도\n";
+					Timer_Event instq;
+					instq.player_id = object->_id;
+					instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
+					instq.exec_time = chrono::system_clock::now() + 1000ms;
+
+					timer_queue.push(instq);
+				}
+				else {
+
+					cout << "매칭성공\n";
+				}
+				
+			}
+			else {
+				gameserver->state_lock.unlock();
+			}
+		}
+
+		//아무 게임서버도 켜져있지 않으면 새로 하나 켜줌.
+		if (bAllServerNotActivate)
+		{
+
+			int newid = Generate_ServerId();
+			Server* server = servers[newid];	//state == USING
+			server->_id = newid;
+			GameServer* gameserver = reinterpret_cast<GameServer*>(server);
+			gameserver->mServerPort = 4000 + newid;	//포트넘버
+			wchar_t tmp[20];
+			_itow_s(gameserver->mServerPort, tmp, 10);
+			ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), tmp, NULL, SW_SHOW);
+
+			cout << "서버 열린곳이 없음. 매칭 재시도\n";
+			Timer_Event instq;
+			instq.player_id = object->_id;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
+			instq.exec_time = chrono::system_clock::now() + 1000ms;
+
+			timer_queue.push(instq);
+		}
+
+		break;
 	}
 	}
 }

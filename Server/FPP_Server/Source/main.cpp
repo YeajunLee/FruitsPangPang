@@ -17,23 +17,28 @@
 using namespace std;
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
 	wcout.imbue(locale("korean"));
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
-
+	short server_port = -1;
+	if(argc >1)
+		server_port = atoi(argv[1]);
 
 	s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(GAMESERVER_PORT);
+	if (server_port != -1)
+		server_addr.sin_port = htons(server_port);
+	else
+		server_addr.sin_port = htons(GAMESERVER_PORT);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bind(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(s_socket, SOMAXCONN);
-
+	cout <<	ntohs(server_addr.sin_port) << endl;
 	hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(s_socket), hiocp, 0, 0);
 
@@ -119,6 +124,7 @@ int main()
 	gl_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = GL_PACKET_LOGIN;
+	packet.port = server_port;
 	mServer->sendPacket(&packet, sizeof(packet));
 
 
