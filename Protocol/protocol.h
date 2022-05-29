@@ -60,6 +60,7 @@ const char SC_PACKET_GAMEWAITING = 14;
 const char SC_PACKET_GAMESTART = 15;
 const char SC_PACKET_GAMEEND = 16;
 const char SC_PACKET_SYNC_BANANA = 17;
+const char SC_PACKET_KILL_INFO = 18;
 
 const char SC_PACKET_CHEAT_GAMETIME = 100;
 
@@ -294,6 +295,12 @@ struct sc_packet_cheat_gametime {
 	int milliseconds;
 };
 
+struct sc_packet_kill_info {
+	unsigned char size;
+	char type;
+	char Attacker[MAX_NAME_SIZE];
+	char Victim[MAX_NAME_SIZE];
+};
 
 //--------------LobbyServer to Client
 

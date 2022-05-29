@@ -8,8 +8,10 @@
 #include "Network.h"
 #include "RespawnWindowWidget.h"
 #include "ScoreWidget.h"
+#include "KillLogTextWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
+#include "Components/ScrollBox.h"
 
 
 void UMainWidget::NativePreConstruct()
@@ -87,4 +89,19 @@ const float UMainWidget::ReduceRemainTime(const float& deltatime)
 {
 	fRemainTime = FMath::Max<float>(fRemainTime - deltatime, 0.0f);
 	return fRemainTime;
+}
+
+
+void UMainWidget::UpdateKillLog(const FString& Attacker, const FString& Victim)
+{
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MKillLogTextWidget.MKillLogTextWidget_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	if (nullptr == WidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MKillLogTextWidget.MKillLogTextWidget_C'"));
+		return;
+	}
+	auto KillLogTextWGT = CreateWidget<UKillLogTextWidget>(GetWorld(), WidgetClass);
+	KillLogTextWGT->MakeKillLog(Attacker, Victim);
+	KillLogBox->AddChild(KillLogTextWGT);
 }

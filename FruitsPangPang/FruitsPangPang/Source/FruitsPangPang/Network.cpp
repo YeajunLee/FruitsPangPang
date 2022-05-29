@@ -746,6 +746,10 @@ void Network::process_packet(unsigned char* p)
 		}
 		break;
 	}
+	case SC_PACKET_KILL_INFO: {
+		sc_packet_kill_info* packet = reinterpret_cast<sc_packet_kill_info*>(p);
+		mMyCharacter->mMainWidget->UpdateKillLog(FString(packet->Attacker), FString(packet->Victim));
+	}
 	}
 }
 

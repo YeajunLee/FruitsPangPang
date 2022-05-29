@@ -320,6 +320,19 @@ void send_sync_banana(const int& player_id,
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_kill_info_packet(const int& player_id, const int& attacker_id, const int& victim_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	auto attacker = reinterpret_cast<Character*>(objects[attacker_id]);
+	auto victim = reinterpret_cast<Character*>(objects[victim_id]);
+	sc_packet_kill_info packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_KILL_INFO;
+	strcpy_s(packet.Attacker, attacker->name);
+	strcpy_s(packet.Victim, victim->name);
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -329,7 +342,11 @@ void process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
+
 		strcpy_s(character->name, packet->name);
+		//임시 sprintf -05.30
+		sprintf_s(character->name, "%d", character->_id);
+
 		character->bAi = packet->cType;
 		send_login_ok_packet(client_id);
 		FPP_LOG("플레이어[%d] 접속", client_id);

@@ -211,6 +211,7 @@ void Character::Hurt(const int& damage, const int& attacker)
 			{
 				character->state_lock.unlock();
 				send_update_score_packet(character->_id, userDeathcount, userKillcount);
+				send_kill_info_packet(character->_id, attackerCharacter->_id, _id);
 			}
 			else {
 				character->state_lock.unlock();
