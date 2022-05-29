@@ -104,7 +104,7 @@ public:
 	UPROPERTY()
 		class UUserWidget* mLoginWidget;
 	UPROPERTY()
-		class UUserWidget* mMatchWidget;
+		class UGameMatchWidget* mMatchWidget;
 	class UMainWidget* MakeMainHUD();
 	void MakeLoadingHUD();
 	void ShowLoginHUD();

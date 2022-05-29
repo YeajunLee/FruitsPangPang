@@ -27,6 +27,7 @@
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
+#include "GameMatchWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -1179,7 +1180,7 @@ void AMyCharacter::ShowMatchHUD()
 			UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MGameMatchWidget.MGameMatchWidget_C'"));
 			return;
 		}
-		mMatchWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		mMatchWidget = CreateWidget<UGameMatchWidget>(GetWorld(), WidgetClass);
 	}
 	FInputModeUIOnly gamemode;
 	auto controller = GetWorld()->GetFirstPlayerController();
@@ -1216,7 +1217,10 @@ bool AMyCharacter::ConnServer()
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(GAMESERVER_PORT);
+	if(Network::GetNetwork()->GameServerPort != -1)
+		server_addr.sin_port = htons(Network::GetNetwork()->GameServerPort);
+	else
+		server_addr.sin_port = htons(GAMESERVER_PORT);
 
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
 	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));

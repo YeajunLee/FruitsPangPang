@@ -35,6 +35,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* RemainGameTimeText;
 
+	UPROPERTY(meta = (BindWidget))
+		class UScrollBox* KillLogBox;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		float fRemainTime;	//Game Remain Time
 
@@ -55,4 +58,5 @@ public:
 	void UpdateHpBar();
 	void ShowRespawnWidget();
 	void HideRespawnWidget();
+	void UpdateKillLog(const FString& Attacker,const FString& Victim);
 };

@@ -8,7 +8,10 @@ class Server
 {
 public:
 
-	enum class STATE { ST_FREE,ST_USING };
+	enum class STATE { 
+		ST_FREE,ST_MATHCING,ST_USING,	//GameServer
+		ST_DB							//DB
+	};
 	Server();
 	virtual ~Server();
 

@@ -4,10 +4,12 @@
 #include <vector>
 #include "Game/Network/Network.h"
 #include "Game/Network/Thread/WorkerThread/WorkerThread.h"
+#include "Game/Network/Thread/TimerThread/TimerThread.h"
 #include "Game/Object/Object.h"
 #include "Game/Object/Character/Character.h"
 #include "Game/Object/Character/Player/Player.h"
 #include "Game/Server/Server.h"
+#include "Game/Server/GameServer/GameServer.h"
 
 #pragma comment (lib,"WS2_32.lib")
 #pragma comment (lib,"MSWSock.lib")
@@ -52,10 +54,11 @@ int main()
 	}
 	for (int i = 0; i < MAX_SERVER; ++i)
 	{
-		servers[i] = new Server();
+		servers[i] = new GameServer();
 	}
 	std::cout << "Creating Worker Threads\n";
 	vector<thread> worker_threads;
+	thread timer_thread{ TimerThread };
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
 	//D:\\sumin\\Graduation\\GraduationProject\\Server\\FPP_Server\\x64\\Debug\\FPP_Server.exe
@@ -65,7 +68,7 @@ int main()
 
 	for (auto& th : worker_threads)
 		th.join();
-
+	timer_thread.join();
 	//스레드가 다 끝남. 그러니까 뮤텍스 필요없음.
 	for (auto& object : objects) {
 		if (!object->isPlayer()) break;

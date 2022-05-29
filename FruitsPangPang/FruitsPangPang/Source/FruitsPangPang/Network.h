@@ -34,7 +34,7 @@ void send_respawn_packet(SOCKET& sock, const char& WannaRespawn);
 void send_PreGameSettingComplete_packet(SOCKET& sock);
 void send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType = 0);
 void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid);
-
+void send_match_request(SOCKET& sock,const short& Amount = -1);
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {
@@ -56,6 +56,8 @@ public:
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
+	short GameServerPort = -1;		//게임서버 접속용 port
+	int mGameMode = 0;	//0 = PlayerMode, 1= AIMode
 	Network();
 	~Network();
 private:
