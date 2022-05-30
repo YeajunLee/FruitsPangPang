@@ -19,6 +19,7 @@ const char LG_PACKET_LOGIN_OK = 1;
 struct gl_packet_login {
 	unsigned char size;
 	char type;
+	short port;
 
 };
 
