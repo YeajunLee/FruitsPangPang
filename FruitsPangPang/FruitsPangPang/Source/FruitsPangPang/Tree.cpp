@@ -7,12 +7,13 @@
 #include "BaseCharacter.h"
 #include "Inventory.h"
 #include "AICharacter.h"
+#include "PointOfInterestComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ATree::ATree()
     : CanHarvest(false)
 {
-
+    POIcomp = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
 }
 
 
