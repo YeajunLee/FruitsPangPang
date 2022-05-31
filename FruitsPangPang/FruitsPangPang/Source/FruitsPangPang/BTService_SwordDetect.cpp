@@ -7,7 +7,7 @@
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 
 UBTService_SwordDetect::UBTService_SwordDetect()
 {
@@ -26,7 +26,7 @@ void UBTService_SwordDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	if (nullptr == World) return;
 
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 900.0f;
+	float DetectRadius = 5000.0f;
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
@@ -43,17 +43,21 @@ void UBTService_SwordDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	{
 		for (FOverlapResult OverlapResult : OverlapResults)
 		{
-			AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
+			//AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
+			auto Character = Cast<ABaseCharacter>(OverlapResult.GetActor());
 
-			if (nullptr != myCharacter)
+
+			if (nullptr != Character)
 			{
+				UE_LOG(LogTemp, Log, TEXT("find enemy!!(sword_AI)"));
+
 				// Character면, 블랙보드에 저장한다.
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, myCharacter);
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, Character);
 
 				// 디버깅 용.
 				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-				DrawDebugPoint(World, myCharacter->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), myCharacter->GetActorLocation(), FColor::Blue, false, 0.2f);
+				DrawDebugPoint(World, Character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Character->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return;
 			}
 		}

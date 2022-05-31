@@ -4,7 +4,7 @@
 #include "BTService_TargetTracking.h"
 #include "AIController_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -20,7 +20,8 @@ void UBTService_TargetTracking::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn) return;
 
-	auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	//auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
 	if (Target)
 	{
 		FVector LookVector = Target->GetActorLocation() - ControllingPawn->GetActorLocation();

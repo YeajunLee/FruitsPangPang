@@ -6,7 +6,7 @@
 #include "AIController_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 
 UBTService_Detect::UBTService_Detect()
 {
@@ -44,17 +44,19 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		for (FOverlapResult OverlapResult : OverlapResults)
 		{
-			AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
+			//AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
+			ABaseCharacter* character = Cast<ABaseCharacter>(OverlapResult.GetActor());
 
-			if (nullptr != myCharacter)
+			if (nullptr != character)
 			{
+				UE_LOG(LogTemp, Log, TEXT("find enemy!!"));
 				// Character면, 블랙보드에 저장한다.
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, myCharacter);
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, character);
 
 				// 디버깅 용.
 				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-				DrawDebugPoint(World, myCharacter->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), myCharacter->GetActorLocation(), FColor::Blue, false, 0.2f);
+				DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+				DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return;
 			}
 		}
