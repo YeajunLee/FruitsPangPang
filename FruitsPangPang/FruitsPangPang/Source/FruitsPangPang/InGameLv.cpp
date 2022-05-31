@@ -47,7 +47,7 @@ void AInGameLv::BeginPlay() {
 	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
 	mc1->GameState = 1;
 	mc1->FinishSpawning(trans);
-	CreateLoadingWidget();
+	//CreateLoadingWidget();
 	Conn();
 
 	//To Loading ...

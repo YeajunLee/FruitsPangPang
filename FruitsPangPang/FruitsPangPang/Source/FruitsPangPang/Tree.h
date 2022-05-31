@@ -28,6 +28,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact | Tree")
 		bool CanHarvest;	//사실, 서버에서 수확가능을 판정하기때문에 필요없지만 불필요한 패킷을 보내는걸 막기 위해서 만들었다.
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class  UPointOfInterestComponent* POIcomp;
+
 	void GenerateFruit(int _FruitType);
 	void HarvestFruit();
 
