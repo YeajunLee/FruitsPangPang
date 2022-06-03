@@ -504,6 +504,7 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[id]->c_id = packet->id;
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+			mMyCharacter->mScoreWidget = mMyCharacter->mInventory->mMainWidget->mScoreWidget;
 		}
 		else {
 			FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
@@ -520,6 +521,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id]->c_id = packet->id;
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+				mMyCharacter->mScoreWidget = mMyCharacter->mInventory->mMainWidget->mScoreWidget;
 			}
 		}
 

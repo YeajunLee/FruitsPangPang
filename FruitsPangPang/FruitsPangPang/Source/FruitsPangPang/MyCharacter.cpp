@@ -30,6 +30,10 @@
 #include "GameMatchWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
+#include "PointOfInterestWidget.h"
+#include "PointOfInterestComponent.h"
+#include "ScoreWidget.h"
+#include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -105,6 +109,9 @@ AMyCharacter::AMyCharacter()
 	{
 		dizzySound = dizzySoundAsset.Object;
 	}
+
+	POIcomponent = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
+	
 }
 
 // Called when the game starts or when spawned
@@ -181,7 +188,7 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 200);
 
 		
-
+		
 		//if (Network::GetNetwork()->init())
 		//{
 		//	//Network::GetNetwork()->C_Recv();
@@ -246,8 +253,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		
 	}
 
-	//SwordInTheBag();
-	
+	//ShowedInMinimap();
 
 }
 
@@ -873,6 +879,24 @@ void AMyCharacter::DropSwordAnimation()
 	}
 
 	send_anim_packet(s_socket, Network::AnimType::DropSword);
+}
+
+void AMyCharacter::ShowedInMinimap()
+{
+	
+	if (mScoreWidget != nullptr)
+	{
+		if (mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
+		{
+			POIcomponent->isOn = true;
+		}
+		else if (mScoreWidget->ScoreBoard[1].GetCharacter()->c_id == this->c_id)
+		{
+			POIcomponent->isOn = false;
+		}
+		else
+			POIcomponent->isOn = false;
+	}
 }
 
 void AMyCharacter::Throw()

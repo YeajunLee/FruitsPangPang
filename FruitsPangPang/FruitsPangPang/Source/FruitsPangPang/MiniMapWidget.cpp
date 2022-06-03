@@ -19,6 +19,7 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 	
 	mPointOfInterestWidget->Owner = actor;
 	mPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
+	mPointOfInterestWidget->isOn = mPOIComponent->isOn;
 
 	//mPOIComponent->isStatic =  mPointOfInterestWidget->isStatic;
 	
@@ -26,3 +27,4 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 	MapOverlay->AddChildToOverlay(mPointOfInterestWidget)->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
 	
 }
+

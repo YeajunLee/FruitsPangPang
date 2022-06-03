@@ -8,6 +8,7 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Components/Image.h"
+#include "Engine/Texture2D.h"
 #include "Math/Vector2D.h"
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -32,34 +33,49 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 	ownerLocX = Owner->GetActorLocation().X;
 	ownerLocY = Owner->GetActorLocation().Y;
 
+	isOn = Network::GetNetwork()->mMyCharacter->POIcomponent->isOn;
+
+
 	// dimension 을 Main widget에서 W_Minimap의 사이즈(350)으로 나누는 것임
 
-	 /*FVector2D((
-		 playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
-		 .Size();
+	
+	
+		SetRenderTranslation(FindCoord(
+			FVector2D((
+				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
+			.Size(),
+			FindAngle(FVector2D(0, 0), FVector2D((
+				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom)))
+		));
 
-	 FindAngle(FVector2D(0,0), FVector2D((
-		 playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom)));*/
+		if (isStatic == false)
+		{
+			if (FVector2D((
+				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
+				.Size() > 165)
+			{
+				CustomImage->SetVisibility(ESlateVisibility::Hidden);
+			}
+			else
+				CustomImage->SetVisibility(ESlateVisibility::Visible);
+		}
 
-	 SetRenderTranslation( FindCoord(
-		 FVector2D((
-			 playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
-		 .Size(),
-		 FindAngle(FVector2D(0,0), FVector2D((
-			 playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom)))
-	 ));
-	 
-	 if (isStatic == false)
-	 {
-		 if (FVector2D((
-			 playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
-			 .Size()>165)
-		 {
-			 CustomImage->SetVisibility(ESlateVisibility::Hidden);
-		 }
-		 else
-			 CustomImage->SetVisibility(ESlateVisibility::Visible);
-	 }
+	
+		if (isOn == false)
+		{
+			//Network::GetNetwork()->mMyCharacter->POIcomponent->iconImage;
+			CustomImage->SetVisibility(ESlateVisibility::Hidden);
+			
+		}
+
+		/*if (isOn == true)
+		{
+			if (isStatic == true)
+			{
+				CustomImage->SetVisibility(ESlateVisibility::Visible);
+			}
+		}*/
+		
 }
 
 float UPointOfInterestWidget::FindAngle(FVector2D a, FVector2D b)

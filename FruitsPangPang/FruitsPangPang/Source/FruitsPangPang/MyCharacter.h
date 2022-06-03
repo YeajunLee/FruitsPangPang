@@ -183,8 +183,13 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
+	class UPointOfInterestWidget* mPOIWidget;
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class  UPointOfInterestComponent* POIcomponent;
+	void ShowedInMinimap();
+	class UScoreWidget* mScoreWidget;
+	//class UImage* myImage;
 	
 protected:
 	// Called when the game starts or when spawned
