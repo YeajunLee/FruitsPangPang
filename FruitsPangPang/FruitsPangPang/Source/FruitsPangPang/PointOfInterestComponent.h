@@ -30,6 +30,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UTexture2D* iconImage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UTexture2D* iconImage2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isOn;
 	
 

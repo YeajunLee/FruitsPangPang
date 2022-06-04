@@ -195,7 +195,8 @@ void AMyCharacter::BeginPlay()
 		//	send_login_packet(s_socket);
 		//}
 	}
-
+	
+	
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -253,7 +254,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		
 	}
 
-	//ShowedInMinimap();
+	ShowedInMinimap();
 
 }
 
@@ -888,14 +889,14 @@ void AMyCharacter::ShowedInMinimap()
 	{
 		if (mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
 		{
-			POIcomponent->isOn = true;
+			POIcomponent->isOn = false;
 		}
 		else if (mScoreWidget->ScoreBoard[1].GetCharacter()->c_id == this->c_id)
 		{
-			POIcomponent->isOn = false;
+			POIcomponent->isOn = true;
 		}
 		else
-			POIcomponent->isOn = false;
+			POIcomponent->isOn = true;
 	}
 }
 

@@ -15,7 +15,7 @@
 
 //void UPointOfInterestWidget::NativeConstruct()
 //{
-//		
+//	
 //}
 
 
@@ -38,7 +38,8 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 
 	// dimension 을 Main widget에서 W_Minimap의 사이즈(350)으로 나누는 것임
 
-	
+	//CustomImage2->SetVisibility(ESlateVisibility::Hidden);
+
 	
 		SetRenderTranslation(FindCoord(
 			FVector2D((
@@ -63,18 +64,15 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 	
 		if (isOn == false)
 		{
-			//Network::GetNetwork()->mMyCharacter->POIcomponent->iconImage;
-			CustomImage->SetVisibility(ESlateVisibility::Hidden);
-			
+			if(Cast<AMyCharacter>(Owner))
+				CustomImage2->SetVisibility(ESlateVisibility::Hidden);
 		}
 
-		/*if (isOn == true)
+		if (isOn == true)
 		{
-			if (isStatic == true)
-			{
-				CustomImage->SetVisibility(ESlateVisibility::Visible);
-			}
-		}*/
+			if (Cast<AMyCharacter>(Owner))
+			CustomImage2->SetVisibility(ESlateVisibility::Visible);
+		}
 		
 }
 

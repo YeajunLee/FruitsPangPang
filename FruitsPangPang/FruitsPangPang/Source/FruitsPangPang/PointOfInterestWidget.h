@@ -25,7 +25,8 @@ public:
 		class USizeBox* SizeBox0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (BindWidget))
 		class UImage* CustomImage;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UImage* CustomImage2;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class AActor* Owner;
