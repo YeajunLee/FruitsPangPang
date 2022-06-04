@@ -183,7 +183,6 @@ public:
 	void PickSwordAnimation();
 	void DropSwordAnimation();
 
-	class UPointOfInterestWidget* mPOIWidget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class  UPointOfInterestComponent* POIcomponent;

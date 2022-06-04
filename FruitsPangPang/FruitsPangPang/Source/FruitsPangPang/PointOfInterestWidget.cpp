@@ -35,7 +35,6 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 
 	isOn = Network::GetNetwork()->mMyCharacter->POIcomponent->isOn;
 
-
 	// dimension 을 Main widget에서 W_Minimap의 사이즈(350)으로 나누는 것임
 
 	//CustomImage2->SetVisibility(ESlateVisibility::Hidden);
@@ -84,5 +83,5 @@ float UPointOfInterestWidget::FindAngle(FVector2D a, FVector2D b)
 
 FVector2D UPointOfInterestWidget::FindCoord(float radius, float degree)
 {
-	return FVector2D(FMath::Sin(degree) * FMath::Clamp(radius, 0.0f, 165.f) * (-1) +165,FMath::Cos(degree) * FMath::Clamp(radius, 0.0f, 165.f)*(-1) );
+	return FVector2D(FMath::Sin(degree) * FMath::Clamp(radius, 0.0f, 165.f) * (-1) +140,FMath::Cos(degree) * FMath::Clamp(radius, 0.0f, 165.f)*(-1) );
 }

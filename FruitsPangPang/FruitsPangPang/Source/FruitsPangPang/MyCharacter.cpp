@@ -30,7 +30,6 @@
 #include "GameMatchWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
-#include "PointOfInterestWidget.h"
 #include "PointOfInterestComponent.h"
 #include "ScoreWidget.h"
 #include "Components/Image.h"
@@ -111,6 +110,7 @@ AMyCharacter::AMyCharacter()
 	}
 
 	POIcomponent = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
+	
 	
 }
 
