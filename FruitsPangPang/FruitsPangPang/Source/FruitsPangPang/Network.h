@@ -49,7 +49,7 @@ public:
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
-
+	FString MyCharacterName;
 	UPROPERTY()
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];

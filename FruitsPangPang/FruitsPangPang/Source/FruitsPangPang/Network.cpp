@@ -128,6 +128,7 @@ void send_login_packet(SOCKET& sock,const char& type)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 	packet.cType = type;
+	strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
@@ -342,6 +343,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mMyCharacter->c_id = packet->id;
+		mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 		//mId = packet->id;
 		for (int i = 0; i < TREE_CNT; ++i)
 		{
@@ -780,6 +782,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 			mMyCharacter->mMainWidget->bActivate = true;
 			mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
+			MyCharacterName = mMyCharacter->CharacterName;
 			FInputModeGameOnly gamemode;
 			if (nullptr != controller)
 			{

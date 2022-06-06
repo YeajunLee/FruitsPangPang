@@ -181,6 +181,7 @@ struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
 };
