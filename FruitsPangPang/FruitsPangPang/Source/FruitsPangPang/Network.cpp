@@ -15,6 +15,8 @@
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
 #include "GameMatchWidget.h"
+#include "PointOfInterestWidget.h"
+#include "MiniMapWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -710,6 +712,7 @@ void Network::process_packet(unsigned char* p)
 			controller->SetInputMode(gamemode);
 			controller->SetShowMouseCursor(false);
 		}
+		mMyCharacter->mMainWidget->W_MiniMap_0->mPointOfInterestWidget->bTickActive = true;
 		break;
 	}
 	case SC_PACKET_GAMEEND: {

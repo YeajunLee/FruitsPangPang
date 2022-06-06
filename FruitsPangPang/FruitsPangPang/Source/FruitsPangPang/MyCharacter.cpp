@@ -254,7 +254,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		
 	}
 
-	ShowedInMinimap();
+	//ShowedInMinimap();
 
 }
 
@@ -890,10 +890,6 @@ void AMyCharacter::ShowedInMinimap()
 		if (mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
 		{
 			POIcomponent->isOn = false;
-		}
-		else if (mScoreWidget->ScoreBoard[1].GetCharacter()->c_id == this->c_id)
-		{
-			POIcomponent->isOn = true;
 		}
 		else
 			POIcomponent->isOn = true;
