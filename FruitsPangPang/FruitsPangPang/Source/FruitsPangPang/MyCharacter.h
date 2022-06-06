@@ -188,6 +188,9 @@ public:
 		class  UPointOfInterestComponent* POIcomponent;
 	void ShowedInMinimap();
 	class UScoreWidget* mScoreWidget;
+
+	//나중에 안쓸 시 지울 것.
+	//class UTexture2D* myEnemy1Icon;
 	
 	
 protected:

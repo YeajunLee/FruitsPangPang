@@ -33,6 +33,7 @@
 #include "PointOfInterestComponent.h"
 #include "ScoreWidget.h"
 #include "Components/Image.h"
+#include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -111,7 +112,12 @@ AMyCharacter::AMyCharacter()
 
 	POIcomponent = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
 	
-	
+	// 나중에 안쓸 시 지울것
+	/*static ConstructorHelpers::FObjectFinder<UTexture2D> myEnemyIconPath(TEXT("/Game/MiniMap/NothingIMG.NothingIMG"));
+	if (myEnemyIconPath.Succeeded())
+	{
+		myEnemy1Icon = myEnemyIconPath.Object;
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -254,8 +260,9 @@ void AMyCharacter::Tick(float DeltaTime)
 		
 	}
 
-	//ShowedInMinimap();
+	ShowedInMinimap();
 
+	
 }
 
 // Called to bind functionality to input

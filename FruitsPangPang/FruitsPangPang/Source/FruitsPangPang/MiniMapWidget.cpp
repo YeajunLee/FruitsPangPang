@@ -21,8 +21,6 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 	mPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
 	mPointOfInterestWidget->isOn = mPOIComponent->isOn;
 	mPointOfInterestWidget->isCharacter = mPOIComponent->isCharacter;
-
-	//mPOIComponent->isStatic =  mPointOfInterestWidget->isStatic;
 	
 	auto poiWGT = MapOverlay->AddChildToOverlay(mPointOfInterestWidget);
 	poiWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);

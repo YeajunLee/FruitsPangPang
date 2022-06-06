@@ -42,6 +42,7 @@ public:
 
 	float FindAngle(FVector2D a, FVector2D b);
 	FVector2D FindCoord(float radius, float degree);
+	
 private:
 	float mDimension;
 	float mZoom;
@@ -56,4 +57,5 @@ private:
 	float enemyLocY;
 
 	float score0_id;
+
 };
