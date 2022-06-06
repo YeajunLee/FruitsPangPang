@@ -1,6 +1,10 @@
 #pragma once
 
-const int  MAX_SERVER = 10;
+//-------------------------
+const short DBSERVER_PORT = 4200;
+const int	GAMESERVER_START = 0;
+const int	MAX_SERVER = 10;
+//------------------------
 
 //-------------------------
 // 1 ~ 99 is Client - Server Number   - Do Not Use This Number

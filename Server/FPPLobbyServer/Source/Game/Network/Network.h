@@ -13,6 +13,7 @@ extern SOCKET s_socket;
 
 extern std::array<class Object*, MAX_OBJECT> objects;
 extern std::array<class Server*, MAX_SERVER> servers;
+extern class DBServer* dbserver;
 extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 void error_display(int err_no);
 int Generate_Id();

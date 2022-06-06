@@ -5,6 +5,7 @@
 #include "../Object/Character/Player/Player.h"
 #include "../Server/Server.h"
 #include "../Server/GameServer/GameServer.h"
+#include "../Server/DBServer/DBServer.h"
 
 using namespace std;
 
@@ -12,6 +13,7 @@ HANDLE hiocp;
 SOCKET s_socket;
 std::array<Object*, MAX_OBJECT> objects;
 std::array<Server*, MAX_SERVER> servers;
+class DBServer* dbserver;
 concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
