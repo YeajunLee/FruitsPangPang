@@ -24,6 +24,7 @@ void Server::recvPacket()
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			Disconnect(_id);
 		}
 	}
 }
@@ -47,6 +48,7 @@ void Server::sendPacket(void* packet, int bytes)
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			Disconnect(_id);
 		}
 	}
 }

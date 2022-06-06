@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="Source\DB\DB.cpp" />
     <ClCompile Include="Source\Game\Network\Network.cpp" />
+    <ClCompile Include="Source\Game\Network\Thread\TimerThread\TimerThread.cpp" />
     <ClCompile Include="Source\Game\Network\Thread\WorkerThread\WorkerThread.cpp" />
     <ClCompile Include="Source\Game\Server\Server.cpp" />
     <ClCompile Include="Source\main.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Source\DB\DB.h" />
     <ClInclude Include="Source\Game\Network\Network.h" />
     <ClInclude Include="Source\Game\Network\Thread\WorkerThread\WorkerThread.h" />
+    <ClInclude Include="Source\Game\Network\Thread\TimerThread\TimerThread.h" />
     <ClInclude Include="Source\Game\Server\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

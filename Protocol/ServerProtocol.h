@@ -9,8 +9,15 @@ const int  MAX_NAME_LEN = 21;
 
 //-------------------------
 // 1 ~ 99 is Client - Server Number   - Do Not Use This Number
-// 100~ 199 is Server - Server Number - Use this Number
+// 100~ 120 is Server - Server Number - Use this Number
+// 125 - Ping Test
 //-------------------------
+
+const char PING_TEST = 125;
+struct ping_test {
+	unsigned char size;
+	char type;
+};
 
 const char GL_PACKET_LOGIN = 100;
 

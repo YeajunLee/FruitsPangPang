@@ -18,7 +18,7 @@ void WorkerThread()
 			int err_no = WSAGetLastError();
 			std::cout << "GQCS Error";
 			error_display(err_no);
-			//Disconnect(client_id);
+			Disconnect(client_id);
 			if (wsa_ex->getCmd() == CMD_SEND)
 				delete wsa_ex;
 			continue;
@@ -51,6 +51,29 @@ void WorkerThread()
 			server->recvPacket();
 			break;
 		}
+		case CMD_PING_TEST: {
+			Server* server = reinterpret_cast<Server*>(servers[client_id]);
+			server->state_lock.lock();
+			if (server->_state != Server::STATE::ST_FREE)
+			{
+				server->state_lock.unlock();
+				send_ping_test(client_id);		
+				Timer_Event instq;
+				instq.server_id = client_id;
+				instq.type = Timer_Event::TIMER_TYPE::TYPE_PING_TEST;
+				instq.exec_time = chrono::system_clock::now() + 1000ms;
+				timer_queue.push(instq);
+				cout << "["<< client_id << "]핑테스트" << endl;
+			}
+			else {
+				server->state_lock.unlock();
+				cout << "핑테스트 취소" << endl;
+			}
+
+
+			delete wsa_ex;
+			break;
+		}
 		case CMD_SEND: {
 			//if (num_byte != wsa_ex->_wsa_buf.len) {
 			//	Disconnect(client_id);
@@ -74,6 +97,12 @@ void WorkerThread()
 
 			CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), hiocp, new_id, 0);
 			server->recvPacket();
+
+			Timer_Event instq;
+			instq.server_id = new_id;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_PING_TEST;
+			instq.exec_time = chrono::system_clock::now() + 1000ms;
+			timer_queue.push(instq);
 
 			ZeroMemory(&wsa_ex->getWsaOver(), sizeof(wsa_ex->getWsaOver()));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);

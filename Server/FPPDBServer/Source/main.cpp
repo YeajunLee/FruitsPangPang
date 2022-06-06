@@ -2,6 +2,7 @@
 #include <vector>
 #include "Game/Network/Network.h"
 #include "Game/Network/Thread/WorkerThread/WorkerThread.h"
+#include "Game/Network/Thread/TimerThread/TimerThread.h"
 #include "Game/Server/Server.h"
 #include "DB/DB.h"
 
@@ -46,13 +47,15 @@ int main()
 	}
 
 	std::cout << "Creating Worker Threads\n";
+	thread timer_thread{ TimerThread };
 	vector<thread> worker_threads;
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
 
-
 	for (auto& th : worker_threads)
 		th.join();
+	timer_thread.join();
+
 	//스레드가 다 끝남. 그러니까 뮤텍스 필요없음.
 	//for (auto& object : objects) {
 	//	if (!object->isPlayer()) break;

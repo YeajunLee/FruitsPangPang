@@ -9,6 +9,7 @@ using namespace std;
 HANDLE hiocp;
 SOCKET s_socket;
 std::array<Server*, MAX_SERVER> servers;
+concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 
 
@@ -39,6 +40,15 @@ void error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
+void Disconnect(int c_id)
+{
+	auto server = reinterpret_cast<Server*>(servers[c_id]);
+	server->state_lock.lock();
+	closesocket(server->_socket);
+	server->_state = Server::STATE::ST_FREE;
+	server->state_lock.unlock();
+}
+
 void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype)
 {
 	auto server = reinterpret_cast<Server*>(servers[server_id]);
@@ -51,6 +61,17 @@ void send_login_authorization_ok_packet(const int& server_id,const int& player_i
 	packet.loginsuccess = succestype;
 	packet.coin = coin;
 	packet.skintype = skintype;
+	server->sendPacket(&packet, sizeof(packet));
+}
+
+void send_ping_test(const int& server_id)
+{
+	auto server = reinterpret_cast<Server*>(servers[server_id]);
+	ping_test packet;
+	memset(&packet, 0, sizeof(ping_test));
+
+	packet.size = sizeof(packet);
+	packet.type = PING_TEST;
 	server->sendPacket(&packet, sizeof(packet));
 }
 
