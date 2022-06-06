@@ -81,6 +81,7 @@ void UScoreWidget::UpdateRank()
 		switch (i)
 		{
 		case 0:
+			//No_1Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_1Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), ScoreBoard[i].GetCharacter()->c_id));
 			No_1Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;

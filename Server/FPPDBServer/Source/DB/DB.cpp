@@ -118,7 +118,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 
 				SQLCancel(hstmt);
 
-				if (0 == strcmp(p_info.p_name, name))
+				if (0 == strcmp(p_info.p_password, password))
 				{
 					return true;
 				}

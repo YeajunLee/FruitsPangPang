@@ -7,7 +7,7 @@ const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
 const int GAMEPLAYTIME_CHEAT_MILLI = 10'000;
-const int  MAX_NAME_SIZE = 20;
+const int  MAX_NAME_SIZE = 21;
 const int USER_START = 0;
 const int  MAX_USER = 8;
 const int TREE_CNT = 56;
@@ -39,6 +39,7 @@ const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
 const char CL_PACKET_MATCH_REQUEST = 14;
+const char CL_PACKET_LOGIN = 15;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -161,6 +162,14 @@ struct cs_packet_cheat {
 	char itemType;
 };
 //-------------------- client to LobbyServer
+
+struct cl_packet_login {
+	unsigned char size;
+	char	type;
+	char	name[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
+};
+
 struct cl_packet_match_request {
 	unsigned char size;
 	char type;
@@ -308,6 +317,10 @@ struct lc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	char name[MAX_NAME_SIZE];
+	char loginsuccess;			//1 성공, 0이하 - 실패
+	int coin;
+	short skintype;
 };
 
 struct lc_packet_match_response {

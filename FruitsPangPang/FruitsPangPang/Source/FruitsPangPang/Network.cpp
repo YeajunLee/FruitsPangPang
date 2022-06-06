@@ -15,6 +15,7 @@
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
 #include "GameMatchWidget.h"
+#include "MessageBoxWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -127,8 +128,18 @@ void send_login_packet(SOCKET& sock,const char& type)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 	packet.cType = type;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
 
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_login), &packet);
+void send_login_lobby_packet(SOCKET& sock, const char* name, const char* password)
+{
+	cl_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_PACKET_LOGIN;
+	strcpy_s(packet.name, name);
+	strcpy_s(packet.password, password);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
@@ -500,6 +511,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->c_id = packet->id;
+			mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 		}
@@ -516,6 +528,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->c_id = packet->id;
+				mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 			}
@@ -760,14 +773,29 @@ void Network::process_LobbyPacket(unsigned char* p)
 	switch (Type) {
 	case LC_PACKET_LOGIN_OK: {
 		lc_packet_login_ok* packet = reinterpret_cast<lc_packet_login_ok*>(p);
-		mMyCharacter->mLoginWidget->RemoveFromParent();
-		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
-		mMyCharacter->mMainWidget->bActivate = true;
-		FInputModeGameOnly gamemode;
-		if (nullptr != controller)
+		switch (packet->loginsuccess)
 		{
-			controller->SetInputMode(gamemode);
-			controller->SetShowMouseCursor(false);
+		case 1:{
+			mMyCharacter->mLoginWidget->RemoveFromParent();
+			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+			mMyCharacter->mMainWidget->bActivate = true;
+			mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
+			FInputModeGameOnly gamemode;
+			if (nullptr != controller)
+			{
+				controller->SetInputMode(gamemode);
+				controller->SetShowMouseCursor(false);
+			}
+			break;
+		}
+		default:{
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
+			MessageBoxWGT->AddToViewport();
+			MessageBoxWGT->MakeMessageBoxWithCode(packet->loginsuccess);
+			break;
+		}
 		}
 		break;
 	}

@@ -13,6 +13,8 @@ extern std::array<class Server*, MAX_SERVER> servers;
 
 void error_display(int err_no);
 
+void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype);
+
 int Generate_ServerId();
 void process_packet(int client_id, unsigned char* p);
 

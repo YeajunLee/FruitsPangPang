@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Network.h"
+#include "../../DB/DB.h"
 #include "../Server/Server.h"
 
 using namespace std;
@@ -38,6 +39,21 @@ void error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
+void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype)
+{
+	auto server = reinterpret_cast<Server*>(servers[server_id]);
+	dl_packet_login_author_ok packet;
+	memset(&packet, 0, sizeof(dl_packet_login_author_ok));
+
+	packet.size = sizeof(packet);
+	packet.type = DL_PACKET_LOGIN_AUTHOR_OK;
+	packet.playerid = player_id;
+	packet.loginsuccess = succestype;
+	packet.coin = coin;
+	packet.skintype = skintype;
+	server->sendPacket(&packet, sizeof(packet));
+}
+
 int Generate_ServerId()
 {
 	static int g_serverid = 0;
@@ -66,11 +82,11 @@ void process_packet(int client_id, unsigned char* p)
 	Server* server = servers[client_id];
 
 	switch (packet_type) {
-	case LG_PACKET_LOGIN_OK: {
-		lg_packet_login_ok* packet = reinterpret_cast<lg_packet_login_ok*>(p);
-
-		cout << client_id << "번째 접속 완\n";
-
+	case LD_PACKET_LOGIN_AUTHOR: {
+		ld_packet_login_author* packet = reinterpret_cast<ld_packet_login_author*>(p);
+		LoginInfo info{};
+		char ret = Login(packet->id, packet->pass, info);
+		send_login_authorization_ok_packet(client_id,packet->playerid, ret, info.p_coin, info.p_skintype);
 		break;
 	}
 	}

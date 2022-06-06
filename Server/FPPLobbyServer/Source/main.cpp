@@ -74,7 +74,7 @@ int main()
 	inet_pton(AF_INET, "127.0.0.1", &dbserver->server_addr.sin_addr);
 	dbserver->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(dbserver->wsa_server_recv.getBuf());
 	dbserver->wsa_server_recv.getWsaBuf().len = BUFSIZE;
-	dbserver->wsa_server_recv.setCmd(CMD_SERVER_RECV);
+	dbserver->wsa_server_recv.setCmd(CMD_DB_RECV);
 	ZeroMemory(&dbserver->wsa_server_recv.getWsaOver(), sizeof(dbserver->wsa_server_recv.getWsaOver()));
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(dbserver->_socket), hiocp, 1, 0);
 
