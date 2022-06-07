@@ -5,7 +5,7 @@
 #include "AICharacter.h"
 #include "AIController_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 #include "Math/UnrealMathUtility.h"
 
 UBTTaskNode_TurnToTarget::UBTTaskNode_TurnToTarget()
@@ -22,7 +22,9 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 
-	auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	//auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+
 	if (nullptr == Target)
 		return EBTNodeResult::Failed;
 

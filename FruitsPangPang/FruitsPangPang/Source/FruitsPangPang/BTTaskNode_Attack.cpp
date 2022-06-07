@@ -6,7 +6,7 @@
 #include "AIController_Custom.h"
 #include "Inventory.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 
 UBTTaskNode_Attack::UBTTaskNode_Attack()
 {
@@ -23,7 +23,9 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     if (nullptr == AICharacter)
         return EBTNodeResult::Failed;
 
-    auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+    //auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+    auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+
     if (nullptr == Target)
         return EBTNodeResult::Failed;
     if (Target->bIsDie)

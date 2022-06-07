@@ -7,7 +7,7 @@
 #include "NavigationSystem.h"
 //#include "AI_SwordCharacter.h"
 #include "AICharacter.h"
-#include "MyCharacter.h"
+//#include "MyCharacter.h"
 #include "Punnet.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -63,6 +63,7 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 			APunnet* punnet = Cast<APunnet>(OverlapResult.GetActor());
 			if (nullptr != punnet)
 			{
+				//UE_LOG(LogTemp, Log, TEXT("Punnet Find!!"));
 				punnets.emplace_back(punnet);
 			}
 		}
