@@ -20,6 +20,8 @@ std::atomic_bool GameActive = true;
 std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
 concurrency::concurrent_queue <Log> logger;
+const char* RandomAIName[] = { "Anderson","Allen","Adams","Brown","Baker","Bailey","Bell","Brooks","Clark","Collins","Davis","Evans","Flores","Howard","Garcia","Jones","Kelly",
+"Miller","Martin","Nelson","Ortiz","Lewis","Phillips","Parker","Robinson","Rivera","Ross","Smith","Scott","Taylor","Turner","Wright","Ward" };
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
 	: _cmd(cmd)
@@ -75,6 +77,7 @@ int Generate_Id()
 		{
 			user->_state = Character::STATE::ST_ACCEPT;
 			user->state_lock.unlock();
+			cout << i <<"번째 캐릭터 입장"<< endl;
 			return i;
 		}
 		user->state_lock.unlock();
@@ -104,11 +107,14 @@ void Disconnect(int c_id)
 }
 
 
-void send_login_ok_packet(int player_id)
+void send_login_ok_packet(int player_id, const char* playername)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_login_ok packet;
 	memset(&packet, 0, sizeof(sc_packet_login_ok));
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_LOGIN_OK;
 
 	for (int i = TREEID_START,tree = 0; i < TREEID_END; ++i,++tree)
 	{		
@@ -121,15 +127,14 @@ void send_login_ok_packet(int player_id)
 	}
 
 	packet.id = player_id;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_LOGIN_OK;
+	strcpy_s(packet.name, playername);
 	player->sendPacket(&packet, sizeof(packet));
 }
 
 void send_move_packet(int player_id, int mover_id, float value)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_move packet;
+	sc_packet_move packet{};
 	packet.id = mover_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_MOVE;
@@ -147,7 +152,7 @@ void send_move_packet(int player_id, int mover_id, float value)
 void send_anim_packet(int player_id, int animCharacter_id, char animtype)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_anim packet;
+	sc_packet_anim packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_ANIM;
 	packet.id = animCharacter_id;
@@ -164,7 +169,7 @@ void send_throwfruit_packet(const int& thrower_character_id, const int& other_ch
 )
 {
 	auto player = reinterpret_cast<Character*>(objects[other_character_id]);
-	sc_packet_spawnobj packet;
+	sc_packet_spawnobj packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_SPAWNOBJ;
 	packet.id = thrower_character_id;
@@ -180,7 +185,7 @@ void send_throwfruit_packet(const int& thrower_character_id, const int& other_ch
 void send_update_inventory_packet(int player_id, short slotNum)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_inventory packet;
+	sc_packet_update_inventory packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_INVENTORY;
 	packet.slotNum = slotNum;
@@ -193,7 +198,7 @@ void send_update_inventory_packet(int player_id, short slotNum)
 void send_update_interstat_packet(const int& player_id, const int& object_id, const bool& CanHarvest, const int& interactType, const int& FruitType)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_interstat packet;
+	sc_packet_update_interstat packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_INTERSTAT;
 	packet.useType = interactType;
@@ -207,7 +212,7 @@ void send_update_interstat_packet(const int& player_id, const int& object_id, co
 void send_remove_object_packet(int player_id, int removeCharacter_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_remove_object packet;
+	sc_packet_remove_object packet{};
 	packet.id = removeCharacter_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_REMOVE_OBJECT;
@@ -217,7 +222,7 @@ void send_remove_object_packet(int player_id, int removeCharacter_id)
 void send_update_userstatus_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_userstatus packet;
+	sc_packet_update_userstatus packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_USERSTATUS;
 	packet.hp = player->hp;
@@ -228,7 +233,7 @@ void send_update_userstatus_packet(int player_id)
 void send_die_packet(int player_id,int deadplayer_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_die packet;
+	sc_packet_die packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_DIE;
 	packet.id = deadplayer_id;
@@ -239,7 +244,7 @@ void send_respawn_packet(int player_id, int respawner_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	auto respawner = objects[respawner_id];
-	sc_packet_respawn packet;
+	sc_packet_respawn packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_RESPAWN;
 	packet.id = respawner_id;
@@ -251,14 +256,14 @@ void send_respawn_packet(int player_id, int respawner_id)
 	packet.rz = respawner->rz;
 	packet.rw = respawner->rw;
 
-	FPP_LOG("User[%d]의 리스폰을 User[%d]에게 알립니다.", respawner_id, player_id);
+	FPP_LOG("User[%d]의 리스폰을 User[%s]에게 알립니다.", respawner_id, player->name);
 	player->sendPacket(&packet, sizeof(packet));
 }
 
 void send_update_score_packet(int player_id,short* userdeathcount, short* userkillcount)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_update_score packet;
+	sc_packet_update_score packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_UPDATE_SCORE;
 	packet.id = player_id;
@@ -270,7 +275,7 @@ void send_update_score_packet(int player_id,short* userdeathcount, short* userki
 void send_gamewaiting_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_gamewaiting packet;
+	sc_packet_gamewaiting packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_GAMEWAITING;
 	player->sendPacket(&packet, sizeof(packet));
@@ -280,7 +285,7 @@ void send_gamewaiting_packet(int player_id)
 void send_gamestart_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_gamestart packet;
+	sc_packet_gamestart packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_GAMESTART;
 	player->sendPacket(&packet, sizeof(packet));
@@ -289,7 +294,7 @@ void send_gamestart_packet(int player_id)
 void send_gameend_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_gameend packet;
+	sc_packet_gameend packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_GAMEEND;
 	player->sendPacket(&packet, sizeof(packet));
@@ -298,7 +303,7 @@ void send_gameend_packet(int player_id)
 void send_cheat_changegametime_packet(int player_id)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_cheat_gametime packet;
+	sc_packet_cheat_gametime packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_CHEAT_GAMETIME;
 	packet.milliseconds = GAMEPLAYTIME_CHEAT_MILLI;
@@ -311,7 +316,7 @@ void send_sync_banana(const int& player_id,
 	const int& uniqueid)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
-	sc_packet_sync_banana packet;
+	sc_packet_sync_banana packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_SYNC_BANANA;
 	packet.rx = rx, packet.ry = ry, packet.rz = rz, packet.rw = rw;
@@ -325,7 +330,7 @@ void send_kill_info_packet(const int& player_id, const int& attacker_id, const i
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	auto attacker = reinterpret_cast<Character*>(objects[attacker_id]);
 	auto victim = reinterpret_cast<Character*>(objects[victim_id]);
-	sc_packet_kill_info packet;
+	sc_packet_kill_info packet{};
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_KILL_INFO;
 	strcpy_s(packet.Attacker, attacker->name);
@@ -344,12 +349,20 @@ void process_packet(int client_id, unsigned char* p)
 		Character* character = reinterpret_cast<Character*>(object);
 
 		strcpy_s(character->name, packet->name);
-		//임시 sprintf -05.30
-		sprintf_s(character->name, "%d", character->_id);
-
 		character->bAi = packet->cType;
-		send_login_ok_packet(client_id);
-		FPP_LOG("플레이어[%d] 접속", client_id);
+		//Ai는 이름을 랜덤으로 부여받음.
+		if (packet->cType == 1)
+		{
+			random_device rd;
+			mt19937 rng(rd());
+			uniform_int_distribution<int> randName(0, 32);
+			int randCnt = randName(rng);
+			strcpy_s(character->name, RandomAIName[randCnt]);
+		}
+
+		send_login_ok_packet(client_id, character->name);
+
+		FPP_LOG("플레이어[%s] 접속", character->name);
 
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
@@ -395,7 +408,7 @@ void process_packet(int client_id, unsigned char* p)
 
 			sc_packet_put_object packet;
 			packet.id = OtherPlayer->_id;
-			//strcpy_s(packet.name, OtherPlayer->name);
+			strcpy_s(packet.name, OtherPlayer->name);
 			packet.object_type = 0;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;

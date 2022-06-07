@@ -30,6 +30,7 @@ void UGameMatchWidget::NativeDestruct()
 
 void UGameMatchWidget::TryMatchingPlayer()
 {
+	Network::GetNetwork()->mGameMode = 0;
 	send_match_request(Network::GetNetwork()->mMyCharacter->l_socket);
 }
 

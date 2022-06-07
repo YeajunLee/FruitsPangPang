@@ -10,6 +10,7 @@
 #include "Game/Object/Character/Player/Player.h"
 #include "Game/Server/Server.h"
 #include "Game/Server/GameServer/GameServer.h"
+#include "Game/Server/DBServer/DBServer.h"
 
 #pragma comment (lib,"WS2_32.lib")
 #pragma comment (lib,"MSWSock.lib")
@@ -52,7 +53,8 @@ int main()
 		objects[i] = new Player();
 
 	}
-	for (int i = 0; i < MAX_SERVER; ++i)
+	dbserver = new DBServer();
+	for (int i = GAMESERVER_START; i < MAX_SERVER; ++i)
 	{
 		servers[i] = new GameServer();
 	}
@@ -61,9 +63,45 @@ int main()
 	thread timer_thread{ TimerThread };
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
-	//D:\\sumin\\Graduation\\GraduationProject\\Server\\FPP_Server\\x64\\Debug\\FPP_Server.exe
 	
-	ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), NULL, NULL, SW_SHOW);
+
+	//----------
+		//-----------------
+	dbserver->_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	ZeroMemory(&dbserver->server_addr, sizeof(dbserver->server_addr));
+	dbserver->server_addr.sin_family = AF_INET;
+	dbserver->server_addr.sin_port = htons(DBSERVER_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &dbserver->server_addr.sin_addr);
+	dbserver->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(dbserver->wsa_server_recv.getBuf());
+	dbserver->wsa_server_recv.getWsaBuf().len = BUFSIZE;
+	dbserver->wsa_server_recv.setCmd(CMD_DB_RECV);
+	ZeroMemory(&dbserver->wsa_server_recv.getWsaOver(), sizeof(dbserver->wsa_server_recv.getWsaOver()));
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(dbserver->_socket), hiocp, 1, 0);
+
+	int rt = connect(dbserver->_socket, reinterpret_cast<sockaddr*>(&dbserver->server_addr), sizeof(dbserver->server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		error_display(err_num);
+		system("pause");
+		//exit(0);
+		closesocket(dbserver->_socket);
+		return false;
+	}
+
+	DWORD recv_flag = 0;
+	int ret = WSARecv(dbserver->_socket, &dbserver->wsa_server_recv.getWsaBuf(), 1, NULL, &recv_flag, &dbserver->wsa_server_recv.getWsaOver(), NULL);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
+	//--------
+
 
 
 	for (auto& th : worker_threads)

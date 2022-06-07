@@ -23,5 +23,9 @@ public:
 	void recvPacket();
 	void PreRecvPacket(unsigned char* RemainMsg, int RemainBytes);
 	void sendPacket(void* packet, int bytes);
+public:
+	std::mutex Coin_lock;
+	int mCoin;
+	std::atomic_short mSkinType;
 };
 

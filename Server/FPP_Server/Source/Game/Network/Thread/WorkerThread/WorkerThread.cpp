@@ -86,18 +86,25 @@ void WorkerThread()
 			std::cout << "Accept Completed.\n";
 			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(wsa_ex->getBuf()));
 			int new_id = Generate_Id();
-			Character* player = reinterpret_cast<Character*>(objects[new_id]);
-			player->_id = new_id;
-			player->_state = Character::STATE::ST_ACCEPT;
-			player->_prev_size = 0;
-			player->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(player->wsa_ex_recv.getBuf());
-			player->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
-			player->wsa_ex_recv.setCmd(CMD_RECV);
-			ZeroMemory(&player->wsa_ex_recv.getWsaOver(), sizeof(player->wsa_ex_recv.getWsaOver()));
-			player->_socket = c_socket;
+			if (new_id != -1)
+			{
+				Character* player = reinterpret_cast<Character*>(objects[new_id]);
+				player->_id = new_id;
+				player->_state = Character::STATE::ST_ACCEPT;
+				player->_prev_size = 0;
+				player->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(player->wsa_ex_recv.getBuf());
+				player->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
+				player->wsa_ex_recv.setCmd(CMD_RECV);
+				ZeroMemory(&player->wsa_ex_recv.getWsaOver(), sizeof(player->wsa_ex_recv.getWsaOver()));
+				player->_socket = c_socket;
 
-			CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), hiocp, new_id, 0);
-			player->recvPacket();
+				CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), hiocp, new_id, 0);
+				player->recvPacket();
+			}
+			else if (new_id == -1)
+			{
+				closesocket(c_socket);
+			}
 
 			ZeroMemory(&wsa_ex->getWsaOver(), sizeof(wsa_ex->getWsaOver()));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);

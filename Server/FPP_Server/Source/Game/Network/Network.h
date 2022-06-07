@@ -21,13 +21,14 @@ extern std::atomic_bool GameActive;
 extern std::atomic_bool CheatGamePlayTime;
 extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 extern concurrency::concurrent_queue <struct Log> logger;
+extern const char* RandomAIName[];
 
 void error_display(int err_no);
 int Generate_Id();
 void Disconnect(int id);
 void process_packet(int client_id, unsigned char* p);
 void process_packet_for_Server(unsigned char* p);
-void send_login_ok_packet(int player_id);
+void send_login_ok_packet(int player_id,const char* playername);
 void send_move_packet(int player_id, int mover_id, float value);
 void send_anim_packet(int player_id, int animCharacter_id, char animtype);
 void send_throwfruit_packet(const int& thrower_character_id, const int& other_character_id,
