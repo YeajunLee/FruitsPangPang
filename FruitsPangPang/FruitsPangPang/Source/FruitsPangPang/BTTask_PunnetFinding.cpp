@@ -37,7 +37,7 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 	}
 
 	FVector source = ControllingPawn->GetActorLocation();
-	float DetectRadius = 10000.f;
+	float DetectRadius = 20000.f;
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
