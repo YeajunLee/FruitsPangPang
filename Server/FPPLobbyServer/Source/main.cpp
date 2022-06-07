@@ -71,7 +71,9 @@ int main()
 	ZeroMemory(&dbserver->server_addr, sizeof(dbserver->server_addr));
 	dbserver->server_addr.sin_family = AF_INET;
 	dbserver->server_addr.sin_port = htons(DBSERVER_PORT);
-	inet_pton(AF_INET, "127.0.0.1", &dbserver->server_addr.sin_addr);
+
+	// 112.152.55.49
+	inet_pton(AF_INET, "112.152.55.49", &dbserver->server_addr.sin_addr);
 	dbserver->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(dbserver->wsa_server_recv.getBuf());
 	dbserver->wsa_server_recv.getWsaBuf().len = BUFSIZE;
 	dbserver->wsa_server_recv.setCmd(CMD_DB_RECV);
