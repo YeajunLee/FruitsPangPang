@@ -823,6 +823,12 @@ void AMyCharacter::CarrotAttackEnd()
 	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+
+void AMyCharacter::PickEnd()
+{
+	bAttacking = false;
+}
+
 void AMyCharacter::PickSwordAnimation()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

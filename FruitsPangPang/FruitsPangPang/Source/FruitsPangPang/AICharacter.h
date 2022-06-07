@@ -91,6 +91,8 @@ public:
 
 	virtual	void GetFruits() override;
 
+	void PickSwordAnimation();
+	void DropSwordAnimation();
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")
 	//	bool OverlapInteract;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "interact")

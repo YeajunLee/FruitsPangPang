@@ -169,6 +169,8 @@ public:
 		void CarrotAttackStart();
 	UFUNCTION(BlueprintCallable)
 		void CarrotAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void PickEnd();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
 		class UAnimMontage* ThrowMontage;

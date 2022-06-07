@@ -223,6 +223,66 @@ void AAICharacter::Attack()
 	
 }
 
+
+void AAICharacter::PickSwordAnimation()
+{
+	{
+		FItemInfo info;
+		bool isempty;
+		int amount;
+		mInventory->GetItemInfoAtSlotIndex(2, isempty, info, amount);
+		if (!isempty)
+		{
+			switch (info.ItemCode)
+			{
+			case 7:
+				send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+				break;
+			case 8:
+				send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+				break;
+			}
+		}
+
+	}
+}
+
+void AAICharacter::DropSwordAnimation()
+{
+	//if (2 != SelectedHotKeySlotNum) return;
+	//if (!mInventory->IsSlotValid(2)) return;
+	//
+	//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//if (AnimInstance && PickSwordMontage)
+	//{
+	//	FItemInfo info;
+	//	bool isempty;
+	//	int amount;
+	//	mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
+	//	switch (info.ItemCode)
+	//	{
+	//	case 7:
+	//		SM_GreenOnion->SetHiddenInGame(true, false);
+	//		GreenOnionBag->SetHiddenInGame(false, false);
+	//		SM_Carrot->SetHiddenInGame(true, false);
+	//		CarrotBag->SetHiddenInGame(true, false);
+	//		send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+	//		break;
+	//	case 8:
+	//		SM_Carrot->SetHiddenInGame(true, false);
+	//		CarrotBag->SetHiddenInGame(false, false);
+	//		SM_GreenOnion->SetHiddenInGame(true, false);
+	//		GreenOnionBag->SetHiddenInGame(true, false);
+	//		send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+	//		break;
+	//	}
+	//	AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
+	//	AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
+	//}
+
+	send_anim_packet(s_socket, Network::AnimType::DropSword);
+}
+
 //void AAICharacter::PostInitializeComponents()
 //{
 //	Super::PostInitializeComponents();

@@ -67,11 +67,11 @@ void UGameResultWidget::NativePreConstruct()
 			mTextBlockRank[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
 			mTextBlockName[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
 			mTextBlockScore[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
-			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), ResultBoard[i].GetCharacter()->c_id));
+			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
 			mTextBlockScore[i]->SetText(FText::Format(LOCTEXT("score", "({0})"), ResultBoard[i].GetScore()));
 		}
 		else {
-			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), ResultBoard[i].GetCharacter()->c_id));
+			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
 			mTextBlockScore[i]->SetText(FText::Format(LOCTEXT("score", "({0})"), ResultBoard[i].GetScore()));
 		}
 	}

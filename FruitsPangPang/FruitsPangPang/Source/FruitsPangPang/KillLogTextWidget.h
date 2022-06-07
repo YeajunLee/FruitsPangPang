@@ -25,5 +25,5 @@ public:
 		class UTextBlock* mVictim;
 
 	void MakeKillLog(const FString& attacker, const FString& victim);
-	float LifeTime = 1.5f;
+	float LifeTime = 5.0f;
 };

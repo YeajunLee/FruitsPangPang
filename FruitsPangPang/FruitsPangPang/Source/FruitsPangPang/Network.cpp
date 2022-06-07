@@ -677,6 +677,7 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->mInventory->mMainWidget->HideRespawnWidget();
 
 			mMyCharacter->bIsDie = false;
+			mMyCharacter->bAttacking = false;
 			mMyCharacter->SetActorEnableCollision(true);
 			
 		}
@@ -1243,7 +1244,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		//sword_ai
 		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(PacketOwner->Controller);
 		if (swordAIController && (packet->itemCode == 7 || packet->itemCode == 8)) // update when ItemCode is only 7 or 8
+		{
 			swordAIController->SavedItemCode = packet->itemCode;
+			PacketOwner->PickSwordAnimation();
+		}
 
 		break;
 	}
@@ -1291,6 +1295,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			PacketOwner->GroundSpeed_AI = 0;
 			
 			PacketOwner->bIsDie = false;
+			PacketOwner->bAttacking = false;
 			PacketOwner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			PacketOwner->SetActorEnableCollision(true);
 		}
