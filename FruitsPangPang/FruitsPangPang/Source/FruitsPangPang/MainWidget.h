@@ -38,6 +38,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UScrollBox* KillLogBox;
 
+	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
+		class UMiniMapWidget* W_MiniMap_0;
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		float fRemainTime;	//Game Remain Time
 
@@ -51,6 +55,8 @@ public:
 	class URespawnWindowWidget* mRespawnWindowWidget;
 
 	class UScoreWidget* mScoreWidget;
+
+	class UMiniMapWidget* mMiniMapWidget;
 
 	class AInventory* mInventory;
 

@@ -7,6 +7,7 @@
 #include "InventorySlotWidget.h"
 #include "Components/HorizontalBox.h"
 
+
 // Sets default values
 AInventory::AInventory()
 	:mMainWidget(nullptr)

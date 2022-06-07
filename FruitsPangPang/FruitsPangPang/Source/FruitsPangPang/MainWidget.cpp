@@ -9,9 +9,12 @@
 #include "RespawnWindowWidget.h"
 #include "ScoreWidget.h"
 #include "KillLogTextWidget.h"
+#include "MiniMapWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
+
+
 
 
 void UMainWidget::NativePreConstruct()
@@ -33,11 +36,7 @@ void UMainWidget::NativePreConstruct()
 		ScoreBox->AddChildToHorizontalBox(ScoreWGT);
 		mScoreWidget = ScoreWGT;
 	}
-
-
-
-
-
+	
 }
 
 

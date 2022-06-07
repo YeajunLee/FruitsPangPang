@@ -1096,7 +1096,7 @@ UMainWidget* AMyCharacter::MakeMainHUD()
 			UE_LOG(LogTemp,Warning,TEXT("MainWidget Source is invalid !! check '/Game/Widget/MMainWidget.MMainWidget_C'"));
 			return nullptr;
 		}
-		if (nullptr == WidgetClass)
+		if (nullptr == SlotWidgetClass)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("SlotWidget Source is invalid !! check '/Game/Widget/MInventorySlotWidget.MInventorySlotWidget_C'"));
 			return nullptr;

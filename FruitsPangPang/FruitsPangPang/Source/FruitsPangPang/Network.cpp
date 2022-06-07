@@ -20,6 +20,7 @@
 #include "AI_Sword_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
+#include "PointOfInterestComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 //#ifdef _DEBUG
@@ -350,6 +351,7 @@ void Network::process_packet(unsigned char* p)
 			if (nullptr != mTree[i])
 			{
 				mTree[i]->GenerateFruit(packet->TreeFruits[i]);
+				//mTree[i]->POIcomp->InitializeComponent();
 			}
 		}
 		for (int i = 0; i < PUNNET_CNT; ++i)
