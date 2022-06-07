@@ -99,7 +99,7 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 		}
 	}
 	
-	//UE_LOG(LogTemp, Log, TEXT("%f"),enemyLocX);
+	UE_LOG(LogTemp, Log, TEXT("%f"),enemyLocX);
 
 		if (isOn == false)
 		{

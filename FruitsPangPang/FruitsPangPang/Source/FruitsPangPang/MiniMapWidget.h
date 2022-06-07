@@ -33,6 +33,8 @@ public:
 
 	class UPointOfInterestComponent* mPOIComponent;
 
+	class UPlayerIconWidget* mPlayerIconWidget;
+
 	void AddPOI(AActor* actor);
 
 	
