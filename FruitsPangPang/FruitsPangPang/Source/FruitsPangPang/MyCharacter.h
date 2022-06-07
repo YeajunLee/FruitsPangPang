@@ -106,6 +106,13 @@ public:
 	UPROPERTY()
 		class UGameMatchWidget* mMatchWidget;
 	class UMainWidget* MakeMainHUD();
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class  UPointOfInterestComponent* POIcomponent;
+	void ShowedInMinimap();
+	class UScoreWidget* mScoreWidget;
+	class UPointOfInterestWidget* mPOIwidget;
+
+
 	void MakeLoadingHUD();
 	void ShowLoginHUD();
 	void ShowMatchHUD();
@@ -184,10 +191,7 @@ public:
 	void DropSwordAnimation();
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class  UPointOfInterestComponent* POIcomponent;
-	void ShowedInMinimap();
-	class UScoreWidget* mScoreWidget;
+	
 
 	//나중에 안쓸 시 지울 것.
 	//class UTexture2D* myEnemy1Icon;

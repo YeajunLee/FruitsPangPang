@@ -240,6 +240,7 @@ void AMyCharacter::Tick(float DeltaTime)
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
+			ShowedInMinimap();
 		}
 		else {
 			
@@ -258,9 +259,9 @@ void AMyCharacter::Tick(float DeltaTime)
 
 		//Update GroundSpeedd (22-04-05)
 		
+		
 	}
 
-	ShowedInMinimap();
 
 	
 }
@@ -892,9 +893,9 @@ void AMyCharacter::DropSwordAnimation()
 void AMyCharacter::ShowedInMinimap()
 {
 	
-	if (mScoreWidget != nullptr)
+	if (mInventory->mMainWidget->mScoreWidget != nullptr)
 	{
-		if (mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
+		if (mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
 		{
 			POIcomponent->isOn = false;
 		}

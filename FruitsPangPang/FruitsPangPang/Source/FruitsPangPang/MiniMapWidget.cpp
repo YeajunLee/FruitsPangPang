@@ -2,6 +2,7 @@
 
 
 #include "MiniMapWidget.h"
+#include "MyCharacter.h"
 #include "PointOfInterestWidget.h"
 #include "PointOfInterestComponent.h"
 #include "PlayerIconWidget.h"
@@ -15,16 +16,23 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 	{
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_PointOfInterest.W_PointOfInterest_C'"));
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		mPointOfInterestWidget = CreateWidget<UPointOfInterestWidget>(GetWorld(), WidgetClass);
+		
+		auto mmPointOfInterestWidget = CreateWidget<UPointOfInterestWidget>(GetWorld(), WidgetClass);
 
 		mPOIComponent = Cast<UPointOfInterestComponent>(actor->GetComponentByClass(UPointOfInterestComponent::StaticClass()));
 
-		mPointOfInterestWidget->Owner = actor;
-		mPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
-		mPointOfInterestWidget->isOn = mPOIComponent->isOn;
-		mPointOfInterestWidget->isCharacter = mPOIComponent->isCharacter;
+		auto mChar = Cast<AMyCharacter>(actor);
+		if (mChar != nullptr)
+		{
+			mChar->mPOIwidget = mmPointOfInterestWidget;
+		}
+		
+		mmPointOfInterestWidget->Owner = actor;
+		mmPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
+		mmPointOfInterestWidget->isOn = mPOIComponent->isOn;
+		mmPointOfInterestWidget->isCharacter = mPOIComponent->isCharacter;
 
-		auto poiWGT = MapOverlay->AddChildToOverlay(mPointOfInterestWidget);
+		auto poiWGT = MapOverlay->AddChildToOverlay(mmPointOfInterestWidget);
 		poiWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
 		poiWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
 	}

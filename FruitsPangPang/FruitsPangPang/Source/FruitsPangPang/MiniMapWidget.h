@@ -29,8 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
 		class UTexture* Image;
 
-	class UPointOfInterestWidget* mPointOfInterestWidget;
-
 	class UPointOfInterestComponent* mPOIComponent;
 
 	class UPlayerIconWidget* mPlayerIconWidget;

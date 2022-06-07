@@ -8,6 +8,7 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "ScoreWidget.h"
+#include "Inventory.h"
 #include "Components/Image.h"
 #include "Engine/Texture2D.h"
 #include "Math/Vector2D.h"
@@ -69,11 +70,11 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 
 	if(bTickActive)
 	{
-		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mScoreWidget->ScoreBoard[0].GetCharacter())
+		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
 		{
-			score0_id = Network::GetNetwork()->mMyCharacter->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id;
-			enemyLocX = Network::GetNetwork()->mMyCharacter->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().X;
-			enemyLocY = Network::GetNetwork()->mMyCharacter->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().Y;
+			score0_id = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id;
+			enemyLocX = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().X;
+			enemyLocY = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().Y;
 			if (isCharacter)
 			{
 				SetRenderTranslation(FindCoord(
@@ -99,7 +100,7 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 		}
 	}
 	
-	UE_LOG(LogTemp, Log, TEXT("%f"),enemyLocX);
+	//UE_LOG(LogTemp, Log, TEXT("%f"),enemyLocX);
 
 		if (isOn == false)
 		{
