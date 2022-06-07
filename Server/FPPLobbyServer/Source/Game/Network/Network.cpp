@@ -120,6 +120,32 @@ void send_login_ok_packet(const int& player_id, const char& succestype, const in
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_signup_packet(const int& player_id, const char* id, const char* pass)
+{
+	ld_packet_signup packet;
+	memset(&packet, 0, sizeof(ld_packet_signup));
+
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_SIGNUP;
+	packet.playerid = player_id;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.pass, pass);
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
+void send_signup_ok_packet(const int& player_id, const char& succestype)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_signup_ok packet;
+	memset(&packet, 0, sizeof(lc_packet_signup_ok));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_SIGNUP_OK;
+	packet.loginsuccess = succestype;
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void send_enter_ingame_packet(const int& player_id, const short& server_port)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
@@ -287,6 +313,13 @@ void process_packet(int client_id, unsigned char* p)
 
 		break;
 	}
+	case CL_PACKET_SIGNUP: {
+		cl_packet_login* packet = reinterpret_cast<cl_packet_login*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+		send_signup_packet(character->_id, packet->name, packet->password);
+
+		break;
+	}
 	}
 }
 
@@ -339,6 +372,23 @@ void process_packet_for_DB(unsigned char* p)
 		}
 		}
 		break;
+	}
+	case DL_PACKET_SIGNUP_OK: {
+		dl_packet_signup_ok* packet = reinterpret_cast<dl_packet_signup_ok*>(p);
+		switch (packet->loginsuccess)
+		{
+		case 1:
+		{
+			Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
+			send_signup_ok_packet(packet->playerid, packet->loginsuccess);
+			std::cout << "회원가입 성공 성공id :" << character->name << endl;
+			break;
+		}
+		default: {
+			send_signup_ok_packet(packet->playerid, packet->loginsuccess);
+			std::cout << "회원가입 실패 실패 코드 :" << (int)packet->loginsuccess << endl;
+		}
+		}
 	}
 	}
 }

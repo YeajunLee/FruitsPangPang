@@ -146,6 +146,16 @@ void send_login_lobby_packet(SOCKET& sock, const char* name, const char* passwor
 }
 
 
+void send_signup_packet(SOCKET& sock, const char* name, const char* password)
+{
+	cl_packet_signup packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_PACKET_SIGNUP;
+	strcpy_s(packet.name, name);
+	strcpy_s(packet.password, password);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
 
 void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, FQuat& rotate, const float& value)
 {
@@ -779,7 +789,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 		lc_packet_login_ok* packet = reinterpret_cast<lc_packet_login_ok*>(p);
 		switch (packet->loginsuccess)
 		{
-		case 1:{
+		case 1: {
 			mMyCharacter->mLoginWidget->RemoveFromParent();
 			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 			mMyCharacter->mMainWidget->bActivate = true;
@@ -793,7 +803,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 			}
 			break;
 		}
-		default:{
+		default: {
 			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
 			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
 			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
@@ -820,12 +830,37 @@ void Network::process_LobbyPacket(unsigned char* p)
 	}
 	case LC_PACKET_MATCH_UPDATE: {
 		lc_packet_match_update* packet = reinterpret_cast<lc_packet_match_update*>(p);
-		if(mMyCharacter->mMatchWidget != nullptr)
+		if (mMyCharacter->mMatchWidget != nullptr)
 			mMyCharacter->mMatchWidget->UpdatePlayerCntText(packet->playercnt);
+		break;
+	}
+	case LC_PACKET_SIGNUP_OK: {
+		lc_packet_signup_ok* packet = reinterpret_cast<lc_packet_signup_ok*>(p);
+		switch (packet->loginsuccess)
+		{
+		case 1: {
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
+			MessageBoxWGT->AddToViewport();
+			MessageBoxWGT->MakeMessageBoxWithCode(2);	//회원가입 성공
+			break;
+		}
+		default: {
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
+			MessageBoxWGT->AddToViewport();
+			MessageBoxWGT->MakeMessageBoxWithCode(packet->loginsuccess);
+			break;
+		}
+		}
 		break;
 	}
 	}
 }
+
+
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag)
 {
 	//cout << "send_callback is called" << endl;

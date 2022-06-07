@@ -13,4 +13,4 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 void InitializeDB();
 void ReleaseDB();
 int Login(const char* name, const char* password, LoginInfo& p_info);
-int MakeCharacter(const char* name, const char* password);
+int SignUp(const char* name, const char* password);

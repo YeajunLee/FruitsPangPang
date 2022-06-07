@@ -40,6 +40,7 @@ const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
 const char CL_PACKET_MATCH_REQUEST = 14;
 const char CL_PACKET_LOGIN = 15;
+const char CL_PACKET_SIGNUP = 16;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -69,6 +70,7 @@ const char SC_PACKET_CHEAT_GAMETIME = 100;
 const char LC_PACKET_LOGIN_OK = 1;
 const char LC_PACKET_MATCH_RESPONSE = 2;
 const char LC_PACKET_MATCH_UPDATE = 3;
+const char LC_PACKET_SIGNUP_OK = 4;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -176,6 +178,12 @@ struct cl_packet_match_request {
 	short amount;		//AI Amount
 };
 
+struct cl_packet_signup {
+	unsigned char size;
+	char	type;
+	char	name[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
+};
 //-------------------- Gameserver to client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -334,5 +342,11 @@ struct lc_packet_match_update {
 	unsigned char size;
 	char type;
 	int playercnt;
+};
+
+struct lc_packet_signup_ok {
+	unsigned char size;
+	char type;
+	char loginsuccess;
 };
 #pragma pack(pop)

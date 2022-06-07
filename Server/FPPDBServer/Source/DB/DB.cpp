@@ -128,7 +128,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 			else if (retcode == SQL_ERROR) {
 				HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 				SQLCancel(hstmt);
-				return -1;
+				return -2;
 			}
 		}
 
@@ -137,36 +137,59 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 		// Process data  
 		SQLCancel(hstmt);
-		return -1;
+		return -2;
 	}
 
 	// Process data  
 	SQLCancel(hstmt);
-	return -1;
+	return -2;
 }
 
 
-int MakeCharacter(const char* name, const char* password)
+int SignUp(const char* name, const char* password)
 {
 	SQLINTEGER p_coin{};
 	SQLSMALLINT p_skintype{};
-	SQLWCHAR p_name[10]{}, p_password[10]{};
+	SQLWCHAR p_name[21]{}, p_password[21]{};
 	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0;
 	SQLRETURN retcode{};
 
-	wstring MakeCharQuery{ L"EXEC make_character " };
+	wstring SignUpQuery{ L"EXEC make_character " };
+	wstring FindCharacterQuery{ L"EXEC find_character " };
 	USES_CONVERSION;
-	MakeCharQuery += A2W(name);
-	MakeCharQuery += L",";
-	MakeCharQuery += A2W(password);
+	SignUpQuery += A2W(name);
+	SignUpQuery += L",";
+	SignUpQuery += A2W(password);
 
-	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)MakeCharQuery.c_str(), SQL_NTS);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)SignUpQuery.c_str(), SQL_NTS);
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		return 1;
 	}
 	else if (retcode == SQL_ERROR) {
-		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
-		return -2;	// 캐릭터만들기 실패
+
+		FindCharacterQuery += A2W(name);
+
+		retcode = SQLExecDirect(hstmt, (SQLWCHAR*)FindCharacterQuery.c_str(), SQL_NTS);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &cbName);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+			retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &cbPassword);
+			retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &cbP_coin);
+			retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &cbP_skintype);
+
+			retcode = SQLFetch(hstmt);
+			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+			{
+				SQLCancel(hstmt);
+				return -4;	// 중복아이디가 있음.
+			}
+			else if (retcode == SQL_ERROR) {
+				SQLCancel(hstmt);
+				return -1; // 알 수 없는 이유로 실패
+			}
+		}
+
+		return -1;	// 알 수 없는 이유로 실패
 	}
 }
