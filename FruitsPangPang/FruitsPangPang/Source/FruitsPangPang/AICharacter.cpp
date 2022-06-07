@@ -558,8 +558,12 @@ bool AAICharacter::ConnServer()
 	s_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(GAMESERVER_PORT);
+	server_addr.sin_family = AF_INET;	
+	if (Network::GetNetwork()->GameServerPort != -1)
+		server_addr.sin_port = htons(Network::GetNetwork()->GameServerPort);
+	else
+		server_addr.sin_port = htons(GAMESERVER_PORT);
+
 
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
 	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
