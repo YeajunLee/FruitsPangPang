@@ -64,6 +64,19 @@ void send_login_authorization_ok_packet(const int& server_id,const int& player_i
 	server->sendPacket(&packet, sizeof(packet));
 }
 
+void send_signup_ok_packet(const int& server_id, const int& player_id, const char& succestype)
+{
+	auto server = reinterpret_cast<Server*>(servers[server_id]);
+	dl_packet_signup_ok packet;
+	memset(&packet, 0, sizeof(dl_packet_signup_ok));
+
+	packet.size = sizeof(packet);
+	packet.type = DL_PACKET_SIGNUP_OK;
+	packet.playerid = player_id;
+	packet.loginsuccess = succestype;
+	server->sendPacket(&packet, sizeof(packet));
+}
+
 void send_ping_test(const int& server_id)
 {
 	auto server = reinterpret_cast<Server*>(servers[server_id]);
@@ -108,6 +121,13 @@ void process_packet(int client_id, unsigned char* p)
 		LoginInfo info{};
 		char ret = Login(packet->id, packet->pass, info);
 		send_login_authorization_ok_packet(client_id,packet->playerid, ret, info.p_coin, info.p_skintype);
+		break;
+	}
+	case LD_PACKET_SIGNUP: {
+		ld_packet_signup* packet = reinterpret_cast<ld_packet_signup*>(p);
+		LoginInfo info{};
+		char ret = SignUp(packet->id, packet->pass);
+		send_signup_ok_packet(client_id, packet->playerid, ret);
 		break;
 	}
 	}

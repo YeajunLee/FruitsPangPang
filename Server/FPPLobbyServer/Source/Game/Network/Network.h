@@ -24,6 +24,8 @@ void process_packet_for_DB(unsigned char* p);
 
 void send_login_authorization_packet(const int& player_id, const char* id, const char* pass);
 void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype);
+void send_signup_packet(const int& player_id, const char* id, const char* pass);
+void send_signup_ok_packet(const int& player_id, const char& succestype);
 void send_enter_ingame_packet(const int& player_id,const short& server_port);
 void send_match_update_packet(const int& player_id, const int& player_cnt);
 
