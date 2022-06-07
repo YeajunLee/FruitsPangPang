@@ -77,6 +77,7 @@ int Generate_Id()
 		{
 			user->_state = Character::STATE::ST_ACCEPT;
 			user->state_lock.unlock();
+			cout << i <<"번째 캐릭터 입장"<< endl;
 			return i;
 		}
 		user->state_lock.unlock();
@@ -354,7 +355,7 @@ void process_packet(int client_id, unsigned char* p)
 		{
 			random_device rd;
 			mt19937 rng(rd());
-			uniform_int_distribution<int> randName(0, 33);
+			uniform_int_distribution<int> randName(0, 32);
 			int randCnt = randName(rng);
 			strcpy_s(character->name, RandomAIName[randCnt]);
 		}
