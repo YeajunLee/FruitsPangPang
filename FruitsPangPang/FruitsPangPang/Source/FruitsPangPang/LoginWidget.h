@@ -28,8 +28,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UButton* LoginButton;
 
+	UPROPERTY(meta = (BindWidget))
+		class UButton* SignUpButton;
 
 	UFUNCTION()
 		void TryLogin();
+	UFUNCTION()
+		void TrySignUp();
 public:
 };

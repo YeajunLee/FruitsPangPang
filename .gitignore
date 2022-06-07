@@ -125,6 +125,9 @@ Test/언리얼 자동차/JparkCar/Saved/*
 
 # Server Ignore
 Server/FPP_Server/x64/*
+Server/FPPDBServer/x64/*
+Server/FPPLobbyServer/x64/*
+
 
 # WhiteList txt File
 !미팅일지.txt

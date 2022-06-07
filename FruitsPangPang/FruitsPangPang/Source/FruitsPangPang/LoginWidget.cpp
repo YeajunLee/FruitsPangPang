@@ -21,6 +21,7 @@ void ULoginWidget::NativePreConstruct()
 		controller->SetShowMouseCursor(true);
 	}
 	LoginButton->OnClicked.AddDynamic(this, &ULoginWidget::TryLogin);
+	SignUpButton->OnClicked.AddDynamic(this, &ULoginWidget::TrySignUp);
 }
 
 void ULoginWidget::NativeDestruct()
@@ -29,6 +30,16 @@ void ULoginWidget::NativeDestruct()
 
 void ULoginWidget::TryLogin()
 {
+	const char* tmpid = TCHAR_TO_ANSI(*id->GetText().ToString());
+	const char* tmppass = TCHAR_TO_ANSI(*Password->GetText().ToString());
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
-		send_login_packet(Network::GetNetwork()->mMyCharacter->l_socket, 0);
+		send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+}
+
+void ULoginWidget::TrySignUp()
+{
+	const char* tmpid = TCHAR_TO_ANSI(*id->GetText().ToString());
+	const char* tmppass = TCHAR_TO_ANSI(*Password->GetText().ToString());
+	if (nullptr != Network::GetNetwork()->mMyCharacter)
+		send_signup_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
 }

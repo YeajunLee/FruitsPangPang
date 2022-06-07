@@ -21,6 +21,8 @@ static std::shared_ptr<class Network> m_Network;
 
 
 void send_login_packet(SOCKET& sock, const char& type);
+void send_login_lobby_packet(SOCKET& sock, const char* name, const char* password);
+void send_signup_packet(SOCKET& sock, const char* name, const char* password);
 void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
 void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale,
 	const int& fruitType, const int& itemSlotNum, const int& uniqueid);//uniqueid is sync for banana
@@ -48,7 +50,7 @@ public:
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
-
+	FString MyCharacterName;
 	UPROPERTY()
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];

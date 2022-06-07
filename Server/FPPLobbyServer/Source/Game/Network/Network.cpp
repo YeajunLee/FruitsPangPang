@@ -5,6 +5,7 @@
 #include "../Object/Character/Player/Player.h"
 #include "../Server/Server.h"
 #include "../Server/GameServer/GameServer.h"
+#include "../Server/DBServer/DBServer.h"
 
 using namespace std;
 
@@ -12,6 +13,7 @@ HANDLE hiocp;
 SOCKET s_socket;
 std::array<Object*, MAX_OBJECT> objects;
 std::array<Server*, MAX_SERVER> servers;
+class DBServer* dbserver;
 concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
@@ -87,15 +89,60 @@ int Generate_ServerId()
 	cout << "Server ID is Over the MAX_SERVER" << endl;
 	return -1;
 }
-void send_login_ok_packet(const int& player_id)
+
+void send_login_authorization_packet(const int& player_id, const char* id, const char* pass)
+{
+	ld_packet_login_author packet;
+	memset(&packet, 0, sizeof(ld_packet_login_author));
+
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_LOGIN_AUTHOR;
+	packet.playerid = player_id;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.pass, pass);
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
+void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
-	sc_packet_login_ok packet;
-	memset(&packet, 0, sizeof(sc_packet_login_ok));
+	lc_packet_login_ok packet;
+	memset(&packet, 0, sizeof(lc_packet_login_ok));
 
-	packet.id = player_id;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_LOGIN_OK;
+	packet.type = LC_PACKET_LOGIN_OK;
+	packet.id = player_id;
+	strcpy_s(packet.name, player->name);
+	packet.loginsuccess = succestype;
+	packet.coin = coin;
+	packet.skintype = skintype;
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_signup_packet(const int& player_id, const char* id, const char* pass)
+{
+	ld_packet_signup packet;
+	memset(&packet, 0, sizeof(ld_packet_signup));
+
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_SIGNUP;
+	packet.playerid = player_id;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.pass, pass);
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
+void send_signup_ok_packet(const int& player_id, const char& succestype)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_signup_ok packet;
+	memset(&packet, 0, sizeof(lc_packet_signup_ok));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_SIGNUP_OK;
+	packet.loginsuccess = succestype;
+
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -129,11 +176,12 @@ void process_packet(int client_id, unsigned char* p)
 	Object* object = objects[client_id];
 
 	switch (packet_type) {
-	case CS_PACKET_LOGIN: {
-		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+	case CL_PACKET_LOGIN: {
+		cl_packet_login* packet = reinterpret_cast<cl_packet_login*>(p);
 		Player* character = reinterpret_cast<Player*>(object);
 		strcpy_s(character->name, packet->name);
-		send_login_ok_packet(client_id);
+		send_login_authorization_packet(character->_id,packet->name, packet->password);
+		//send_login_ok_packet(client_id);
 
 		character->_state = Player::STATE::ST_INGAME;
 		break;
@@ -265,6 +313,13 @@ void process_packet(int client_id, unsigned char* p)
 
 		break;
 	}
+	case CL_PACKET_SIGNUP: {
+		cl_packet_login* packet = reinterpret_cast<cl_packet_login*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+		send_signup_packet(character->_id, packet->name, packet->password);
+
+		break;
+	}
 	}
 }
 
@@ -284,6 +339,56 @@ void process_packet_for_Server(int client_id, unsigned char* p)
 		cout << client_id << "번째 접속 완\n";
 
 		break;
+	}
+	}
+}
+
+void process_packet_for_DB(unsigned char* p)
+{
+	unsigned char packet_type = p[1];
+	DBServer* server = dbserver;
+
+	switch (packet_type) {
+	case DL_PACKET_LOGIN_AUTHOR_OK: {
+		dl_packet_login_author_ok* packet = reinterpret_cast<dl_packet_login_author_ok*>(p);
+
+		switch (packet->loginsuccess)
+		{
+		case 1: 
+		{
+			Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
+			character->mSkinType = packet->skintype;
+			character->Coin_lock.lock();
+			character->mCoin = packet->coin;
+			character->Coin_lock.unlock();
+
+			send_login_ok_packet(packet->playerid, packet->loginsuccess, packet->coin, packet->skintype);
+			std::cout << "로그인 성공 성공id :" << character->name << endl;
+			break;
+		}
+		default: {
+			send_login_ok_packet(packet->playerid, packet->loginsuccess, -1, -1);
+			std::cout << "로그인 실패 실패 코드 :" << (int)packet->loginsuccess << endl;
+		}
+		}
+		break;
+	}
+	case DL_PACKET_SIGNUP_OK: {
+		dl_packet_signup_ok* packet = reinterpret_cast<dl_packet_signup_ok*>(p);
+		switch (packet->loginsuccess)
+		{
+		case 1:
+		{
+			Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
+			send_signup_ok_packet(packet->playerid, packet->loginsuccess);
+			std::cout << "회원가입 성공 성공id :" << character->name << endl;
+			break;
+		}
+		default: {
+			send_signup_ok_packet(packet->playerid, packet->loginsuccess);
+			std::cout << "회원가입 실패 실패 코드 :" << (int)packet->loginsuccess << endl;
+		}
+		}
 	}
 	}
 }

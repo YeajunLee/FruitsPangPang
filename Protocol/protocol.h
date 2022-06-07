@@ -2,12 +2,12 @@
 
 const short GAMESERVER_PORT = 4000;
 const short LOBBYSERVER_PORT = 4100;
-const int MAX_PLAYER_CONN = 7;
+const int MAX_PLAYER_CONN = 1;
 const int ACTIVE_AI_CNT = 6;
 const int BUFSIZE = 256;
 const int GAMEPLAYTIME_MILLI = 600'000;
 const int GAMEPLAYTIME_CHEAT_MILLI = 10'000;
-const int  MAX_NAME_SIZE = 20;
+const int  MAX_NAME_SIZE = 21;
 const int USER_START = 0;
 const int  MAX_USER = 8;
 const int TREE_CNT = 56;
@@ -39,6 +39,8 @@ const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
 const char CS_PACKET_SYNC_BANANA = 13;
 const char CL_PACKET_MATCH_REQUEST = 14;
+const char CL_PACKET_LOGIN = 15;
+const char CL_PACKET_SIGNUP = 16;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -68,6 +70,7 @@ const char SC_PACKET_CHEAT_GAMETIME = 100;
 const char LC_PACKET_LOGIN_OK = 1;
 const char LC_PACKET_MATCH_RESPONSE = 2;
 const char LC_PACKET_MATCH_UPDATE = 3;
+const char LC_PACKET_SIGNUP_OK = 4;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -161,17 +164,32 @@ struct cs_packet_cheat {
 	char itemType;
 };
 //-------------------- client to LobbyServer
+
+struct cl_packet_login {
+	unsigned char size;
+	char	type;
+	char	name[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
+};
+
 struct cl_packet_match_request {
 	unsigned char size;
 	char type;
 	short amount;		//AI Amount
 };
 
+struct cl_packet_signup {
+	unsigned char size;
+	char	type;
+	char	name[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
+};
 //-------------------- Gameserver to client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
 };
@@ -308,6 +326,10 @@ struct lc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	char name[MAX_NAME_SIZE];
+	char loginsuccess;			//1 성공, 0이하 - 실패
+	int coin;
+	short skintype;
 };
 
 struct lc_packet_match_response {
@@ -320,5 +342,11 @@ struct lc_packet_match_update {
 	unsigned char size;
 	char type;
 	int playercnt;
+};
+
+struct lc_packet_signup_ok {
+	unsigned char size;
+	char type;
+	char loginsuccess;
 };
 #pragma pack(pop)
