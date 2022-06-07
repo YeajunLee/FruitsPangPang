@@ -56,9 +56,8 @@ public:
 
 	class UScoreWidget* mScoreWidget;
 
-	class UMiniMapWidget* mMiniMapWidget;
-
 	class AInventory* mInventory;
+
 
 	class ABaseCharacter* mOwnerCharacter;
 	void UpdateHpBar();

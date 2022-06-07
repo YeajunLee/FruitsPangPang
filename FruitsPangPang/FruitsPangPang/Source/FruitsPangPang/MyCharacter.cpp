@@ -30,6 +30,10 @@
 #include "GameMatchWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
+#include "PointOfInterestComponent.h"
+#include "ScoreWidget.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -105,6 +109,15 @@ AMyCharacter::AMyCharacter()
 	{
 		dizzySound = dizzySoundAsset.Object;
 	}
+
+	POIcomponent = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
+	
+	// 나중에 안쓸 시 지울것
+	/*static ConstructorHelpers::FObjectFinder<UTexture2D> myEnemyIconPath(TEXT("/Game/MiniMap/NothingIMG.NothingIMG"));
+	if (myEnemyIconPath.Succeeded())
+	{
+		myEnemy1Icon = myEnemyIconPath.Object;
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -181,14 +194,15 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 200);
 
 		
-
+		
 		//if (Network::GetNetwork()->init())
 		//{
 		//	//Network::GetNetwork()->C_Recv();
 		//	send_login_packet(s_socket);
 		//}
 	}
-
+	
+	
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -226,6 +240,7 @@ void AMyCharacter::Tick(float DeltaTime)
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
+			ShowedInMinimap();
 		}
 		else {
 			
@@ -244,11 +259,11 @@ void AMyCharacter::Tick(float DeltaTime)
 
 		//Update GroundSpeedd (22-04-05)
 		
+		
 	}
 
-	//SwordInTheBag();
-	
 
+	
 }
 
 // Called to bind functionality to input
@@ -873,6 +888,20 @@ void AMyCharacter::DropSwordAnimation()
 	}
 
 	send_anim_packet(s_socket, Network::AnimType::DropSword);
+}
+
+void AMyCharacter::ShowedInMinimap()
+{
+	
+	if (mInventory->mMainWidget->mScoreWidget != nullptr)
+	{
+		if (mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
+		{
+			POIcomponent->isOn = false;
+		}
+		else
+			POIcomponent->isOn = true;
+	}
 }
 
 void AMyCharacter::Throw()

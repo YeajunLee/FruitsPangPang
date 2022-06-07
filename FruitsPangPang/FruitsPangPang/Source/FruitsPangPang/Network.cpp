@@ -15,6 +15,8 @@
 #include "ScoreWidget.h"
 #include "GameResultWidget.h"
 #include "GameMatchWidget.h"
+#include "PointOfInterestWidget.h"
+#include "MiniMapWidget.h"
 #include "MessageBoxWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
@@ -528,6 +530,7 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+			
 		}
 		else {
 			FName path = TEXT("Blueprint'/Game/Character/BP_MyCharacter.BP_MyCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
@@ -545,6 +548,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
+				
 			}
 		}
 
@@ -733,6 +737,7 @@ void Network::process_packet(unsigned char* p)
 			controller->SetInputMode(gamemode);
 			controller->SetShowMouseCursor(false);
 		}
+		mMyCharacter->mPOIwidget->bTickActive = true;
 		break;
 	}
 	case SC_PACKET_GAMEEND: {

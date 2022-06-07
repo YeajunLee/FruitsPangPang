@@ -23,20 +23,15 @@ void UPointOfInterestComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//class UUserWidget* MainWidgetRef;
-	//class UMiniMapWidget* MiniMapWidgetRef;
 	FTimerHandle WaitHandle;
 	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
 		{
-			//MainWidgetRef = myChar->mMainWidget->W_MiniMap;
+			
 			if (Network::GetNetwork()->mMyCharacter != nullptr)
 			{
 				Network::GetNetwork()->mMyCharacter->mMainWidget->W_MiniMap_0->AddPOI(GetOwner());
-				//myChar->mMainWidget->W_MiniMap->AddPOI();
 			}
-			
 		}), 0.2, false);
-	
 }
 
 
@@ -44,8 +39,6 @@ void UPointOfInterestComponent::BeginPlay()
 void UPointOfInterestComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UPointOfInterestComponent::InitializePOI()
@@ -53,7 +46,6 @@ void UPointOfInterestComponent::InitializePOI()
 	if (Network::GetNetwork()->mMyCharacter != nullptr)
 	{
 		Network::GetNetwork()->mMyCharacter->mMainWidget->W_MiniMap_0->AddPOI(GetOwner());
-		//myChar->mMainWidget->W_MiniMap->AddPOI();
 	}
 }
 

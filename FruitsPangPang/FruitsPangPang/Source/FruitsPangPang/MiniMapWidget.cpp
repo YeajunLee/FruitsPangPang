@@ -2,8 +2,10 @@
 
 
 #include "MiniMapWidget.h"
+#include "MyCharacter.h"
 #include "PointOfInterestWidget.h"
 #include "PointOfInterestComponent.h"
+#include "PlayerIconWidget.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Engine/Texture.h"
@@ -11,18 +13,38 @@
 
 void UMiniMapWidget::AddPOI(AActor* actor)
 {
-	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_PointOfInterest.W_PointOfInterest_C'"));
-	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-	mPointOfInterestWidget = CreateWidget<UPointOfInterestWidget>(GetWorld(), WidgetClass);
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_PointOfInterest.W_PointOfInterest_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		
+		auto mmPointOfInterestWidget = CreateWidget<UPointOfInterestWidget>(GetWorld(), WidgetClass);
 
-	mPOIComponent = Cast<UPointOfInterestComponent>( actor->GetComponentByClass(UPointOfInterestComponent::StaticClass()));
-	
-	mPointOfInterestWidget->Owner = actor;
-	mPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
+		mPOIComponent = Cast<UPointOfInterestComponent>(actor->GetComponentByClass(UPointOfInterestComponent::StaticClass()));
 
-	//mPOIComponent->isStatic =  mPointOfInterestWidget->isStatic;
-	
-	MapOverlay->AddChildToOverlay(mPointOfInterestWidget)->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
-	MapOverlay->AddChildToOverlay(mPointOfInterestWidget)->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+		auto mChar = Cast<AMyCharacter>(actor);
+		if (mChar != nullptr)
+		{
+			mChar->mPOIwidget = mmPointOfInterestWidget;
+		}
+		
+		mmPointOfInterestWidget->Owner = actor;
+		mmPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
+		mmPointOfInterestWidget->isOn = mPOIComponent->isOn;
+		mmPointOfInterestWidget->isCharacter = mPOIComponent->isCharacter;
+
+		auto poiWGT = MapOverlay->AddChildToOverlay(mmPointOfInterestWidget);
+		poiWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		poiWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+	}
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_PlayerIcon.W_PlayerIcon_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		mPlayerIconWidget = CreateWidget<UPlayerIconWidget>(GetWorld(), WidgetClass);
+
+		auto iconWGT = MapOverlay->AddChildToOverlay(mPlayerIconWidget);
+		iconWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		iconWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+	}
 	
 }
+
