@@ -4,6 +4,7 @@
 Player::Player(OBJTYPE type, STATE state)
 	:_state(state)
 	, _is_active(true)
+	, mCoin(0)
 {
 	_otype = type;
 }
