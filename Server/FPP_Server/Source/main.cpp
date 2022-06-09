@@ -8,6 +8,7 @@
 #include "Game/Object/Object.h"
 #include "Game/Object/Interaction/Tree/Tree.h"
 #include "Game/Object/Interaction/Punnet/Punnet.h"
+#include "Game/Object/Interaction/Heal/Heal.h"
 #include "Game/Object/Character/Character.h"
 #include "Game/Server/Server.h"
 
@@ -75,6 +76,12 @@ int main(int argc, char* argv[])
 		objects[i] = new Punnet();
 		auto punnet = reinterpret_cast<Punnet*>(objects[i]);
 		punnet->_id = i;
+	}
+	for (int i = HEALID_START; i < HEALID_END; ++i)
+	{
+		objects[i] = new Heal();
+		auto heal = reinterpret_cast<Heal*>(objects[i]);
+		heal->_id = i;
 	}
 
 	std::cout << "Creating Worker Threads\n";

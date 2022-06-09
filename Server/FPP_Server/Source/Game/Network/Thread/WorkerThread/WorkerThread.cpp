@@ -4,6 +4,7 @@
 #include "../../../Object/Character/Character.h"
 #include "../../../Object/Interaction/Tree/Tree.h"
 #include "../../../Object/Interaction/Punnet/Punnet.h"
+#include "../../../Object/Interaction/Heal/Heal.h"
 #include "../../../Server/Server.h"
 
 using namespace std;
@@ -116,20 +117,7 @@ void WorkerThread()
 
 			auto tree = reinterpret_cast<Tree*>(objects[client_id]);
 			cout << "나무 id:" << client_id << endl;
-			tree->canHarvest = true;
 			tree->GenerateFruit();
-
-			for (auto& other : objects)
-			{
-				if (!other->isPlayer()) break;
-				auto player = reinterpret_cast<Character*>(other);
-				if (player->_state == Character::STATE::ST_INGAME)
-				{
-
-					//cout << "과일나무 생성됐다고 보냅니다" << endl;
-					send_update_interstat_packet(other->_id, client_id - TREEID_START, true,INTERACT_TYPE_TREE, static_cast<int>(tree->_ftype));
-				}
-			}
 			delete wsa_ex;
 			break;
 		}		
@@ -137,20 +125,15 @@ void WorkerThread()
 
 			auto punnet = reinterpret_cast<Punnet*>(objects[client_id]);
 			//cout << "바구니 id:" << client_id << endl;
-			punnet->canHarvest = true;
 			punnet->GenerateFruit();
 
-			for (auto& other : objects)
-			{
-				if (!other->isPlayer()) break;
-				auto player = reinterpret_cast<Character*>(other);
-				if (player->_state == Character::STATE::ST_INGAME)
-				{
+			delete wsa_ex;
+			break;
+		}
+		case CMD_HEAL_RESPAWN: {
+			auto heal = reinterpret_cast<Heal*>(objects[client_id]);
+			heal->GenerateFruit();
 
-					//cout << "과일바구니 생성됐다고 보냅니다" << endl;
-					send_update_interstat_packet(other->_id, client_id - PUNNETID_START, true,INTERACT_TYPE_PUNNET, static_cast<int>(punnet->_ftype));
-				}
-			}
 			delete wsa_ex;
 			break;
 		}
