@@ -4,6 +4,7 @@
 
 Interaction::Interaction(OBJTYPE type, INTERTYPE itype)
 	:_itype(itype)
+	,CanInteract(true)
 {
 	_type = type;
 }
@@ -14,7 +15,7 @@ Interaction::~Interaction()
 }
 
 
-void Interaction::interact()
+void Interaction::interact(Object* interactobj)
 {
 
 }

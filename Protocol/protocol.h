@@ -13,10 +13,13 @@ const int  MAX_USER = 8;
 const int TREE_CNT = 56;
 const int GREEN_TREE_CNT = 41;
 const int PUNNET_CNT = 11;
+const int HEAL_CNT = 10;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + TREE_CNT;
 const int PUNNETID_START = TREEID_END;
 const int PUNNETID_END = PUNNETID_START + PUNNET_CNT;
+const int HEALID_START = PUNNETID_END;
+const int HEALID_END = HEALID_START + HEAL_CNT;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
 
@@ -24,6 +27,7 @@ const char POS_TYPE_DURIAN = 1;
 
 const char INTERACT_TYPE_TREE = 1;
 const char INTERACT_TYPE_PUNNET = 2;
+const char INTERACT_TYPE_HEAL = 3;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -41,6 +45,7 @@ const char CS_PACKET_SYNC_BANANA = 13;
 const char CL_PACKET_MATCH_REQUEST = 14;
 const char CL_PACKET_LOGIN = 15;
 const char CL_PACKET_SIGNUP = 16;
+const char CS_PACKET_GETFRUITS_HEAL = 17;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -192,6 +197,7 @@ struct sc_packet_login_ok {
 	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
+	char HealFruits[HEAL_CNT];
 };
 
 struct sc_packet_move {

@@ -7,6 +7,7 @@
 #include "../Object/Interaction/Interaction.h"
 #include "../Object/Interaction/Tree/Tree.h"
 #include "../Object/Interaction/Punnet/Punnet.h"
+#include "../Object/Interaction/Heal/Heal.h"
 #include "../Server/Server.h"
 
 using namespace std;
@@ -124,6 +125,11 @@ void send_login_ok_packet(int player_id, const char* playername)
 	for (int i = PUNNETID_START,punnet = 0; i < PUNNETID_END; ++i,++punnet)
 	{
 		packet.PunnetFruits[punnet] = static_cast<char>(reinterpret_cast<Punnet*>(objects[i])->_ftype);
+	}
+
+	for (int i = HEALID_START, heal = 0; i < HEALID_END; ++i, ++heal)
+	{
+		packet.HealFruits[heal] = static_cast<char>(reinterpret_cast<Heal*>(objects[i])->_ftype);
 	}
 
 	packet.id = player_id;
@@ -514,92 +520,20 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	case CS_PACKET_GETFRUITS_TREE: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
-		Character* character = reinterpret_cast<Character*>(object);
 		Tree* tree = reinterpret_cast<Tree*>(objects[packet->obj_id + TREEID_START]);
-		
-		if (!tree->canHarvest)
-		{
-			cout << " 수확할 수 없습니다!" << endl;
-			break;
-
-		}
-		tree->canHarvest = false;
-
-		//cout << "과일 받았습니다(나무)" << packet->obj_id << endl;
-		FPP_LOG("플레이어[%d]가 [%d]번째 나무에서 [%d]타입의 아이템 획득", client_id, tree->_id, tree->_ftype);
-		switch (tree->_ttype)
-		{
-		case TREETYPE::GREEN:
-			character->UpdateInventorySlotAtIndex(0, tree->_ftype, 10);
-			send_update_inventory_packet(client_id, 0);
-			break;
-		case TREETYPE::ORANGE:
-			character->UpdateInventorySlotAtIndex(1, tree->_ftype, 5);
-			send_update_inventory_packet(client_id, 1);
-			break;
-		}
-		tree->interact();
-
-		for (auto& other : objects)
-		{
-			if (!other->isPlayer()) break;
-			auto player = reinterpret_cast<Character*>(other);
-			if (player->_state == Character::STATE::ST_INGAME)
-			{
-				//cout << "과일나무 떨어졌다고 보냅니다"<<packet->obj_id<<"," << endl;
-				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_TREE);
-			}
-		}
-		/*}
-		tree->CanHarvestLock.unlock();
-		*/
-
+		tree->interact(object);
 		break;
 	}
 	case CS_PACKET_GETFRUITS_PUNNET: {
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
-		Character* character = reinterpret_cast<Character*>(object);
-		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNETID_START]);
-
-		if (!punnet->canHarvest)
-			break;
-		punnet->canHarvest = false;
-
-		//cout << "과일 받았습니다(과일상자)" << endl;
-		if (punnet->_ftype == FRUITTYPE::T_HEAL)
-		{
-			character->Heal(10);
-		}
-		else if (punnet->_ftype == FRUITTYPE::T_GREENONION)
-		{
-			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
-		}
-		else if (punnet->_ftype == FRUITTYPE::T_CARROT)
-		{
-			character->UpdateInventorySlotAtIndex(2, punnet->_ftype, 1);
-		}
-		else if (punnet->_ftype == FRUITTYPE::T_BANANA)
-		{
-			character->UpdateInventorySlotAtIndex(4, punnet->_ftype, 3);
-		}
-		else
-		{
-			character->UpdateInventorySlotAtIndex(3, punnet->_ftype, 5);
-		}
-
-		
-		punnet->interact();
-
-		for (auto& other : objects)
-		{
-			if (!other->isPlayer()) break;
-			auto player = reinterpret_cast<Character*>(other);
-			if (player->_state == Character::STATE::ST_INGAME)
-			{
-				//cout << "과일박스 먹었다고 보냅니다" <<packet->obj_id<<"," << endl;
-				send_update_interstat_packet(other->_id, packet->obj_id, false, INTERACT_TYPE_PUNNET);
-			}
-		}
+		Punnet* punnet = reinterpret_cast<Punnet*>(objects[packet->obj_id + PUNNETID_START]);		
+		punnet->interact(object);
+		break;
+	}
+	case CS_PACKET_GETFRUITS_HEAL: {
+		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
+		Heal* heal = reinterpret_cast<Heal*>(objects[packet->obj_id + HEALID_START]);
+		heal->interact(object);
 		break;
 	}
 	case CS_PACKET_USEITEM: {
