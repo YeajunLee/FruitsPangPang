@@ -6,6 +6,7 @@
 #include "AICharacter.h"
 #include "Tree.h"
 #include "Punnet.h"
+#include "HealSpawner.h"
 #include "Inventory.h"
 #include "Item.h"
 #include "Projectile.h"
@@ -44,6 +45,8 @@ Network::Network()
 	for (auto& p : mTree)
 		p = nullptr;
 	for (auto& p : mPunnet)
+		p = nullptr;
+	for (auto& p : mHealSpawner)
 		p = nullptr;
 	for (auto& p : mAiCharacter)
 		p = nullptr;
@@ -238,6 +241,22 @@ void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
+void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId)
+{
+	if (healspawnerId == -1)
+	{
+		//Exception Occurred
+		return;
+	}
+	cs_packet_getfruits packet;
+	packet.size = sizeof(cs_packet_getfruits);
+	packet.type = CS_PACKET_GETFRUITS_HEAL;
+	packet.obj_id = healspawnerId;
+
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_getfruits), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
 void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount)
 {
 	cs_packet_useitem packet;
@@ -371,6 +390,13 @@ void Network::process_packet(unsigned char* p)
 			if (nullptr != mPunnet[i])
 			{
 				mPunnet[i]->GenerateFruit(packet->PunnetFruits[i]);
+			}
+		}
+		for (int i = 0; i < HEAL_CNT; ++i)
+		{
+			if (nullptr != mHealSpawner[i])
+			{
+				mHealSpawner[i]->GenerateFruit(packet->HealFruits[i]);
 			}
 		}
 		mMyCharacter->mInventory->ClearInventory();
@@ -612,6 +638,11 @@ void Network::process_packet(unsigned char* p)
 				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
+			else if (packet->useType == INTERACT_TYPE_HEAL)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
+				mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
 		}
 		else {					//수확 로직
 
@@ -623,6 +654,11 @@ void Network::process_packet(unsigned char* p)
 			{
 				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				mPunnet[packet->objNum]->HarvestFruit();
+			}
+			else if (packet->useType == INTERACT_TYPE_HEAL)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
+				mHealSpawner[packet->objNum]->HarvestFruit();
 			}
 
 		}
@@ -1332,6 +1368,11 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				Game->mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
+			else if (packet->useType == INTERACT_TYPE_HEAL)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
+				mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
+			}
 		}
 		else {					//수확 로직
 
@@ -1345,6 +1386,11 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			{
 				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				Game->mPunnet[packet->objNum]->HarvestFruit();
+			}
+			else if (packet->useType == INTERACT_TYPE_HEAL)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
+				mHealSpawner[packet->objNum]->HarvestFruit();
 			}
 
 		}

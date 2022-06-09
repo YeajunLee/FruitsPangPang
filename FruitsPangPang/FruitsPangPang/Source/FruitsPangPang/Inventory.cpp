@@ -159,6 +159,9 @@ bool AInventory::IsSlotValid(const int& index)
 	return true;
 }
 
+
+// 1:tomato 2:kiwi 3:apple 4:watermelon 5:pineapple 6:pumpkin
+// 7:GreenOnion 8:Carrot 9:Durian 10:Nut 11:Banana 12:FirstAidKit
 const FText AInventory::ItemCodeToItemName(const int& itemCode)
 {
 	FText res;
@@ -207,6 +210,9 @@ const FText AInventory::ItemCodeToItemName(const int& itemCode)
 	return res;
 }
 
+
+// 1:tomato 2:kiwi 3:apple 4:watermelon 5:pineapple 6:pumpkin
+// 7:- 8:- 9:Durian 10:Nut 11:Banana 12:-
 const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 {
 	switch (itemCode)
@@ -240,6 +246,9 @@ const FName AInventory::ItemCodeToItemBombPath(const int& itemCode)
 	}
 }
 
+
+// 1:tomato 2:kiwi 3:apple 4:watermelon 5:pineapple 6:pumpkin
+// 7:- 8:- 9:Durian 10:Nut 11:Banana 12:-
 const FName AInventory::ItemCodeToItemBombPathForAI(const int& itemCode)
 {
 	switch (itemCode)
@@ -273,6 +282,8 @@ const FName AInventory::ItemCodeToItemBombPathForAI(const int& itemCode)
 	}
 }
 
+// 1:tomato 2:kiwi 3:apple 4:watermelon 5:pineapple 6:pumpkin
+// 7:GreenOnion 8:Carrot 9:Durian 10:Nut 11:Banana 12:FirstAidKit
 const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 {
 	switch (itemCode)
@@ -306,6 +317,9 @@ const FName AInventory::ItemCodeToItemFruitPath(const int& itemCode)
 	}
 }
 
+
+// 1:tomato 2:kiwi 3:apple 4:watermelon 5:pineapple 6:pumpkin
+// 7:GreenOnion 8:Carrot 9:Durian 10:Nut 11:Banana 12:-
 UTexture2D* AInventory::ItemCodeToItemIcon(const int& itemCode)
 {
 	UTexture2D* res = nullptr;

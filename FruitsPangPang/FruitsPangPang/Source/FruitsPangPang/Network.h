@@ -28,6 +28,7 @@ void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const 
 	const int& fruitType, const int& itemSlotNum, const int& uniqueid);//uniqueid is sync for banana
 void send_getfruits_tree_packet(SOCKET& sock, const int& treeId);
 void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId);
+void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId);
 void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount);
 void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType = 0);
 void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum);
@@ -55,6 +56,7 @@ public:
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];
 	class APunnet* mPunnet[PUNNET_CNT];
+	class AHealSpawner* mHealSpawner[HEAL_CNT];
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;

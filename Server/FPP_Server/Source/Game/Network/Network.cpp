@@ -127,6 +127,11 @@ void send_login_ok_packet(int player_id, const char* playername)
 		packet.PunnetFruits[punnet] = static_cast<char>(reinterpret_cast<Punnet*>(objects[i])->_ftype);
 	}
 
+	for (int i = HEALID_START, heal = 0; i < HEALID_END; ++i, ++heal)
+	{
+		packet.HealFruits[heal] = static_cast<char>(reinterpret_cast<Heal*>(objects[i])->_ftype);
+	}
+
 	packet.id = player_id;
 	strcpy_s(packet.name, playername);
 	player->sendPacket(&packet, sizeof(packet));

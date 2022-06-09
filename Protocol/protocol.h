@@ -197,6 +197,7 @@ struct sc_packet_login_ok {
 	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
+	char HealFruits[HEAL_CNT];
 };
 
 struct sc_packet_move {
