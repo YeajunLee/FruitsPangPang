@@ -24,6 +24,7 @@
 #include "Inventory.h"
 #include "InventorySlotWidget.h"
 #include "MainWidget.h"
+#include "MessageBoxWidget.h"
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
@@ -402,6 +403,10 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			
 		}
 	}
+	else if (Key == EKeys::R)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Please Call Shop Widget Here!!!!!"));
+	}
 	else if (Key == EKeys::P)
 	{
 		send_Cheat(s_socket, CHEAT_TYPE_GAMETIME);
@@ -580,6 +585,22 @@ void AMyCharacter::InteractNpc()
 	case 0:
 		ShowMatchHUD();
 		break;
+	case 1:
+	{
+		auto controller = GetWorld()->GetFirstPlayerController();
+		FInputModeUIOnly gamemode;
+		if (nullptr != controller)
+		{
+			controller->SetInputMode(gamemode);
+			controller->SetShowMouseCursor(true);
+		}
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(GetWorld(), WidgetClass);
+		MessageBoxWGT->AddToViewport();
+		MessageBoxWGT->MakeMessageBoxWithCode(3);
+	}
+	break;
 	}
 }
 
