@@ -17,6 +17,9 @@
 #include "GameResultWidget.h"
 #include "GameMatchWidget.h"
 #include "PointOfInterestWidget.h"
+#include "GoldIconWidget.h"
+#include "SilverIconWidget.h"
+#include "BronzeIconWidget.h"
 #include "MiniMapWidget.h"
 #include "MessageBoxWidget.h"
 #include "AIController_Custom.h"
@@ -774,7 +777,9 @@ void Network::process_packet(unsigned char* p)
 			controller->SetInputMode(gamemode);
 			controller->SetShowMouseCursor(false);
 		}
-		mMyCharacter->mPOIwidget->bTickActive = true;
+		mMyCharacter->mMainWidget->W_MiniMap_0->mSilverIconWidget->bTickActive = true;
+		mMyCharacter->mMainWidget->W_MiniMap_0->mGoldIconWidget->bTickActive = true;
+		mMyCharacter->mMainWidget->W_MiniMap_0->mBronzeIconWidget->bTickActive = true;
 		break;
 	}
 	case SC_PACKET_GAMEEND: {

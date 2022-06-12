@@ -106,12 +106,10 @@ public:
 	UPROPERTY()
 		class UGameMatchWidget* mMatchWidget;
 	class UMainWidget* MakeMainHUD();
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class  UPointOfInterestComponent* POIcomponent;
+
 	void ShowedInMinimap();
 	class UScoreWidget* mScoreWidget;
-	class UPointOfInterestWidget* mPOIwidget;
-
+	
 
 	void MakeLoadingHUD();
 	void ShowLoginHUD();

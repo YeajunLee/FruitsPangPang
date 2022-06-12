@@ -33,6 +33,12 @@ public:
 
 	class UPlayerIconWidget* mPlayerIconWidget;
 
+	class UGoldIconWidget* mGoldIconWidget;
+
+	class USilverIconWidget* mSilverIconWidget;
+
+	class UBronzeIconWidget* mBronzeIconWidget;
+
 	void AddPOI(AActor* actor);
 
 	
