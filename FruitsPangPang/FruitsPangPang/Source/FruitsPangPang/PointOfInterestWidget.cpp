@@ -18,8 +18,6 @@
 
 void UPointOfInterestWidget::NativePreConstruct()
 {
-	bTickActive = false;
-
 	
 }
 
@@ -38,81 +36,26 @@ void UPointOfInterestWidget::NativeTick(const FGeometry& Geometry, float DeltaSe
 	ownerLocX = Owner->GetActorLocation().X;
 	ownerLocY = Owner->GetActorLocation().Y;
 
-	isOn = Network::GetNetwork()->mMyCharacter->POIcomponent->isOn;
 
-	// dimension 을 Main widget에서 W_Minimap의 사이즈(350)으로 나누는 것임
+	SetRenderTranslation(FindCoord(
+		FVector2D((
+			playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
+		.Size(),
+		FindAngle(FVector2D(0, 0), FVector2D((
+			playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom)))
+	));
 
-	//CustomImage2->SetVisibility(ESlateVisibility::Hidden);
-	
-	if (!isCharacter)
+	if (isStatic == false)
 	{
-
-		SetRenderTranslation(FindCoord(
-			FVector2D((
-				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
-			.Size(),
-			FindAngle(FVector2D(0, 0), FVector2D((
-				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom)))
-		));
-
-		if (isStatic == false)
+		if (FVector2D((
+			playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
+			.Size() > 165)
 		{
-			if (FVector2D((
-				playerLocX - ownerLocX) / ((mDimension / 350) * mZoom), (playerLocY - ownerLocY) * (-1) / ((mDimension / 350) * mZoom))
-				.Size() > 165)
-			{
-				ActorImage->SetVisibility(ESlateVisibility::Hidden);
-			}
-			else
-				ActorImage->SetVisibility(ESlateVisibility::Visible);
+			ActorImage->SetVisibility(ESlateVisibility::Hidden);
 		}
+		else
+			ActorImage->SetVisibility(ESlateVisibility::Visible);
 	}
-
-	if(bTickActive)
-	{
-		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
-		{
-			score0_id = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id;
-			enemyLocX = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().X;
-			enemyLocY = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().Y;
-			if (isCharacter)
-			{
-				SetRenderTranslation(FindCoord(
-					FVector2D((
-						playerLocX - enemyLocX) / ((mDimension / 350) * mZoom), (playerLocY - enemyLocY) * (-1) / ((mDimension / 350) * mZoom))
-					.Size(),
-					FindAngle(FVector2D(0, 0), FVector2D((
-						playerLocX - enemyLocX) / ((mDimension / 350) * mZoom), (playerLocY - enemyLocY) * (-1) / ((mDimension / 350) * mZoom)))
-				));
-
-				if (isStatic == false)
-				{
-					if (FVector2D((
-						playerLocX - enemyLocX) / ((mDimension / 350) * mZoom), (playerLocY - enemyLocY) * (-1) / ((mDimension / 350) * mZoom))
-						.Size() > 165)
-					{
-						CharacterImage1->SetVisibility(ESlateVisibility::Hidden);
-					}
-					else
-						CharacterImage1->SetVisibility(ESlateVisibility::Visible);
-				}
-			}
-		}
-	}
-	
-	//UE_LOG(LogTemp, Log, TEXT("%f"),enemyLocX);
-
-		if (isOn == false)
-		{
-			if(Cast<AMyCharacter>(Owner))
-				CharacterImage1->SetVisibility(ESlateVisibility::Hidden);
-		}
-
-		if (isOn == true)
-		{
-			if (Cast<AMyCharacter>(Owner))
-			CharacterImage1->SetVisibility(ESlateVisibility::Visible);
-		}
 		
 }
 

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PointOfInterestWidget.generated.h"
+#include "SilverIconWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FRUITSPANGPANG_API UPointOfInterestWidget : public UUserWidget
+class FRUITSPANGPANG_API USilverIconWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -20,21 +20,22 @@ public:
 	virtual void NativeTick(const FGeometry& Geometry, float DeltaSeconds) override;
 
 	UPROPERTY(meta = (BindWidget))
-		class UOverlay* Overlay0;
+		class UOverlay* Overlay_0;
 	UPROPERTY(meta = (BindWidget))
-		class USizeBox* SizeBox0;
+		class USizeBox* SizeBox_0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (BindWidget))
-		class UImage* ActorImage;
+		class UImage* SilverIcon;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class AActor* Owner;
 
-	bool isStatic;
+	class UPointOfInterestWidget* mPOIWidget;
 
+	bool bTickActive;
+	bool isOn;
+
+private:
 	float FindAngle(FVector2D a, FVector2D b);
 	FVector2D FindCoord(float radius, float degree);
-	
-private:
+
 	float mDimension;
 	float mZoom;
 
@@ -43,5 +44,4 @@ private:
 
 	float ownerLocX;
 	float ownerLocY;
-
 };

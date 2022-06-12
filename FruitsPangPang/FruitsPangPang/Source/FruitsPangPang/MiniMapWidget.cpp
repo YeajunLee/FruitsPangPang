@@ -6,6 +6,9 @@
 #include "PointOfInterestWidget.h"
 #include "PointOfInterestComponent.h"
 #include "PlayerIconWidget.h"
+#include "GoldIconWidget.h"
+#include "SilverIconWidget.h"
+#include "BronzeIconWidget.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Engine/Texture.h"
@@ -21,20 +24,40 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 
 		mPOIComponent = Cast<UPointOfInterestComponent>(actor->GetComponentByClass(UPointOfInterestComponent::StaticClass()));
 
-		auto mChar = Cast<AMyCharacter>(actor);
-		if (mChar != nullptr)
-		{
-			mChar->mPOIwidget = mmPointOfInterestWidget;
-		}
-		
 		mmPointOfInterestWidget->Owner = actor;
 		mmPointOfInterestWidget->isStatic = mPOIComponent->isStatic;
-		mmPointOfInterestWidget->isOn = mPOIComponent->isOn;
-		mmPointOfInterestWidget->isCharacter = mPOIComponent->isCharacter;
+
 
 		auto poiWGT = MapOverlay->AddChildToOverlay(mmPointOfInterestWidget);
 		poiWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
 		poiWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+	}
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_GoldIcon.W_GoldIcon_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		mGoldIconWidget = CreateWidget<UGoldIconWidget>(GetWorld(), WidgetClass);
+
+		auto iconWGT = MapOverlay->AddChildToOverlay(mGoldIconWidget);
+		iconWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		iconWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+	}
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_SilverIcon.W_SilverIcon_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		mSilverIconWidget = CreateWidget<USilverIconWidget>(GetWorld(), WidgetClass);
+
+		auto iconWGT = MapOverlay->AddChildToOverlay(mSilverIconWidget);
+		iconWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		iconWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+	}
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_BronzeIcon.W_BronzeIcon_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		mBronzeIconWidget = CreateWidget<UBronzeIconWidget>(GetWorld(), WidgetClass);
+
+		auto iconWGT = MapOverlay->AddChildToOverlay(mBronzeIconWidget);
+		iconWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		iconWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
 	}
 	{
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MiniMap/W_PlayerIcon.W_PlayerIcon_C'"));
@@ -45,6 +68,5 @@ void UMiniMapWidget::AddPOI(AActor* actor)
 		iconWGT->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
 		iconWGT->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
 	}
-	
 }
 

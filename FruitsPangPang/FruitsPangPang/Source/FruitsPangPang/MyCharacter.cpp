@@ -111,7 +111,7 @@ AMyCharacter::AMyCharacter()
 		dizzySound = dizzySoundAsset.Object;
 	}
 
-	POIcomponent = CreateDefaultSubobject<UPointOfInterestComponent>(TEXT("POIComp"));
+	
 	
 	// 나중에 안쓸 시 지울것
 	/*static ConstructorHelpers::FObjectFinder<UTexture2D> myEnemyIconPath(TEXT("/Game/MiniMap/NothingIMG.NothingIMG"));
@@ -241,7 +241,7 @@ void AMyCharacter::Tick(float DeltaTime)
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
-			ShowedInMinimap();
+			//ShowedInMinimap();
 		}
 		else {
 			
@@ -917,19 +917,20 @@ void AMyCharacter::DropSwordAnimation()
 	send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
 
-void AMyCharacter::ShowedInMinimap()
-{
-	
-	if (mInventory->mMainWidget->mScoreWidget != nullptr)
-	{
-		if (mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
-		{
-			POIcomponent->isOn = false;
-		}
-		else
-			POIcomponent->isOn = true;
-	}
-}
+// 끝나기 3분 이전에는 화면에 1,2,3등 아이콘이 나타나지 않게 하도록 하는 함수
+//void AMyCharacter::ShowedInMinimap()
+//{
+//	
+//	if (mInventory->mMainWidget->mScoreWidget != nullptr)
+//	{
+//		if (mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->c_id == this->c_id)
+//		{
+//			POIcomponent->isOn = false;
+//		}
+//		else
+//			POIcomponent->isOn = true;
+//	}
+//}
 
 void AMyCharacter::Throw()
 {
