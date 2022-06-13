@@ -32,14 +32,14 @@ void UScoreWidget::NativePreConstruct()
 {
 
 #define LOCTEXT_NAMESPACE "score"
-	No_1->SetText(FText::FromString("No.1"));
-	No_2->SetText(FText::FromString("No.2"));
-	No_3->SetText(FText::FromString("No.3"));
-	No_4->SetText(FText::FromString("No.4"));
-	No_5->SetText(FText::FromString("No.5"));
-	No_6->SetText(FText::FromString("No.6"));
-	No_7->SetText(FText::FromString("No.7"));
-	No_8->SetText(FText::FromString("No.8"));
+	No_1->SetText(FText::FromString("1st"));
+	No_2->SetText(FText::FromString("2nd"));
+	No_3->SetText(FText::FromString("3rd"));
+	No_4->SetText(FText::FromString("4th"));
+	No_5->SetText(FText::FromString("5th"));
+	No_6->SetText(FText::FromString("6th"));
+	No_7->SetText(FText::FromString("7th"));
+	No_8->SetText(FText::FromString("8th"));
 
 	if(nullptr!= Network::GetNetwork()->mMyCharacter)
 		ScoreBoard.push_back(ScoreInfo(Network::GetNetwork()->mMyCharacter));
