@@ -97,5 +97,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* No_8Score;
 
-
+	// 현재 나의 등수를 나타내는 텍스트
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* MyRank;
 };
