@@ -29,11 +29,13 @@
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
 #include "GameMatchWidget.h"
+#include "StoreWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
 #include "PointOfInterestComponent.h"
 #include "ScoreWidget.h"
 #include "Components/Image.h"
+#include "Components/Button.h"
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -406,6 +408,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::R)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Please Call Shop Widget Here!!!!!"));
+		showStoreHUD();
 	}
 	else if (Key == EKeys::P)
 	{
@@ -1247,6 +1250,30 @@ void AMyCharacter::ShowMatchHUD()
 		controller->SetShowMouseCursor(true);
 	}
 	mMatchWidget->AddToViewport();
+}
+
+void AMyCharacter::showStoreHUD()
+{
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreWidget.MStoreWidget_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	if (nullptr == WidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MStoreWidget.MStoreWidget_C'"));
+		return;
+	}
+	mStoreWidget = CreateWidget<UStoreWidget>(GetWorld(), WidgetClass);
+
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		DisableInput(controller);
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(true);
+	}
+	mStoreWidget->AddToViewport();
+
+	
 }
 
 

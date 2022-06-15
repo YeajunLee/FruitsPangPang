@@ -39,7 +39,7 @@ public:
 		class UButton* Button2_2;
 
 	UFUNCTION()
-	void BClick0_0();
+		void BClick0_0();
 	UFUNCTION()
 		void BClick1_0();
 	UFUNCTION()

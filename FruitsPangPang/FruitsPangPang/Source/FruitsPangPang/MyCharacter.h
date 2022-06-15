@@ -105,6 +105,8 @@ public:
 		class UUserWidget* mLoginWidget;
 	UPROPERTY()
 		class UGameMatchWidget* mMatchWidget;
+	UPROPERTY()
+		class UStoreWidget* mStoreWidget;
 	class UMainWidget* MakeMainHUD();
 
 	void ShowedInMinimap();
@@ -114,6 +116,7 @@ public:
 	void MakeLoadingHUD();
 	void ShowLoginHUD();
 	void ShowMatchHUD();
+	void showStoreHUD();
 public:
 	//Player Stats
 	int GameState;	// -1 = INVALID , 0 = Lobby, 1 = InGame
