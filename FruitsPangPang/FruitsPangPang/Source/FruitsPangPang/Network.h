@@ -61,7 +61,7 @@ public:
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
 	short GameServerPort = -1;		//게임서버 접속용 port
-	int mGameMode = 0;	//0 = PlayerMode, 1= AIMode
+	//int mGameMode = 0;	//0 = PlayerMode, 1= AIMode
 	Network();
 	~Network();
 private:

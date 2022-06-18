@@ -27,5 +27,6 @@ public:
 	std::mutex Coin_lock;
 	int mCoin;
 	std::atomic_short mSkinType;
+	bool bisAI;	// false - player , true - AI
 };
 

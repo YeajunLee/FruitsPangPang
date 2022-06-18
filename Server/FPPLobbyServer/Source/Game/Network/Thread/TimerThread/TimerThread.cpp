@@ -26,6 +26,11 @@ void TimerThread()
 						wsa_ex->setCmd(CMD_MATCH_REQUEST);
 						memcpy(wsa_ex->getBuf(), &is_already.object_id, sizeof(int));
 						PostQueuedCompletionStatus(hiocp, 1, is_already.player_id, &wsa_ex->getWsaOver());
+					}else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_MATCH_WAITING_TIMEOUT)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_MATCH_WAITING_TIMEOUT);
+						PostQueuedCompletionStatus(hiocp, 1, is_already.player_id, &wsa_ex->getWsaOver());
 					}
 					triger = false;
 
@@ -43,7 +48,12 @@ void TimerThread()
 					wsa_ex->setCmd(CMD_MATCH_REQUEST);
 					memcpy(wsa_ex->getBuf(), &exec_event.object_id, sizeof(int));
 					PostQueuedCompletionStatus(hiocp, 1, exec_event.player_id, &wsa_ex->getWsaOver());
-				}				
+				}else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_MATCH_WAITING_TIMEOUT)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_MATCH_WAITING_TIMEOUT);
+					PostQueuedCompletionStatus(hiocp, 1, exec_event.player_id, &wsa_ex->getWsaOver());
+				}
 			}
 			else {
 

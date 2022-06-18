@@ -49,7 +49,7 @@ void Disconnect(int c_id)
 	server->state_lock.unlock();
 }
 
-void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype)
+void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype, const short& playertype)
 {
 	auto server = reinterpret_cast<Server*>(servers[server_id]);
 	dl_packet_login_author_ok packet;
@@ -61,6 +61,7 @@ void send_login_authorization_ok_packet(const int& server_id,const int& player_i
 	packet.loginsuccess = succestype;
 	packet.coin = coin;
 	packet.skintype = skintype;
+	packet.playertype = playertype;
 	server->sendPacket(&packet, sizeof(packet));
 }
 
@@ -120,7 +121,7 @@ void process_packet(int client_id, unsigned char* p)
 		ld_packet_login_author* packet = reinterpret_cast<ld_packet_login_author*>(p);
 		LoginInfo info{};
 		char ret = Login(packet->id, packet->pass, info);
-		send_login_authorization_ok_packet(client_id,packet->playerid, ret, info.p_coin, info.p_skintype);
+		send_login_authorization_ok_packet(client_id, packet->playerid, ret, info.p_coin, info.p_skintype, info.p_playertype);
 		break;
 	}
 	case LD_PACKET_SIGNUP: {
