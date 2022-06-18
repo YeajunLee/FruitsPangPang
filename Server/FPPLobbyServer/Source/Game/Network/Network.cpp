@@ -155,6 +155,7 @@ void send_enter_ingame_packet(const int& player_id, const short& server_port)
 	packet.port = server_port;
 	packet.size = sizeof(packet);
 	packet.type = LC_PACKET_MATCH_RESPONSE;
+	packet.playertype = player->bisAI;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -301,14 +302,25 @@ void process_packet(int client_id, unsigned char* p)
 			_itow_s(gameserver->mServerPort, tmp, 10);
 			ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), tmp, NULL, SW_SHOW);
 
-			cout << "서버 열린곳이 없음. 매칭 재시도\n";
-			Timer_Event instq;
-			instq.player_id = object->_id;
-			instq.object_id = AmountOfTryMatchingPlayer;
-			instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
-			instq.exec_time = chrono::system_clock::now() + 1000ms;
+			{
+				Timer_Event instq;
+				instq.player_id = server->_id;
+				instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_WAITING_TIMEOUT;
+				instq.exec_time = chrono::system_clock::now() + 10000ms;		//10초간 대기하고 반응이없다면 AI넣어줌.
 
-			timer_queue.push(instq);
+				timer_queue.push(instq);
+			}
+
+			cout << "서버 열린곳이 없음. 매칭 재시도\n";
+			{
+				Timer_Event instq;
+				instq.player_id = object->_id;
+				instq.object_id = AmountOfTryMatchingPlayer;
+				instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_REQUEST;
+				instq.exec_time = chrono::system_clock::now() + 1000ms;
+
+				timer_queue.push(instq);
+			}
 		}
 
 		break;
@@ -361,6 +373,7 @@ void process_packet_for_DB(unsigned char* p)
 			character->Coin_lock.lock();
 			character->mCoin = packet->coin;
 			character->Coin_lock.unlock();
+			character->bisAI = packet->playertype;	//서버에서만 사용되는 변수. 클라에게로 넘겨줄 이유는 없다.
 
 			send_login_ok_packet(packet->playerid, packet->loginsuccess, packet->coin, packet->skintype);
 			std::cout << "로그인 성공 성공id :" << character->name << endl;

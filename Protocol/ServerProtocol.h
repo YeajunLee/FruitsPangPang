@@ -81,6 +81,7 @@ struct dl_packet_login_author_ok {
 	char loginsuccess;			//1 성공, 0이하 - 실패
 	int coin;
 	short skintype;
+	short playertype;
 };
 
 struct dl_packet_signup_ok {

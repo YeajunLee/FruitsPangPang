@@ -15,7 +15,7 @@ extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 void error_display(int err_no);
 
-void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const int& coin, const short& skintype);
+void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const int& coin, const short& skintype, const short& playertype);
 void send_signup_ok_packet(const int& server_id, const int& player_id, const char& succestype);
 void send_ping_test(const int& server_id);
 void Disconnect(int id);
@@ -64,4 +64,5 @@ struct LoginInfo {
 	char p_password[21];
 	int p_coin;
 	short p_skintype;
+	short p_playertype;
 };

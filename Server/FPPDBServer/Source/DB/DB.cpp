@@ -82,9 +82,9 @@ void ReleaseDB()
 int Login(const char* name, const char* password, LoginInfo& p_info)
 {
 	SQLINTEGER p_coin{};
-	SQLSMALLINT p_skintype{};
+	SQLSMALLINT p_skintype{}, p_playertype{};
 	SQLWCHAR p_name[21]{}, p_password[21]{};
-	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0;
+	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0,cbP_playertype = 0;
 	SQLRETURN retcode{};
 
 	//cout << "ODBC Connected !" << endl;
@@ -105,6 +105,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &cbPassword);
 		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &cbP_coin);
 		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &cbP_skintype);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &cbP_playertype);
 
 		// Fetch and print each row of data. On an error, display a message and exit.  
 		{
@@ -115,6 +116,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 				WideCharToMultiByte(CP_ACP, 0, p_password, -1, p_info.p_password, 21, 0, 0);
 				p_info.p_coin = p_coin;
 				p_info.p_skintype = p_skintype;
+				p_info.p_playertype = p_playertype;
 
 				SQLCancel(hstmt);
 
@@ -149,9 +151,9 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 int SignUp(const char* name, const char* password)
 {
 	SQLINTEGER p_coin{};
-	SQLSMALLINT p_skintype{};
+	SQLSMALLINT p_skintype{}, p_playertype{};
 	SQLWCHAR p_name[21]{}, p_password[21]{};
-	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0;
+	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0, cbP_playertype = 0;
 	SQLRETURN retcode{};
 
 	wstring SignUpQuery{ L"EXEC make_character " };
@@ -177,6 +179,7 @@ int SignUp(const char* name, const char* password)
 			retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &cbPassword);
 			retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &cbP_coin);
 			retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &cbP_skintype);
+			retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &cbP_playertype);
 
 			retcode = SQLFetch(hstmt);
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
