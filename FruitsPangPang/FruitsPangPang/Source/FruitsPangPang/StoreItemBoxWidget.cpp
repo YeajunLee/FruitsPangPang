@@ -5,3 +5,14 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Network.h"
+#include "MyCharacter.h"
+
+void UStoreItemBoxWidget::NativePreConstruct()
+{
+	BuyBotton->OnClicked.AddDynamic(this, &UStoreItemBoxWidget::ClickBuy_0);
+	
+}void UStoreItemBoxWidget::ClickBuy_0()
+{
+	//Network::GetNetwork()->mMyCharacter->bNifeSkin = true;
+}

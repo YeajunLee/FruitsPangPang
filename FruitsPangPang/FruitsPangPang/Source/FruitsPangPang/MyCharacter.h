@@ -116,7 +116,6 @@ public:
 	void MakeLoadingHUD();
 	void ShowLoginHUD();
 	void ShowMatchHUD();
-	void showStoreHUD();
 public:
 	//Player Stats
 	int GameState;	// -1 = INVALID , 0 = Lobby, 1 = InGame
@@ -196,8 +195,11 @@ public:
 
 	
 
-	//나중에 안쓸 시 지울 것.
-	//class UTexture2D* myEnemy1Icon;
+	//캐릭터 스킨 장착 변수들
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		class UStaticMeshComponent* NifeSkin;
+	bool bNifeSkin;
 	
 	
 protected:

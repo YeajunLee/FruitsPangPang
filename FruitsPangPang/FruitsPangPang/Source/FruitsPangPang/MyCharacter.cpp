@@ -113,14 +113,9 @@ AMyCharacter::AMyCharacter()
 		dizzySound = dizzySoundAsset.Object;
 	}
 
+	/*NifeSkin = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Skins"));
+	NifeSkin->SetupAttachment(GetMesh());*/
 	
-	
-	// 나중에 안쓸 시 지울것
-	/*static ConstructorHelpers::FObjectFinder<UTexture2D> myEnemyIconPath(TEXT("/Game/MiniMap/NothingIMG.NothingIMG"));
-	if (myEnemyIconPath.Succeeded())
-	{
-		myEnemy1Icon = myEnemyIconPath.Object;
-	}*/
 }
 
 // Called when the game starts or when spawned
@@ -266,6 +261,8 @@ void AMyCharacter::Tick(float DeltaTime)
 	}
 
 
+	//store item box widget 에서 buy 버튼을 누르면 bnikeSkin 이 true 바뀌게 되고 이때 nife skin 이 캐릭터에 부착됨.
+	
 	
 }
 
@@ -408,7 +405,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::R)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Please Call Shop Widget Here!!!!!"));
-		showStoreHUD();
+		this->mMainWidget->ShowStoreWidget();
 	}
 	else if (Key == EKeys::P)
 	{
@@ -1252,29 +1249,6 @@ void AMyCharacter::ShowMatchHUD()
 	mMatchWidget->AddToViewport();
 }
 
-void AMyCharacter::showStoreHUD()
-{
-	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreWidget.MStoreWidget_C'"));
-	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-	if (nullptr == WidgetClass)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MStoreWidget.MStoreWidget_C'"));
-		return;
-	}
-	mStoreWidget = CreateWidget<UStoreWidget>(GetWorld(), WidgetClass);
-
-	FInputModeUIOnly gamemode;
-	auto controller = GetWorld()->GetFirstPlayerController();
-	if (nullptr != controller)
-	{
-		DisableInput(controller);
-		controller->SetInputMode(gamemode);
-		controller->SetShowMouseCursor(true);
-	}
-	mStoreWidget->AddToViewport();
-
-	
-}
 
 
 

@@ -10,6 +10,7 @@
 #include "ScoreWidget.h"
 #include "KillLogTextWidget.h"
 #include "MiniMapWidget.h"
+#include "StoreWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
@@ -37,6 +38,7 @@ void UMainWidget::NativePreConstruct()
 		mScoreWidget = ScoreWGT;
 	}
 	
+	W_Store->SetVisibility(ESlateVisibility::Hidden);
 }
 
 
@@ -74,6 +76,27 @@ void UMainWidget::HideRespawnWidget()
 	}
 	mRespawnWindowWidget->bActivate = false;
 	mRespawnWindowWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainWidget::ShowStoreWidget()
+{
+	FInputModeUIOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->SetInputMode(gamemode);
+	controller->SetShowMouseCursor(true);
+	W_Store->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UMainWidget::HideStoreWidget()
+{
+	FInputModeGameOnly gamemode;
+	auto controller = GetWorld()->GetFirstPlayerController();
+	if (nullptr != controller)
+	{
+		controller->SetInputMode(gamemode);
+		controller->SetShowMouseCursor(false);
+	}
+	W_Store->SetVisibility(ESlateVisibility::Hidden);
 }
 
 

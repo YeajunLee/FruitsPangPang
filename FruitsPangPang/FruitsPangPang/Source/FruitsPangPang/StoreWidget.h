@@ -22,4 +22,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UButton* QuitButton;
 
+	UFUNCTION()
+		void ClickQuit();
+
+	class UMainWidget* mMainWidget;
 };

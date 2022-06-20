@@ -38,8 +38,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UScrollBox* KillLogBox;
 
+
 	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
 		class UMiniMapWidget* W_MiniMap_0;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		class UStoreWidget* W_Store;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
@@ -63,5 +67,7 @@ public:
 	void UpdateHpBar();
 	void ShowRespawnWidget();
 	void HideRespawnWidget();
+	void ShowStoreWidget();
+	void HideStoreWidget();
 	void UpdateKillLog(const FString& Attacker,const FString& Victim);
 };

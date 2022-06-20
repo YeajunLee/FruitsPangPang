@@ -15,6 +15,9 @@ class FRUITSPANGPANG_API UStoreItemBoxWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
+	virtual void NativePreConstruct() override;
+
 	UPROPERTY(meta = (BindWidget))
 		class UImage* ItemImage;
 	UPROPERTY(meta = (BindWidget))
@@ -25,5 +28,8 @@ public:
 		class UButton* EquipButton;
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* PriceText;
+
+	UFUNCTION()
+		void ClickBuy_0();
 	
 };
