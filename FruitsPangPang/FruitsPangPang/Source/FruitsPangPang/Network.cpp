@@ -864,7 +864,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 	case LC_PACKET_MATCH_RESPONSE: {
 		lc_packet_match_response* packet = reinterpret_cast<lc_packet_match_response*>(p);
 		GameServerPort = packet->port;
-		switch (mGameMode)
+		switch (packet->playertype)
 		{
 		case 0:
 			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));

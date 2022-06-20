@@ -342,6 +342,7 @@ struct lc_packet_match_response {
 	unsigned char size;
 	char type;
 	short port;
+	short playertype;
 };
 
 struct lc_packet_match_update {

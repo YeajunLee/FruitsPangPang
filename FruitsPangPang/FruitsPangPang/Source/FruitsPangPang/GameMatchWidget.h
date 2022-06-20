@@ -19,8 +19,6 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-		class UButton* MatchforAI;
-	UPROPERTY(meta = (BindWidget))
 		class UButton* MatchforPlayer;
 	UPROPERTY(meta = (BindWidget))
 		class UOverlay* mMatchWaitOverlay;
@@ -32,8 +30,6 @@ public:
 
 	UFUNCTION()
 		void TryMatchingPlayer();
-	UFUNCTION()
-		void TryMatchingAI();
 
 	void UpdatePlayerCntText(const int& cnt);
 };

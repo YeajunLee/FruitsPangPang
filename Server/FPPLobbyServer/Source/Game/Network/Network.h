@@ -32,7 +32,8 @@ void send_match_update_packet(const int& player_id, const int& player_cnt);
 struct Timer_Event {
 	enum class TIMER_TYPE 
 	{
-		TYPE_MATCH_REQUEST
+		TYPE_MATCH_REQUEST,
+		TYPE_MATCH_WAITING_TIMEOUT
 	};
 	int object_id;
 	int player_id;
@@ -48,7 +49,7 @@ enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV,//Basic
 	CMD_DB_RECV,	//DB
 	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, //Game Cycle
-	CMD_MATCH_REQUEST
+	CMD_MATCH_REQUEST, CMD_MATCH_WAITING_TIMEOUT	//Match
 };
 
 class WSA_OVER_EX {

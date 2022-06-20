@@ -155,12 +155,35 @@ void WorkerThread()
 
 						timer_queue.push(instq);
 					}
+					else {
+						break;
+					}
 
 				}
 				else {
 					gameserver->state_lock.unlock();
+					cout << "WorkerTHread에서 서버가 켜진곳이 없어서 예외상황이 발생했습니다. 아직 코딩 안한 부분입니다\n";
 				}
 			}
+			delete wsa_ex;
+			break;
+		}
+		case CMD_MATCH_WAITING_TIMEOUT: {
+			GameServer* gameserver = reinterpret_cast<GameServer*>(servers[client_id]);
+			bool isGameAlreadyStart = false;
+			gameserver->state_lock.lock();
+			if (gameserver->_state == Server::STATE::ST_MATHCING)
+				gameserver->_state = Server::STATE::ST_USING;
+			else
+				isGameAlreadyStart = true;
+			gameserver->state_lock.unlock();
+			// 이 이후로는 플레이어 매칭은 다 막음
+			
+
+			if(!isGameAlreadyStart)	//게임이 이미 시작한 상태가 아니라면
+				gameserver->AIMatch();
+
+
 			delete wsa_ex;
 			break;
 		}

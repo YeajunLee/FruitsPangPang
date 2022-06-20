@@ -16,5 +16,7 @@ public:
 	bool isAIEntered;
 	int SaveAI_id;
 	bool Match(const int& player_id,const short& amount = 1);
+	void AIMatch();
+	void ServerReset();
 };
 
