@@ -31,11 +31,16 @@ void USilverIconWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds
 
 	if (bTickActive)
 	{
-		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
+		if (Network::GetNetwork()->mMyCharacter == Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
 		{
+			SilverIcon->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			SilverIcon->SetVisibility(ESlateVisibility::Visible);
 			ownerLocX = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[1].GetCharacter()->GetActorLocation().X;
 			ownerLocY = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[1].GetCharacter()->GetActorLocation().Y;
-			
+
 			{
 				SetRenderTranslation(FindCoord(
 					FVector2D((

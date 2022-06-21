@@ -31,8 +31,13 @@ void UGoldIconWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
 
 	if (bTickActive)
 	{
-		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
+		if (Network::GetNetwork()->mMyCharacter == Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
 		{
+			GoldIcon->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			GoldIcon->SetVisibility(ESlateVisibility::Visible);
 			ownerLocX = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().X;
 			ownerLocY = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter()->GetActorLocation().Y;
 
@@ -48,7 +53,7 @@ void UGoldIconWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
 			}
 		}
 	}
-
+	
 }
 
 float UGoldIconWidget::FindAngle(FVector2D a, FVector2D b)
