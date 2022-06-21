@@ -74,10 +74,11 @@ void UScoreWidget::UpdateRank()
 	UpdateScoreBoard();
 	sort(ScoreBoard.begin(), ScoreBoard.end());
 
-
 #define LOCTEXT_NAMESPACE "score"
 	for (int i = 0; i < ScoreBoard.size(); ++i)
 	{
+		if (Network::GetNetwork()->mMyCharacter->c_id == ScoreBoard[i].GetCharacter()->c_id)
+			MyRank->SetText(FText::Format(LOCTEXT("score", "{0}/{1}"), i, ScoreBoard.size()));
 		switch (i)
 		{
 		case 0:
