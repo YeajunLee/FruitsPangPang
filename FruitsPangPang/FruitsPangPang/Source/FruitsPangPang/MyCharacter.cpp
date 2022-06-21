@@ -225,7 +225,7 @@ void AMyCharacter::Tick(float DeltaTime)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 
-		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -20.f, 30.f);
+		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 45.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 		if (GetController()->IsPlayerController()) {
