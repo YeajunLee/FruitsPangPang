@@ -49,7 +49,7 @@ void AHealSpawner::GenerateFruit(int _FruitType)
             SpawnParams.Owner = this;
             FRotator rotator;
             FVector  SpawnLocation = GetActorLocation();
-            SpawnLocation.Z += 10.0f;
+            SpawnLocation.Z += 40.0f;
             mFruitMesh = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
         }
         CanHarvest = true;
