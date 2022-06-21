@@ -31,8 +31,13 @@ void UBronzeIconWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds
 
 	if (bTickActive)
 	{
-		if (Network::GetNetwork()->mMyCharacter != Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
+		if (Network::GetNetwork()->mMyCharacter == Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[0].GetCharacter())
 		{
+			BronzeIcon->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			BronzeIcon->SetVisibility(ESlateVisibility::Visible);
 			ownerLocX = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[2].GetCharacter()->GetActorLocation().X;
 			ownerLocY = Network::GetNetwork()->mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard[2].GetCharacter()->GetActorLocation().Y;
 
