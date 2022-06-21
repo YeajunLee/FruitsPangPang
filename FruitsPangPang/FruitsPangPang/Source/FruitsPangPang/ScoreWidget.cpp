@@ -82,35 +82,35 @@ void UScoreWidget::UpdateRank()
 		switch (i)
 		{
 		case 0:
-			No_1Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_1Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_1Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 1:
-			No_2Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_2Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_2Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 2:
-			No_3Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_3Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_3Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 3:
-			No_4Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_4Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_4Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 4:
-			No_5Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_5Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_5Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 5:
-			No_6Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_6Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_6Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 6:
-			No_7Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_7Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_7Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 		case 7:
-			No_8Name->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
+			No_8Name->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ScoreBoard[i].GetCharacter()->CharacterName)));
 			No_8Score->SetText(FText::Format(LOCTEXT("score", "({0})"), ScoreBoard[i].GetScore()));
 			break;
 
@@ -121,35 +121,35 @@ void UScoreWidget::UpdateRank()
 		switch (i)
 		{
 		case 0:
-			No_1Name->SetText(FText::FromString("ID:NoName"));
+			No_1Name->SetText(FText::FromString("NoName"));
 			No_1Score->SetText(FText::FromString("(-)"));
 			break;
 		case 1:
-			No_2Name->SetText(FText::FromString("ID:NoName"));
+			No_2Name->SetText(FText::FromString("NoName"));
 			No_2Score->SetText(FText::FromString("(-)"));
 			break;
 		case 2:
-			No_3Name->SetText(FText::FromString("ID:NoName"));
+			No_3Name->SetText(FText::FromString("NoName"));
 			No_3Score->SetText(FText::FromString("(-)"));
 			break;
 		case 3:
-			No_4Name->SetText(FText::FromString("ID:NoName"));
+			No_4Name->SetText(FText::FromString("NoName"));
 			No_4Score->SetText(FText::FromString("(-)"));
 			break;
 		case 4:
-			No_5Name->SetText(FText::FromString("ID:NoName"));
+			No_5Name->SetText(FText::FromString("NoName"));
 			No_5Score->SetText(FText::FromString("(-)"));
 			break;
 		case 5:
-			No_6Name->SetText(FText::FromString("ID:NoName"));
+			No_6Name->SetText(FText::FromString("NoName"));
 			No_6Score->SetText(FText::FromString("(-)"));
 			break;
 		case 6:
-			No_7Name->SetText(FText::FromString("ID:NoName"));
+			No_7Name->SetText(FText::FromString("NoName"));
 			No_7Score->SetText(FText::FromString("(-)"));
 			break;
 		case 7:
-			No_8Name->SetText(FText::FromString("ID:NoName"));
+			No_8Name->SetText(FText::FromString("NoName"));
 			No_8Score->SetText(FText::FromString("(-)"));
 			break;
 
