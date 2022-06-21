@@ -78,7 +78,7 @@ void UScoreWidget::UpdateRank()
 	for (int i = 0; i < ScoreBoard.size(); ++i)
 	{
 		if (Network::GetNetwork()->mMyCharacter->c_id == ScoreBoard[i].GetCharacter()->c_id)
-			MyRank->SetText(FText::Format(LOCTEXT("score", "{0}/{1}"), i, ScoreBoard.size()));
+			MyRank->SetText(FText::Format(LOCTEXT("score", "{0}/{1}"), i + 1, ScoreBoard.size()));
 		switch (i)
 		{
 		case 0:
