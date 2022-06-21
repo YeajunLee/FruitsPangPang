@@ -587,18 +587,18 @@ void AMyCharacter::InteractNpc()
 		break;
 	case 1:
 	{
-		auto controller = GetWorld()->GetFirstPlayerController();
-		FInputModeUIOnly gamemode;
-		if (nullptr != controller)
-		{
-			controller->SetInputMode(gamemode);
-			controller->SetShowMouseCursor(true);
-		}
-		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
-		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(GetWorld(), WidgetClass);
-		MessageBoxWGT->AddToViewport();
-		MessageBoxWGT->MakeMessageBoxWithCode(3);
+		//auto controller = GetWorld()->GetFirstPlayerController();
+		//FInputModeUIOnly gamemode;
+		//if (nullptr != controller)
+		//{
+		//	controller->SetInputMode(gamemode);
+		//	controller->SetShowMouseCursor(true);
+		//}
+		//FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+		//auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		//auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(GetWorld(), WidgetClass);
+		//MessageBoxWGT->AddToViewport();
+		//MessageBoxWGT->MakeMessageBoxWithCode(3);
 	}
 	break;
 	}
