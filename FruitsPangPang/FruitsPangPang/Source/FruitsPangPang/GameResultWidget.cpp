@@ -57,7 +57,7 @@ void UGameResultWidget::NativePreConstruct()
 #define LOCTEXT_NAMESPACE "score"
 	for (int i = 0; i < mTextBlockRank.size(); ++i)
 	{
-		mTextBlockRank[i]->SetText(FText::Format(LOCTEXT("score", "No.{0}"), i + 1));
+		mTextBlockRank[i]->SetText(FText::Format(LOCTEXT("score", "{0}. "), i + 1));
 	}
 
 	for (int i = 0; i < ResultBoard.size(); ++i)
@@ -67,11 +67,11 @@ void UGameResultWidget::NativePreConstruct()
 			mTextBlockRank[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
 			mTextBlockName[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
 			mTextBlockScore[i]->SetColorAndOpacity(FSlateColor(FLinearColor(1, 1, 0)));
-			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
+			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
 			mTextBlockScore[i]->SetText(FText::Format(LOCTEXT("score", "({0})"), ResultBoard[i].GetScore()));
 		}
 		else {
-			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "ID:{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
+			mTextBlockName[i]->SetText(FText::Format(LOCTEXT("score", "{0}"), FText::FromString(ResultBoard[i].GetCharacter()->CharacterName)));
 			mTextBlockScore[i]->SetText(FText::Format(LOCTEXT("score", "({0})"), ResultBoard[i].GetScore()));
 		}
 	}
