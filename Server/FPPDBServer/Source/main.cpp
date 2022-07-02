@@ -53,10 +53,10 @@ int main()
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(WorkerThread);
 
+
 	for (auto& th : worker_threads)
 		th.join();
 	timer_thread.join();
-
 	//스레드가 다 끝남. 그러니까 뮤텍스 필요없음.
 	//for (auto& object : objects) {
 	//	if (!object->isPlayer()) break;

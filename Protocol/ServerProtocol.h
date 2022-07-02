@@ -5,6 +5,7 @@ const short DBSERVER_PORT = 4200;
 const int	GAMESERVER_START = 0;
 const int	MAX_SERVER = 10;
 const int  MAX_NAME_LEN = 21;
+const int MAX_SHOP_ITEM = 20;
 //------------------------
 
 //-------------------------
@@ -30,10 +31,12 @@ const char LG_PACKET_LOGIN_OK = 1;
 
 const char LD_PACKET_LOGIN_AUTHOR = 1;
 const char LD_PACKET_SIGNUP = 2;
+const char LD_PACKET_REQUESTITEMINFO = 3;
 
 
 const char DL_PACKET_LOGIN_AUTHOR_OK = 1;
 const char DL_PACKET_SIGNUP_OK = 2;
+const char DL_PACKET_GETITEMINFO = 3;
 
 
 #pragma pack (push, 1)
@@ -72,6 +75,11 @@ struct ld_packet_signup {
 	char id[MAX_NAME_LEN];
 	char pass[MAX_NAME_LEN];
 };
+
+struct ld_packet_requestiteminfo {
+	unsigned char size;
+	char type;
+};
 //------------------- Lobbyserver to DBserver
 
 struct dl_packet_login_author_ok {
@@ -82,6 +90,8 @@ struct dl_packet_login_author_ok {
 	int coin;
 	short skintype;
 	short playertype;
+	char numberofplayerhaveitem;	//플레이어가 가지고있는 아이템의 갯수
+	unsigned char itemcode[MAX_SHOP_ITEM];
 };
 
 struct dl_packet_signup_ok {
@@ -91,4 +101,11 @@ struct dl_packet_signup_ok {
 	char loginsuccess;			//1 성공, 0이하 - 실패
 };
 
+struct dl_packet_getiteminfo {
+	unsigned char size;
+	char type;
+	char MaxItemAmount;						//상점에 현재 있는 아이템 종류의 갯수.
+	unsigned char itemcode[MAX_SHOP_ITEM];	//MAX_SHOP_ITEM : 최대로 상점에 들어가있을 수 있는 아이템 종류 갯수
+	short price[MAX_SHOP_ITEM];
+};
 #pragma pack(pop)

@@ -1,8 +1,11 @@
 #include <iostream>
+#include <ppl.h>
+#include <concurrent_unordered_map.h>
 #include "Network.h"
 #include "../Object/Object.h"
 #include "../Object/Character/Character.h"
 #include "../Object/Character/Player/Player.h"
+#include "../Object/Character/Npc/Npc.h"
 #include "../Server/Server.h"
 #include "../Server/GameServer/GameServer.h"
 #include "../Server/DBServer/DBServer.h"
@@ -11,7 +14,7 @@ using namespace std;
 
 HANDLE hiocp;
 SOCKET s_socket;
-std::array<Object*, MAX_OBJECT> objects;
+std::array<Object*, MAX_USER_LOBBY + MAX_NPC_LOBBY> objects;
 std::array<Server*, MAX_SERVER> servers;
 class DBServer* dbserver;
 concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
@@ -103,6 +106,16 @@ void send_login_authorization_packet(const int& player_id, const char* id, const
 	dbserver->sendPacket(&packet, sizeof(packet));
 }
 
+void send_request_iteminfo_packet()
+{
+	ld_packet_requestiteminfo packet;
+	memset(&packet, 0, sizeof(ld_packet_requestiteminfo));
+
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_REQUESTITEMINFO;
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
 void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
@@ -116,9 +129,17 @@ void send_login_ok_packet(const int& player_id, const char& succestype, const in
 	packet.loginsuccess = succestype;
 	packet.coin = coin;
 	packet.skintype = skintype;
+	int i = 0;
+	for (auto& p : player->ShopInventory)
+	{
+		packet.haveitems[i] = p.first;
+		++i;
+	}
+	packet.numberofitemshave = i;
 
 	player->sendPacket(&packet, sizeof(packet));
 }
+
 
 void send_signup_packet(const int& player_id, const char* id, const char* pass)
 {
@@ -168,6 +189,18 @@ void send_match_update_packet(const int& player_id, const int& player_cnt)
 	packet.playercnt = player_cnt;
 	packet.size = sizeof(packet);
 	packet.type = LC_PACKET_MATCH_UPDATE;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_buyitem_result_packet(const int& player_id, const int& remaincoin)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_buyitem_result packet;
+	memset(&packet, 0, sizeof(lc_packet_buyitem_result));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_BUYITEM_RESULT;
+	packet.Coin = remaincoin;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -332,6 +365,34 @@ void process_packet(int client_id, unsigned char* p)
 
 		break;
 	}
+	case CL_PACKET_BUY: {
+
+		cl_packet_buy* packet = reinterpret_cast<cl_packet_buy*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+		int remaincoin = 0;
+		Npc* ShopNpc = reinterpret_cast<Npc*>(objects[NPC_ID_START_LOBBY]);
+		character->db_lock.lock();
+		if (false == character->ShopInventory[ShopNpc->Shop[packet->itemcode].first])
+		{
+			if (0 <= character->mCoin - ShopNpc->Shop[packet->itemcode].second)
+			{
+				character->mCoin -= ShopNpc->Shop[packet->itemcode].second;
+				character->ShopInventory[ShopNpc->Shop[packet->itemcode].first] = true;
+				//update characters DB in playerhaveitem
+			}
+		}
+		remaincoin = character->mCoin;
+		character->db_lock.unlock();
+
+		send_buyitem_result_packet(character->_id, remaincoin);
+
+		break;
+	}
+	case CL_PACKET_EQUIP: {
+		cl_packet_equip* packet = reinterpret_cast<cl_packet_equip*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+
+	}
 	}
 }
 
@@ -363,17 +424,25 @@ void process_packet_for_DB(unsigned char* p)
 	switch (packet_type) {
 	case DL_PACKET_LOGIN_AUTHOR_OK: {
 		dl_packet_login_author_ok* packet = reinterpret_cast<dl_packet_login_author_ok*>(p);
-
 		switch (packet->loginsuccess)
 		{
 		case 1: 
 		{
 			Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
 			character->mSkinType = packet->skintype;
-			character->Coin_lock.lock();
+			character->db_lock.lock();
 			character->mCoin = packet->coin;
-			character->Coin_lock.unlock();
+			character->db_lock.unlock();
 			character->bisAI = packet->playertype;	//서버에서만 사용되는 변수. 클라에게로 넘겨줄 이유는 없다.
+
+			//---------------------------------------
+			//플레이어 보유 아이템관련 설정.
+			//캐릭터가 보유한 아이템 목록 생성.
+			for (int i = 0; i < packet->numberofplayerhaveitem; ++i)
+			{
+				character->ShopInventory.insert(make_pair(static_cast<int>(packet->itemcode[i]),true));
+			}
+			//-----------------------------------------
 
 			send_login_ok_packet(packet->playerid, packet->loginsuccess, packet->coin, packet->skintype);
 			std::cout << "로그인 성공 성공id :" << character->name << endl;
@@ -401,6 +470,16 @@ void process_packet_for_DB(unsigned char* p)
 			send_signup_ok_packet(packet->playerid, packet->loginsuccess);
 			std::cout << "회원가입 실패 실패 코드 :" << (int)packet->loginsuccess << endl;
 		}
+		}
+	}
+	case DL_PACKET_GETITEMINFO: {
+		dl_packet_getiteminfo* packet = reinterpret_cast<dl_packet_getiteminfo*>(p);
+		auto npc = reinterpret_cast<Npc*>(objects[NPC_ID_START_LOBBY]);
+		npc->NumberofItemsInStore = packet->MaxItemAmount;
+		for (int i = 0; i < packet->MaxItemAmount; ++i)
+		{
+			npc->Shop[packet->itemcode[i]].first = packet->itemcode[i];
+			npc->Shop[packet->itemcode[i]].second = packet->price[i];
 		}
 	}
 	}

@@ -8,6 +8,7 @@
 #include "Game/Object/Object.h"
 #include "Game/Object/Character/Character.h"
 #include "Game/Object/Character/Player/Player.h"
+#include "Game/Object/Character/Npc/Npc.h"
 #include "Game/Server/Server.h"
 #include "Game/Server/GameServer/GameServer.h"
 #include "Game/Server/DBServer/DBServer.h"
@@ -48,10 +49,14 @@ int main()
 		sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex.getWsaOver());
 	std::cout << "Accept Called\n";
 
-	for (int i = 0; i < MAX_USER; ++i)
+	for (int i = 0; i < MAX_USER_LOBBY; ++i)
 	{
 		objects[i] = new Player();
 
+	}
+	for (int i = NPC_ID_START_LOBBY; i < NPC_ID_END_LOBBY; ++i)
+	{
+		objects[i] = new Npc();
 	}
 	dbserver = new DBServer();
 	for (int i = GAMESERVER_START; i < MAX_SERVER; ++i)
@@ -103,8 +108,9 @@ int main()
 		}
 	}
 	//--------
+	send_request_iteminfo_packet();	//db에서 가져올것 가져오기.
 
-
+	//send_login_authorization_packet(0, "ss", "s");
 
 	for (auto& th : worker_threads)
 		th.join();

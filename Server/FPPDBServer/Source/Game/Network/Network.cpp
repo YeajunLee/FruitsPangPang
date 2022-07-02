@@ -49,7 +49,7 @@ void Disconnect(int c_id)
 	server->state_lock.unlock();
 }
 
-void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const int& coin, const short& skintype, const short& playertype)
+void send_login_authorization_ok_packet(const int& server_id,const int& player_id, const char& succestype, const LoginInfo& info)
 {
 	auto server = reinterpret_cast<Server*>(servers[server_id]);
 	dl_packet_login_author_ok packet;
@@ -59,9 +59,11 @@ void send_login_authorization_ok_packet(const int& server_id,const int& player_i
 	packet.type = DL_PACKET_LOGIN_AUTHOR_OK;
 	packet.playerid = player_id;
 	packet.loginsuccess = succestype;
-	packet.coin = coin;
-	packet.skintype = skintype;
-	packet.playertype = playertype;
+	packet.coin = info.p_coin;
+	packet.skintype = info.p_skintype;
+	packet.playertype = info.p_playertype;
+	packet.numberofplayerhaveitem = info.p_numberofplayerhaveitem;
+	memcpy(packet.itemcode, info.p_itemcode, sizeof(packet.itemcode));
 	server->sendPacket(&packet, sizeof(packet));
 }
 
@@ -75,6 +77,15 @@ void send_signup_ok_packet(const int& server_id, const int& player_id, const cha
 	packet.type = DL_PACKET_SIGNUP_OK;
 	packet.playerid = player_id;
 	packet.loginsuccess = succestype;
+	server->sendPacket(&packet, sizeof(packet));
+}
+
+void send_shop_data_packet(const int& server_id,dl_packet_getiteminfo& packet)
+{
+	auto server = reinterpret_cast<Server*>(servers[server_id]);
+
+	packet.size = sizeof(packet);
+	packet.type = DL_PACKET_GETITEMINFO;
 	server->sendPacket(&packet, sizeof(packet));
 }
 
@@ -121,7 +132,7 @@ void process_packet(int client_id, unsigned char* p)
 		ld_packet_login_author* packet = reinterpret_cast<ld_packet_login_author*>(p);
 		LoginInfo info{};
 		char ret = Login(packet->id, packet->pass, info);
-		send_login_authorization_ok_packet(client_id, packet->playerid, ret, info.p_coin, info.p_skintype, info.p_playertype);
+		send_login_authorization_ok_packet(client_id, packet->playerid, ret, info);
 		break;
 	}
 	case LD_PACKET_SIGNUP: {
@@ -130,6 +141,13 @@ void process_packet(int client_id, unsigned char* p)
 		char ret = SignUp(packet->id, packet->pass);
 		send_signup_ok_packet(client_id, packet->playerid, ret);
 		break;
+	}
+	case LD_PACKET_REQUESTITEMINFO: {
+		ld_packet_requestiteminfo* packet = reinterpret_cast<ld_packet_requestiteminfo*>(p);
+		dl_packet_getiteminfo iteminfo{};
+		
+		iteminfo.MaxItemAmount = GetShopData(iteminfo);
+		send_shop_data_packet(client_id, iteminfo);
 	}
 	}
 }
