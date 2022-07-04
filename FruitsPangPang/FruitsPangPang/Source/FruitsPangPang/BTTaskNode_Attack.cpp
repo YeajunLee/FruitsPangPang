@@ -4,6 +4,7 @@
 #include "BTTaskNode_Attack.h"
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "Inventory.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "MyCharacter.h"
@@ -23,8 +24,15 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     if (nullptr == AICharacter)
         return EBTNodeResult::Failed;
 
-    //auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
-    auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+    //2022-07-05
+    auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
+    auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
+
+    ABaseCharacter* Target = nullptr;
+    if(AIController)
+        Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+    else if(smartAIController)
+        Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
 
     if (nullptr == Target)
         return EBTNodeResult::Failed;
@@ -40,7 +48,10 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
 
     //update KeyAmount(BTS_subtomato before)--------------------------------------------------------
     int FruitAmount = AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount;
-    OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+    if (AIController)
+        OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+    else if(smartAIController)
+        OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAI_Smart_Controller_Custom::AmountKey, FruitAmount);
     //----------------------------------------------------------------------------------------------
 
     return EBTNodeResult::InProgress;

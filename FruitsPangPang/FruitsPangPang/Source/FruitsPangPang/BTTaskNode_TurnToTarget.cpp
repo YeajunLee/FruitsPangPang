@@ -4,6 +4,7 @@
 #include "BTTaskNode_TurnToTarget.h"
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "MyCharacter.h"
 #include "Math/UnrealMathUtility.h"
@@ -22,8 +23,15 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 
-	//auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
-	auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	//2022-07-05
+	auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
+
+	ABaseCharacter* Target = nullptr;
+	if(AIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	else if(smartAIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
 
 	if (nullptr == Target)
 		return EBTNodeResult::Failed;
