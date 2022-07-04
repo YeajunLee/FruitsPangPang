@@ -15,8 +15,11 @@ extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 void error_display(int err_no);
 
-void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const int& coin, const short& skintype, const short& playertype);
+void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const struct LoginInfo& info);
 void send_signup_ok_packet(const int& server_id, const int& player_id, const char& succestype);
+void send_shop_data_packet(const int& server_id, dl_packet_getiteminfo& packet);
+void send_request_player_info(const int& server_id, const int& client_id, const struct LoginInfo& info);
+
 void send_ping_test(const int& server_id);
 void Disconnect(int id);
 int Generate_ServerId();
@@ -65,4 +68,6 @@ struct LoginInfo {
 	int p_coin;
 	short p_skintype;
 	short p_playertype;
+	char p_numberofplayerhaveitem;	//플레이어가 가지고있는 아이템의 갯수
+	unsigned char p_itemcode[MAX_SHOP_ITEM];
 };

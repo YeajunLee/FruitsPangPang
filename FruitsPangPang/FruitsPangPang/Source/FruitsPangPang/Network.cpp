@@ -28,6 +28,7 @@
 #include "BrainComponent.h"
 #include "PointOfInterestComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "StoreWidget.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -78,7 +79,7 @@ bool Network::init()
 {
 	if (!isInit)
 	{
-		isInit = true;
+		isInit = true; 
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -97,6 +98,11 @@ void Network::release()
 			p = nullptr;
 		mSyncBananaID = 0;
 		WSACleanup();
+		if (!bLevelOpenTriggerEnabled)	//openlevel로 인한 release가 아니라, editor중지때문에 생기는 release라면 false시켜줌.
+		{
+			bLoginFlag = false;
+			bLevelOpenTriggerEnabled = false;	//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
+		}
 		isInit = false;
 	}
 	
@@ -370,6 +376,25 @@ void send_match_request(SOCKET& sock, const short& Amount)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
+void send_buy_packet(SOCKET& sock, const int& itemcode)
+{
+	cl_packet_buy packet;
+	packet.size = sizeof(cl_packet_buy);
+	packet.type = CL_PACKET_BUY;
+	packet.itemcode = itemcode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
+void send_equip_packet(SOCKET& sock, const int& itemcode)
+{
+	cl_packet_equip packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_PACKET_EQUIP;
+	packet.itemcode = itemcode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
 
 void Network::process_packet(unsigned char* p)
 {
@@ -378,6 +403,8 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mMyCharacter->c_id = packet->id;
+		mMyCharacter->skinType = packet->skintype;
+		mMyCharacter->EquipSkin();
 		mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 		//mId = packet->id;
 		for (int i = 0; i < TREE_CNT; ++i)
@@ -557,6 +584,8 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->c_id = packet->id;
 			mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
+			mOtherCharacter[id]->skinType = packet->skintype;
+			mOtherCharacter[id]->EquipSkin();
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 			mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 			
@@ -575,6 +604,8 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->c_id = packet->id;
 				mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
+				mOtherCharacter[id]->skinType = packet->skintype;
+				mOtherCharacter[id]->EquipSkin();
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->ScoreBoard.push_back(ScoreInfo(mOtherCharacter[id]));
 				mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 				
@@ -759,6 +790,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAMEWAITING: {
 		//3초 기다리는 UI
+		UE_LOG(LogTemp, Warning, TEXT("WAITING CALLED"));
 		mMyCharacter->mLoadingWidget->RemoveFromParent();
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MWaitingWidget.MWaitingWidget_C'"));
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
@@ -768,6 +800,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAMESTART: {
 		//waiting 위젯 지우고, 게임모드 바꿔주는
+		UE_LOG(LogTemp, Warning, TEXT("START CALLED"));
 		mMyCharacter->mWaitingWidget->RemoveFromParent();
 		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 		mMyCharacter->mMainWidget->bActivate = true;
@@ -823,9 +856,18 @@ void Network::process_packet(unsigned char* p)
 	case SC_PACKET_KILL_INFO: {
 		sc_packet_kill_info* packet = reinterpret_cast<sc_packet_kill_info*>(p);
 		mMyCharacter->mMainWidget->UpdateKillLog(FString(packet->Attacker), FString(packet->Victim));
+		break;
 	}
 	}
 }
+
+
+
+
+
+
+
+
 
 void Network::process_LobbyPacket(unsigned char* p)
 {
@@ -837,16 +879,26 @@ void Network::process_LobbyPacket(unsigned char* p)
 		switch (packet->loginsuccess)
 		{
 		case 1: {
-			mMyCharacter->mLoginWidget->RemoveFromParent();
+			if(mMyCharacter->mLoginWidget)
+				mMyCharacter->mLoginWidget->RemoveFromParent();
 			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 			mMyCharacter->mMainWidget->bActivate = true;
 			mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
+			mMyCharacter->Cash = packet->coin;
+			mMyCharacter->skinType = packet->skintype;
+			mMyCharacter->EquipSkin();
 			MyCharacterName = mMyCharacter->CharacterName;
+			bLoginFlag = true;
+			bLevelOpenTriggerEnabled = false;	//openlevel로 인한 변경이 끝났으니 false로 바꿔줌.
 			FInputModeGameOnly gamemode;
 			if (nullptr != controller)
 			{
 				controller->SetInputMode(gamemode);
 				controller->SetShowMouseCursor(false);
+			}
+			for (int i = 0; i < static_cast<int>(packet->numberofitemshave); ++i)
+			{
+				mMyCharacter->mMainWidget->W_Store->UpdateItemSlotStatus(static_cast<int>(packet->haveitems[i]));
 			}
 			break;
 		}
@@ -864,6 +916,8 @@ void Network::process_LobbyPacket(unsigned char* p)
 	case LC_PACKET_MATCH_RESPONSE: {
 		lc_packet_match_response* packet = reinterpret_cast<lc_packet_match_response*>(p);
 		GameServerPort = packet->port;
+		mMyCharacter->l_prev_size = 0;
+		bLevelOpenTriggerEnabled = true;
 		switch (packet->playertype)
 		{
 		case 0:
@@ -902,6 +956,19 @@ void Network::process_LobbyPacket(unsigned char* p)
 			break;
 		}
 		}
+		break;
+	}
+	case LC_PACKET_BUYITEM_RESULT: {
+		lc_packet_buyitem_result* packet = reinterpret_cast<lc_packet_buyitem_result*>(p);
+		mMyCharacter->Cash = packet->Coin;
+		mMyCharacter->mMainWidget->W_Store->UpdateItemSlotStatus(packet->itemcode);
+		mMyCharacter->mMainWidget->W_Store->UpdateCash(mMyCharacter->Cash);
+		break;
+	}
+	case LC_PACKET_EQUIP_RESPONSE: {
+		lc_packet_equip_response* packet = reinterpret_cast<lc_packet_equip_response*>(p);
+		mMyCharacter->skinType = packet->itemcode;
+		mMyCharacter->EquipSkin();
 		break;
 	}
 	}
@@ -943,6 +1010,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 
 	if (nullptr == Network::GetNetwork()->mMyCharacter) return;
+	if (INVALID_SOCKET == Network::GetNetwork()->mMyCharacter->l_socket) return;
 
 	int to_process_data = num_bytes + Network::GetNetwork()->mMyCharacter->l_prev_size;
 	unsigned char* packet = over->getBuf();

@@ -39,8 +39,15 @@ void AInLobbyLv::Conn()
 	if (nullptr != player)
 	{
 		player->ConnLobbyServer();
-		player->ShowLoginHUD();
-		//send_login_packet(player->s_socket, 0);
+		if(!Network::GetNetwork()->bLoginFlag)
+			player->ShowLoginHUD();
+		else
+		{
+			const char* tmpid = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName);
+			const char* tmppass = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord);
+			if (nullptr != Network::GetNetwork()->mMyCharacter)
+				send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+		}
 		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 
 	}

@@ -14,3 +14,7 @@ void InitializeDB();
 void ReleaseDB();
 int Login(const char* name, const char* password, LoginInfo& p_info);
 int SignUp(const char* name, const char* password);
+int GetShopData(dl_packet_getiteminfo& shopInfo);
+int BuyItem(const char* name, const char& itemcode, const int& coin);
+int EquipItem(const char* name, const short& skintype);
+int GetPlayerInfo(const char* name, LoginInfo& p_info);

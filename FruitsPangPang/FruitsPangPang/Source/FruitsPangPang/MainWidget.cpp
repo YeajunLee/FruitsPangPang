@@ -12,6 +12,7 @@
 #include "MiniMapWidget.h"
 #include "StoreWidget.h"
 #include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
 
@@ -38,7 +39,17 @@ void UMainWidget::NativePreConstruct()
 		mScoreWidget = ScoreWGT;
 	}
 	
-	W_Store->SetVisibility(ESlateVisibility::Hidden);
+	{
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreWidget.MStoreWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto StoreWGT = CreateWidget<UStoreWidget>(GetWorld(), WidgetClass);
+		W_Store = StoreWGT;
+		auto SettupStoreBox = StoreBox->AddChildToHorizontalBox(StoreWGT);
+		FSlateChildSize Rules;
+		Rules.SizeRule = ESlateSizeRule::Fill;
+		SettupStoreBox->SetSize(Rules);
+		HideStoreWidget();
+	}
 }
 
 
@@ -84,6 +95,7 @@ void UMainWidget::ShowStoreWidget()
 	auto controller = GetWorld()->GetFirstPlayerController();
 	controller->SetInputMode(gamemode);
 	controller->SetShowMouseCursor(true);
+	W_Store->UpdateCash(Network::GetNetwork()->mMyCharacter->Cash);
 	W_Store->SetVisibility(ESlateVisibility::Visible);
 }
 

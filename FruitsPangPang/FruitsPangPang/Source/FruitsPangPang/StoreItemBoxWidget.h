@@ -23,7 +23,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* ItemName;
 	UPROPERTY(meta = (BindWidget))
-		class UButton* BuyBotton;
+		class UButton* BuyButton;
 	UPROPERTY(meta = (BindWidget))
 		class UButton* EquipButton;
 	UPROPERTY(meta = (BindWidget))
@@ -31,5 +31,12 @@ public:
 
 	UFUNCTION()
 		void ClickBuy_0();
-	
+	UFUNCTION()
+		void ClickEquip();
+	int mitemcode = 0;
+	int mPrice = 0;
+	void InitializeItem(const int& itemcode, const FText& name, const int& price);
+
+
+	static UTexture2D* ItemCodeToShopItemIcon(const int& itemCode);
 };

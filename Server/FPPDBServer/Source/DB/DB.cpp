@@ -18,13 +18,6 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 		fwprintf(stderr, L"Invalid handle!\n");
 		return;
 	}
-	auto t = SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage,
-		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL);
-
-	if (t == SQL_INVALID_HANDLE) {
-		fwprintf(stderr, L"Invalid handle!\n");
-		return;
-	}
 	while (SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage,
 		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS) {
 		// Hide data truncated..
@@ -81,18 +74,18 @@ void ReleaseDB()
 
 int Login(const char* name, const char* password, LoginInfo& p_info)
 {
-	SQLINTEGER p_coin{};
-	SQLSMALLINT p_skintype{}, p_playertype{};
-	SQLWCHAR p_name[21]{}, p_password[21]{};
-	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0,cbP_playertype = 0;
+	SQLINTEGER p_coin{};	//플레이어 보유코인
+	SQLSMALLINT p_skintype{}, p_playertype{}, p_playeritemcode{};//플레이어 장착 액세사리타입, 플레이어타입, 플레이어 보유아이템코드
+	SQLWCHAR p_name[21]{}, p_password[21]{};	//플레이어 이름, 플레이어 패스워드
+	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0, l_playeritemcode = 0;
 	SQLRETURN retcode{};
 
 	//cout << "ODBC Connected !" << endl;
 	wstring LoginQuery{ L"EXEC try_login " };
+	wstring GetItemDataQuery{ L"EXEC get_playeritemdata " };
 	USES_CONVERSION;
 	LoginQuery += A2W(name);
-	LoginQuery += L",";
-	LoginQuery += A2W(password);
+	GetItemDataQuery += A2W(name);
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)LoginQuery.c_str(), SQL_NTS);
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
@@ -101,42 +94,62 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 		// Bind columns 1, 2, and 3  
 		// mssql에서 varchar(10) 을 했을 때, db에서 10글자 까지 저장이 가능.
 		// c++로 긁어올때 이 10글자는 1글자당 2byte로 치환되어서 sqlbindcol의 bufferlen에서 20byte + 문자열끝 2byte  총 22byte로 받아야 함.
-		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &cbName);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
-		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &cbPassword);
-		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &cbP_coin);
-		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &cbP_skintype);
-		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &cbP_playertype);
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &l_Name);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &l_Password);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &l_coin);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &l_skintype);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &l_playertype);
 
 		// Fetch and print each row of data. On an error, display a message and exit.  
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
-			retcode = SQLFetch(hstmt);
-			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+			WideCharToMultiByte(CP_ACP, 0, p_name, -1, p_info.p_name, 21, 0, 0);
+			WideCharToMultiByte(CP_ACP, 0, p_password, -1, p_info.p_password, 21, 0, 0);
+			p_info.p_coin = p_coin;
+			p_info.p_skintype = p_skintype;
+			p_info.p_playertype = p_playertype;
+
+			SQLCancel(hstmt);
+
+			if (0 == strcmp(p_info.p_password, password))
 			{
-				WideCharToMultiByte(CP_ACP, 0, p_name, -1, p_info.p_name, 21, 0, 0);
-				WideCharToMultiByte(CP_ACP, 0, p_password, -1, p_info.p_password, 21, 0, 0);
-				p_info.p_coin = p_coin;
-				p_info.p_skintype = p_skintype;
-				p_info.p_playertype = p_playertype;
+				//--- 로그인 성공! 해당 플레이어의 아이템 정보를 가져와야함.
+				retcode = SQLExecDirect(hstmt, (SQLWCHAR*)GetItemDataQuery.c_str(), SQL_NTS);
+				if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 
-				SQLCancel(hstmt);
+					retcode = SQLBindCol(hstmt, 1, SQL_C_SHORT, &p_playeritemcode, 100, &l_playeritemcode);
+					int i = 0;
+					while (1)
+					{
+						retcode = SQLFetch(hstmt);
+						if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+						{
+							p_info.p_itemcode[i] = p_playeritemcode;
+							++i;
+						}
+						else {
+							break;
+						}
+					}
 
-				if (0 == strcmp(p_info.p_password, password))
-				{
-					return true;
+					p_info.p_numberofplayerhaveitem = i;
+
 				}
 
-				return -3;	//비밀번호가 다름
-			}
-			else if (retcode == SQL_ERROR) {
-				HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 				SQLCancel(hstmt);
-				return -2;
+				return true;	//로그인 성공
 			}
+			return -3;	//비밀번호가 다름
 		}
-
+		else if (retcode == SQL_ERROR) {
+			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+			SQLCancel(hstmt);
+			return -2;
+		}
 	}
 	else {
-		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		// Process data  
 		SQLCancel(hstmt);
 		return -2;
@@ -145,15 +158,15 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 	// Process data  
 	SQLCancel(hstmt);
 	return -2;
-}
 
+}
 
 int SignUp(const char* name, const char* password)
 {
 	SQLINTEGER p_coin{};
 	SQLSMALLINT p_skintype{}, p_playertype{};
 	SQLWCHAR p_name[21]{}, p_password[21]{};
-	SQLLEN cbName = 0, cbPassword = 0, cbP_coin = 0, cbP_skintype = 0, cbP_playertype = 0;
+	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0;
 	SQLRETURN retcode{};
 
 	wstring SignUpQuery{ L"EXEC make_character " };
@@ -175,11 +188,11 @@ int SignUp(const char* name, const char* password)
 		retcode = SQLExecDirect(hstmt, (SQLWCHAR*)FindCharacterQuery.c_str(), SQL_NTS);
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
-			retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &cbName);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
-			retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &cbPassword);
-			retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &cbP_coin);
-			retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &cbP_skintype);
-			retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &cbP_playertype);
+			retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &l_Name);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+			retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &l_Password);
+			retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &l_coin);
+			retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &l_skintype);
+			retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &l_playertype);
 
 			retcode = SQLFetch(hstmt);
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
@@ -195,4 +208,159 @@ int SignUp(const char* name, const char* password)
 
 		return -1;	// 알 수 없는 이유로 실패
 	}
+}
+
+int GetShopData(dl_packet_getiteminfo& shopInfo)
+{
+	SQLSMALLINT p_itemcode{};
+	SQLWCHAR p_itemname[21]{};
+	SQLSMALLINT p_price{};
+	SQLLEN l_itemcode = 0, l_itemname = 0, l_price = 0;
+	SQLRETURN retcode{};
+
+	wstring GetShopDataQuery{ L"EXEC get_ShopData" };
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)GetShopDataQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+
+		retcode = SQLBindCol(hstmt, 1, SQL_C_SHORT, &p_itemcode, 100, &l_itemcode);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_itemname, 42, &l_itemname);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_SHORT, &p_price, 100, &l_price);
+
+		int i = 0;
+		while (1)
+		{
+			retcode = SQLFetch(hstmt);
+			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+			{
+				shopInfo.itemcode[i] = p_itemcode;
+				shopInfo.price[i] = p_price;
+				++i;
+;
+			}
+			else {
+				break;
+			}
+		}
+
+		SQLCancel(hstmt);
+		return i;		//몇개 아이템이 있는지 (1부터 시작)
+	}
+	else if (retcode == SQL_ERROR) {
+		return 0;
+	}
+}
+
+int BuyItem(const char* name, const char& itemcode, const int& coin)
+{
+	char itemCodeTmp[10];
+	char MoneyTemp[20];
+	_itoa_s(static_cast<int>(itemcode), itemCodeTmp, 10);
+	_itoa_s(coin, MoneyTemp, 10);
+	SQLRETURN retcode{};
+
+	wstring BuyItemQuery{ L"EXEC buy_item " };
+	USES_CONVERSION;
+	BuyItemQuery += A2W(name);
+	BuyItemQuery += L",";
+	BuyItemQuery += A2W(itemCodeTmp);
+	BuyItemQuery += L",";
+	BuyItemQuery += A2W(MoneyTemp);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)BuyItemQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		return 1;
+	}
+	else if (retcode == SQL_ERROR) {
+		//키 중복때문에 들어올 가능성이 높음.
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+		return -1;	// 알 수 없는 이유로 실패
+	}
+
+	return -1;// 알수없는 이유로 실패.
+}
+
+int EquipItem(const char* name, const short& skintype)
+{
+	char skintypeTmp[10];
+	_itoa_s(static_cast<int>(skintype), skintypeTmp, 10);
+	SQLRETURN retcode{};
+
+	wstring EquipItemQuery{ L"EXEC equip_item " };
+	USES_CONVERSION;
+	EquipItemQuery += A2W(name);
+	EquipItemQuery += L",";
+	EquipItemQuery += A2W(skintypeTmp);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)EquipItemQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		return 1;
+	}
+	else if (retcode == SQL_ERROR) {
+		//키 중복때문에 들어올 가능성이 높음.
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+		return -1;	// 알 수 없는 이유로 실패
+	}
+
+	return -1;// 알수없는 이유로 실패.
+}
+
+int GetPlayerInfo(const char* name, LoginInfo& p_info)
+{
+	SQLINTEGER p_coin{};	//플레이어 보유코인
+	SQLSMALLINT p_skintype{}, p_playertype{}, p_playeritemcode{};//플레이어 장착 액세사리타입, 플레이어타입, 플레이어 보유아이템코드
+	SQLWCHAR p_name[21]{}, p_password[21]{};	//플레이어 이름, 플레이어 패스워드
+	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0, l_playeritemcode = 0;
+	SQLRETURN retcode{};
+
+	//cout << "ODBC Connected !" << endl;
+	wstring LoginQuery{ L"EXEC try_login " };
+	USES_CONVERSION;
+	LoginQuery += A2W(name);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)LoginQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+
+
+		// Bind columns 1, 2, and 3  
+		// mssql에서 varchar(10) 을 했을 때, db에서 10글자 까지 저장이 가능.
+		// c++로 긁어올때 이 10글자는 1글자당 2byte로 치환되어서 sqlbindcol의 bufferlen에서 20byte + 문자열끝 2byte  총 22byte로 받아야 함.
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &l_Name);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &l_Password);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &l_coin);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &l_skintype);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &l_playertype);
+
+		// Fetch and print each row of data. On an error, display a message and exit.  
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			WideCharToMultiByte(CP_ACP, 0, p_name, -1, p_info.p_name, 21, 0, 0);
+			WideCharToMultiByte(CP_ACP, 0, p_password, -1, p_info.p_password, 21, 0, 0);
+			p_info.p_coin = p_coin;
+			p_info.p_skintype = p_skintype;
+			p_info.p_playertype = p_playertype;
+
+			SQLCancel(hstmt);
+			return true;	//여기서는 무조건 성공
+		}
+		else if (retcode == SQL_ERROR) {
+			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+			SQLCancel(hstmt);
+			return -2;
+		}
+	}
+	else {
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+		// Process data  
+		SQLCancel(hstmt);
+		return -2;
+	}
+
+	// Process data  
+	SQLCancel(hstmt);
+	return -2;
 }
