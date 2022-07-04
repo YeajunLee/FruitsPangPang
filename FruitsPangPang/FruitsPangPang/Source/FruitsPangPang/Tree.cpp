@@ -68,11 +68,14 @@ void ATree::GenerateFruit(int _FruitType)
           SpawnParams.Owner = this;
           FRotator rotator;
           FVector  SpawnLocation = GetActorLocation();
-          SpawnLocation.Z += 90.0f;
+          SpawnLocation.Z += 100.0f;
+          SpawnLocation.Y += 25.0f;
+          SpawnLocation.X += 30.0f;
           mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
           SpawnLocation.X -= 45.0f;
+          SpawnLocation.Y -= 30.0f;
           mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-          SpawnLocation.X += 90.0f;
+          SpawnLocation.X += 80.0f;
           mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
         }
         CanHarvest = true;
