@@ -27,6 +27,14 @@ public:
 	PunnetInfo(class APunnet* punnet);
 };
 
+class HealSpawnerInfo {
+public:
+	class AHealSpawner* mHealSpawner;
+	bool bIgnored;
+	HealSpawnerInfo();
+	HealSpawnerInfo(class AHealSpawner* healspawner);
+};
+
 UCLASS()
 class FRUITSPANGPANG_API AAICharacter : public ABaseCharacter
 {
@@ -88,6 +96,11 @@ public:
 	float ClosestPunnetDistance;
 	int TargetPunnetIndex;
 	std::vector<PunnetInfo> punnets;
+
+	//HealSpawner
+	float ClosestHealSpawnerDistance;
+	int TargetHealSpawnerIndex;
+	std::vector<HealSpawnerInfo> heals;
 
 	virtual	void GetFruits() override;
 

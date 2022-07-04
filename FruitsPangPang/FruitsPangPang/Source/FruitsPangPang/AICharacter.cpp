@@ -8,6 +8,7 @@
 #include "Projectile.h"
 #include "Tree.h"
 #include "Punnet.h"
+#include "HealSpawner.h"
 #include "Network.h"
 #include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -46,6 +47,20 @@ PunnetInfo::PunnetInfo(APunnet* punnet)
 {
 
 }
+
+HealSpawnerInfo::HealSpawnerInfo()
+	:mHealSpawner(nullptr)
+	,bIgnored(false)
+{
+
+}
+
+HealSpawnerInfo::HealSpawnerInfo(AHealSpawner* healspawner)
+	:mHealSpawner(healspawner)
+	, bIgnored(false)
+{
+}
+
 
 // Sets default values
 AAICharacter::AAICharacter()
