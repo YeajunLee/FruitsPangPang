@@ -49,6 +49,7 @@ public:
 public:
 	FString CharacterName;
 public:
+	UPROPERTY(BlueprintReadOnly)
 	int hp;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -103,6 +104,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "punnet")
 		bool bIsUnderthePunnet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HealSpawner")
+		bool bIsUndertheHealSpawner;
 
 public:
 	// 112.152.55.49  127.0.0.1

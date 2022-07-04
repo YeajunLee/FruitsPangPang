@@ -24,6 +24,10 @@ void AHealSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		{
 			CanHarvest = false;
 			send_getfruits_healspawner_packet(player->s_socket, HealSpanwerId);
+
+            player->bIsUndertheHealSpawner = true;
+
+            UE_LOG(LogTemp, Warning, TEXT("Heal Overlap!"));
 		}
     }
 }
@@ -31,6 +35,16 @@ void AHealSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 void AHealSpawner::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+
+    if (OtherActor)
+    {
+        ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
+        if (player)
+        {
+            player->bIsUndertheHealSpawner = false;
+
+        }
+    }
 }
 
 
