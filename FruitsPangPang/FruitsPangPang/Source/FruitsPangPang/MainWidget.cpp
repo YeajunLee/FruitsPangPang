@@ -95,6 +95,7 @@ void UMainWidget::ShowStoreWidget()
 	auto controller = GetWorld()->GetFirstPlayerController();
 	controller->SetInputMode(gamemode);
 	controller->SetShowMouseCursor(true);
+	W_Store->UpdateCash(Network::GetNetwork()->mMyCharacter->Cash);
 	W_Store->SetVisibility(ESlateVisibility::Visible);
 }
 

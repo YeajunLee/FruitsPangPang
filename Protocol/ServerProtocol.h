@@ -10,7 +10,7 @@ const int MAX_SHOP_ITEM = 20;
 
 //-------------------------
 // 1 ~ 99 is Client - Server Number   - Do Not Use This Number
-// 100~ 120 is Server - Server Number - Use this Number
+// 100~ 120 is gameServer - LobbyServer Number - Use this Number
 // 125 - Ping Test
 //-------------------------
 
@@ -23,7 +23,7 @@ struct ping_test {
 const char GL_PACKET_LOGIN = 100;
 
 const char LG_PACKET_LOGIN_OK = 1;
-
+const char DG_PACKET_REQUEST_PLAYER_INFO = 2;
 //----------------------------------
 
 
@@ -32,7 +32,9 @@ const char LG_PACKET_LOGIN_OK = 1;
 const char LD_PACKET_LOGIN_AUTHOR = 1;
 const char LD_PACKET_SIGNUP = 2;
 const char LD_PACKET_REQUESTITEMINFO = 3;
-
+const char LD_PACKET_BUYITEMUPDATE = 4;
+const char LD_PACKET_UPDATE_SKINTYPE = 5;
+const char GD_PACKET_GET_PLAYER_INFO = 6;
 
 const char DL_PACKET_LOGIN_AUTHOR_OK = 1;
 const char DL_PACKET_SIGNUP_OK = 2;
@@ -50,6 +52,25 @@ struct gl_packet_login {
 	short port;
 
 };
+
+//----------------- GameServer to DBServer
+struct gd_packet_get_player_info {
+	unsigned char size;
+	char type;
+	char name[MAX_NAME_LEN];
+	int id;
+};
+
+//---------------- DBServer to GameServer
+
+struct dg_packet_request_player_info {
+	unsigned char size;
+	char type;
+	int id;
+	short skintype;
+};
+
+
 
 //------------------- Lobbyserver to Gameserver
 struct lg_packet_login_ok {
@@ -79,6 +100,21 @@ struct ld_packet_signup {
 struct ld_packet_requestiteminfo {
 	unsigned char size;
 	char type;
+};
+
+struct ld_packet_buyitemupdate {
+	unsigned char size;
+	char type;
+	char id[MAX_NAME_LEN];
+	unsigned char itemcode;
+	int coin;
+};
+
+struct ld_packet_update_skintype {
+	unsigned char size;
+	char type;
+	char id[MAX_NAME_LEN];
+	short skintype;
 };
 //------------------- Lobbyserver to DBserver
 

@@ -84,6 +84,7 @@ const char LC_PACKET_MATCH_RESPONSE = 2;
 const char LC_PACKET_MATCH_UPDATE = 3;
 const char LC_PACKET_SIGNUP_OK = 4;
 const char LC_PACKET_BUYITEM_RESULT = 5;
+const char LC_PACKET_EQUIP_RESPONSE = 6;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -214,6 +215,7 @@ struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	short skintype;
 	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
@@ -237,6 +239,7 @@ struct sc_packet_put_object {
 	float rx, ry, rz, rw;
 	char object_type;
 	char	name[MAX_NAME_SIZE];
+	short skintype;
 };
 
 struct sc_packet_remove_object {
@@ -383,5 +386,12 @@ struct lc_packet_buyitem_result {
 	unsigned char size;
 	char type;
 	int Coin;
+	unsigned char itemcode;
+};
+
+struct lc_packet_equip_response {
+	unsigned char size;
+	char type;
+	unsigned char itemcode;
 };
 #pragma pack(pop)

@@ -116,6 +116,27 @@ void send_request_iteminfo_packet()
 	dbserver->sendPacket(&packet, sizeof(packet));
 }
 
+void send_buyitem_updateDB_packet(const char* name, const unsigned char& itemcode,const int& coin)
+{
+	ld_packet_buyitemupdate packet{};
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_BUYITEMUPDATE;
+	strcpy_s(packet.id, name);
+	packet.itemcode = itemcode;
+	packet.coin = coin;
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
+void send_updateDB_skintype_packet(const char* name, const short& skintype)
+{
+	ld_packet_update_skintype packet{};
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_UPDATE_SKINTYPE;
+	strcpy_s(packet.id, name);
+	packet.skintype = skintype;
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
 void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
@@ -192,7 +213,7 @@ void send_match_update_packet(const int& player_id, const int& player_cnt)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_buyitem_result_packet(const int& player_id, const int& remaincoin)
+void send_buyitem_result_packet(const int& player_id, const int& remaincoin,const unsigned char& itemcode)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
 	lc_packet_buyitem_result packet;
@@ -201,6 +222,19 @@ void send_buyitem_result_packet(const int& player_id, const int& remaincoin)
 	packet.size = sizeof(packet);
 	packet.type = LC_PACKET_BUYITEM_RESULT;
 	packet.Coin = remaincoin;
+	packet.itemcode = itemcode;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_equip_response_packet(const int& player_id, const unsigned char& itemcode)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_equip_response packet;
+	memset(&packet, 0, sizeof(lc_packet_equip_response));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_EQUIP_RESPONSE;
+	packet.itemcode = itemcode;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -379,19 +413,23 @@ void process_packet(int client_id, unsigned char* p)
 				character->mCoin -= ShopNpc->Shop[packet->itemcode].second;
 				character->ShopInventory[ShopNpc->Shop[packet->itemcode].first] = true;
 				//update characters DB in playerhaveitem
+				send_buyitem_updateDB_packet(character->name, packet->itemcode,character->mCoin);
 			}
 		}
 		remaincoin = character->mCoin;
 		character->db_lock.unlock();
 
-		send_buyitem_result_packet(character->_id, remaincoin);
+		send_buyitem_result_packet(character->_id, remaincoin,packet->itemcode);	//어떤 아이템을 구매했는지, 구매후 돈은 얼마인지.
 
 		break;
 	}
 	case CL_PACKET_EQUIP: {
 		cl_packet_equip* packet = reinterpret_cast<cl_packet_equip*>(p);
 		Player* character = reinterpret_cast<Player*>(object);
-
+		character->mSkinType = packet->itemcode;
+		send_equip_response_packet(client_id, packet->itemcode);
+		send_updateDB_skintype_packet(character->name, character->mSkinType);
+		break;
 	}
 	}
 }

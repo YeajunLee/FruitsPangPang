@@ -31,7 +31,8 @@ public:
 
 	UFUNCTION()
 		void ClickBuy_0();
-
+	UFUNCTION()
+		void ClickEquip();
 	int mitemcode = 0;
 	int mPrice = 0;
 	void InitializeItem(const int& itemcode, const FText& name, const int& price);

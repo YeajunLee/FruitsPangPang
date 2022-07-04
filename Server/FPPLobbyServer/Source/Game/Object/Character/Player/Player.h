@@ -1,7 +1,7 @@
 #pragma once
 #include <atomic>
 #include <mutex>
-#include <ppl.h>
+//#include <ppl.h> 이게 있을 시, 소켓프로그래밍에 버그가 생김.... ???? 
 #include <concurrent_unordered_map.h>
 #include "../Character.h"
 #include "../../../Network/Network.h"

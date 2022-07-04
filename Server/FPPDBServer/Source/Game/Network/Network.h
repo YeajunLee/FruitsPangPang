@@ -15,10 +15,10 @@ extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 
 void error_display(int err_no);
 
-void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const class LoginInfo& info);
+void send_login_authorization_ok_packet(const int& server_id, const int& player_id, const char& succestype, const struct LoginInfo& info);
 void send_signup_ok_packet(const int& server_id, const int& player_id, const char& succestype);
 void send_shop_data_packet(const int& server_id, dl_packet_getiteminfo& packet);
-
+void send_request_player_info(const int& server_id, const int& client_id, const struct LoginInfo& info);
 
 void send_ping_test(const int& server_id);
 void Disconnect(int id);

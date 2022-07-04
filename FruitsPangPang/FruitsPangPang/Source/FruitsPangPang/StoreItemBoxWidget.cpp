@@ -11,12 +11,29 @@
 void UStoreItemBoxWidget::NativePreConstruct()
 {
 	BuyButton->OnClicked.AddDynamic(this, &UStoreItemBoxWidget::ClickBuy_0);
-}
-void UStoreItemBoxWidget::ClickBuy_0()
-{
-	//Network::GetNetwork()->mMyCharacter->bNifeSkin = true;
+	EquipButton->OnClicked.AddDynamic(this, &UStoreItemBoxWidget::ClickEquip);
+	EquipButton->SetIsEnabled(false);
 }
 
+void UStoreItemBoxWidget::ClickBuy_0()
+{
+	auto Character = Network::GetNetwork()->mMyCharacter;
+	if (nullptr != Character)
+	{
+		if (Character->Cash >= mPrice)
+		{
+			send_buy_packet(Network::GetNetwork()->mMyCharacter->l_socket, mitemcode);
+		}
+		else {
+			//µ· ¾ø´Ù´Â Ã¢ ¶ç¿öÁÙ ¿¹Á¤.
+		}
+	}
+}
+
+void UStoreItemBoxWidget::ClickEquip()
+{
+	send_equip_packet(Network::GetNetwork()->mMyCharacter->l_socket, mitemcode);
+}
 
 void UStoreItemBoxWidget::InitializeItem(const int& itemcode, const FText& name, const int& price)
 {

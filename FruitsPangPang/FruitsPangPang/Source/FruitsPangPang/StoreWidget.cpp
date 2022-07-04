@@ -8,6 +8,7 @@
 #include "Network.h"
 #include "MainWidget.h"
 #include "StoreItemBoxWidget.h"
+#include "Components/TextBlock.h"
 #include "Engine/DataTable.h"
 #include "Item.h"
 
@@ -53,6 +54,27 @@ void UStoreWidget::InsertItem(const int& itemCode, const FText& itemName,const i
 		itemWGT->InitializeItem(itemCode, itemName, price);
 
 		StuffWrapBox->AddChildToWrapBox(itemWGT);
+		items.Add(itemWGT);
 	}
 
+}
+void UStoreWidget::UpdateItemSlotStatus(const int& itemcode)
+{
+
+	auto item = items.FindByPredicate([&itemcode](UStoreItemBoxWidget* wgt) {
+		return wgt->mitemcode == itemcode;
+	});
+	if (nullptr != item)
+	{
+		(*item)->BuyButton->SetIsEnabled(false);
+		(*item)->EquipButton->SetIsEnabled(true);
+	}
+	
+}
+
+void UStoreWidget::UpdateCash(const int& Cash)
+{
+#define LOCTEXT_NAMESPACE "cash"
+	CashText->SetText(FText::Format(LOCTEXT("cash", "{0}"), Cash));
+#undef LOCTEXT_NAMESPACE
 }

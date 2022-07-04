@@ -28,6 +28,8 @@ public:
 		void ClickQuit();
 
 	void InsertItem(const int& itemcode, const FText& itemName, const int& price);
-
+	void UpdateItemSlotStatus(const int& itemcode);
+	void UpdateCash(const int& Cash);
 	class UMainWidget* mMainWidget;
+	TArray<class UStoreItemBoxWidget*> items;
 };

@@ -38,6 +38,8 @@ void send_PreGameSettingComplete_packet(SOCKET& sock);
 void send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType = 0);
 void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid);
 void send_match_request(SOCKET& sock,const short& Amount = -1);
+void send_buy_packet(SOCKET& sock, const int& itemcode);
+void send_equip_packet(SOCKET& sock, const int& itemcode);
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {

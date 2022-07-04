@@ -38,6 +38,7 @@ public:
 	bool bAi;
 	short maxhp;
 	std::atomic_short hp;
+	short skintype;
 	InventorySlot mSlot[5];
 	std::atomic_int mActivationSlot;
 	std::atomic_int mKillCount;

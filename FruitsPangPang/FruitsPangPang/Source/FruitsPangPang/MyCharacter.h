@@ -197,15 +197,13 @@ public:
 public:	
 
 	//Related Shop, Equip Skin
-	unsigned int Cash;		//현재 가진 돈.
+	int Cash;		//현재 가진 돈.
 	short skinType;	//현재 장착한 스킨 타입 0 - None , 1 - ... (스킨 아이템 번호)
 	unsigned char haveitems[PLAYER_HAVE_ITEM_LOBBY];
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-		class UStaticMeshComponent* NifeSkin;
-	bool bNifeSkin;
 	
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		class UStaticMeshComponent* SkinParts;
+	void EquipSkin();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -24,13 +24,16 @@ void process_packet_for_DB(unsigned char* p);
 
 void send_login_authorization_packet(const int& player_id, const char* id, const char* pass);
 void send_request_iteminfo_packet();
+void send_buyitem_updateDB_packet(const char* name, const unsigned char& itemcode, const int& coin);
+void send_updateDB_skintype_packet(const char* name, const short& skintype);
 
 void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype);
 void send_signup_packet(const int& player_id, const char* id, const char* pass);
 void send_signup_ok_packet(const int& player_id, const char& succestype);
 void send_enter_ingame_packet(const int& player_id,const short& server_port);
 void send_match_update_packet(const int& player_id, const int& player_cnt);
-void send_buyitem_result_packet(const int& player_id, const int& remaincoin);
+void send_buyitem_result_packet(const int& player_id, const int& remaincoin, const unsigned char& itemcode);
+void send_equip_response_packet(const int& player_id, const unsigned char& itemcode);
 
 struct Timer_Event {
 	enum class TIMER_TYPE 

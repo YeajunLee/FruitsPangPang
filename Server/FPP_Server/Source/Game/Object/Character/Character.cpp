@@ -14,6 +14,7 @@ Character::Character(OBJTYPE type, STATE state)
 	, mKillCount(0)
 	,mDeathCount(0)
 	,bAi(false)
+	,skintype(0)
 {
 	_type = type;
 }
