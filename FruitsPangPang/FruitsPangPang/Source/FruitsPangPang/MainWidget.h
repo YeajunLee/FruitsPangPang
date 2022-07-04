@@ -42,8 +42,10 @@ public:
 	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
 		class UMiniMapWidget* W_MiniMap_0;
 
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UStoreWidget* W_Store;
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* StoreBox;
+
+	class UStoreWidget* W_Store;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")

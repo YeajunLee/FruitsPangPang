@@ -3,15 +3,32 @@
 
 #include "StoreWidget.h"
 #include "Components/Button.h"
+#include "Components/WrapBox.h"
 #include "MyCharacter.h"
 #include "Network.h"
 #include "MainWidget.h"
-
+#include "StoreItemBoxWidget.h"
+#include "Engine/DataTable.h"
+#include "Item.h"
 
 
 void UStoreWidget::NativePreConstruct()
 {	
 	QuitButton-> OnClicked.AddDynamic(this, &UStoreWidget::ClickQuit);
+
+	UDataTable* StoreItemList = nullptr;
+	FName Path("DataTable'/Game/Widget/Assets/Shop.Shop'");
+	StoreItemList = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), NULL, *Path.ToString()));
+	if (nullptr != StoreItemList)
+	{
+		TArray<FStoreItemInfo*> row;
+		FString context;
+		StoreItemList->GetAllRows(context, row);
+		for (auto p : row)
+		{
+			InsertItem(p->ItemCode, p->Name, p->Price);
+		}
+	}
 }
 
 void UStoreWidget::ClickQuit()
@@ -23,3 +40,19 @@ void UStoreWidget::ClickQuit()
 	Network::GetNetwork()->mMyCharacter->mMainWidget->HideStoreWidget();
 }
 
+void UStoreWidget::InsertItem(const int& itemCode, const FText& itemName,const int& price)
+{
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreItemBoxWidget.MStoreItemBoxWidget_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	auto itemWGT = CreateWidget<UStoreItemBoxWidget>(GetWorld(), WidgetClass);
+	if (nullptr == itemWGT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StoreItemBoxWidget Source is invalid !! check '/Game/Widget/MStoreItemBoxWidget.MStoreItemBoxWidget_C'"));
+	}
+	else {
+		itemWGT->InitializeItem(itemCode, itemName, price);
+
+		StuffWrapBox->AddChildToWrapBox(itemWGT);
+	}
+
+}

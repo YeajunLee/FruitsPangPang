@@ -22,8 +22,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UButton* QuitButton;
 
+	UPROPERTY(meta = (BindWidget))
+		class UWrapBox* StuffWrapBox;
 	UFUNCTION()
 		void ClickQuit();
+
+	void InsertItem(const int& itemcode, const FText& itemName, const int& price);
 
 	class UMainWidget* mMainWidget;
 };
