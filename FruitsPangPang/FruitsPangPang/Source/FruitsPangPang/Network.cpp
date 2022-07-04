@@ -1014,6 +1014,13 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				mPunnet[i]->GenerateFruit(packet->PunnetFruits[i]);
 			}
 		}
+		for (int i = 0; i < HEAL_CNT; ++i)
+		{
+			if (nullptr != mHealSpawner[i])
+			{
+				mHealSpawner[i]->GenerateFruit(packet->HealFruits[i]);
+			}
+		}
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -1376,7 +1383,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
 				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
-				mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
+				Game->mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
 		else {					//수확 로직
@@ -1395,7 +1402,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
 				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
-				mHealSpawner[packet->objNum]->HarvestFruit();
+				Game->mHealSpawner[packet->objNum]->HarvestFruit();
 			}
 
 		}
