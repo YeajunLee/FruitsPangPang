@@ -20,7 +20,7 @@ ABaseCharacter::ABaseCharacter()
 	, bStepBanana(false)
 	, bHitbyFruit(false)
 	, CharacterName(FString(""))
-	, l_socket(0)
+	, l_socket(INVALID_SOCKET)
 	, l_prev_size(0)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.

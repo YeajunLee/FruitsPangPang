@@ -34,6 +34,7 @@ void ULoginWidget::TryLogin()
 	const char* tmppass = TCHAR_TO_ANSI(*Password->GetText().ToString());
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
 		send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+	Network::GetNetwork()->MyCharacterPassWord = Password->GetText().ToString();
 }
 
 void ULoginWidget::TrySignUp()

@@ -79,7 +79,7 @@ bool Network::init()
 {
 	if (!isInit)
 	{
-		isInit = true;
+		isInit = true; 
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -98,6 +98,11 @@ void Network::release()
 			p = nullptr;
 		mSyncBananaID = 0;
 		WSACleanup();
+		if (!bLevelOpenTriggerEnabled)	//openlevel로 인한 release가 아니라, editor중지때문에 생기는 release라면 false시켜줌.
+		{
+			bLoginFlag = false;
+			bLevelOpenTriggerEnabled = false;	//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
+		}
 		isInit = false;
 	}
 	
@@ -856,6 +861,14 @@ void Network::process_packet(unsigned char* p)
 	}
 }
 
+
+
+
+
+
+
+
+
 void Network::process_LobbyPacket(unsigned char* p)
 {
 
@@ -866,7 +879,8 @@ void Network::process_LobbyPacket(unsigned char* p)
 		switch (packet->loginsuccess)
 		{
 		case 1: {
-			mMyCharacter->mLoginWidget->RemoveFromParent();
+			if(mMyCharacter->mLoginWidget)
+				mMyCharacter->mLoginWidget->RemoveFromParent();
 			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 			mMyCharacter->mMainWidget->bActivate = true;
 			mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
@@ -874,6 +888,8 @@ void Network::process_LobbyPacket(unsigned char* p)
 			mMyCharacter->skinType = packet->skintype;
 			mMyCharacter->EquipSkin();
 			MyCharacterName = mMyCharacter->CharacterName;
+			bLoginFlag = true;
+			bLevelOpenTriggerEnabled = false;	//openlevel로 인한 변경이 끝났으니 false로 바꿔줌.
 			FInputModeGameOnly gamemode;
 			if (nullptr != controller)
 			{
@@ -901,6 +917,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 		lc_packet_match_response* packet = reinterpret_cast<lc_packet_match_response*>(p);
 		GameServerPort = packet->port;
 		mMyCharacter->l_prev_size = 0;
+		bLevelOpenTriggerEnabled = true;
 		switch (packet->playertype)
 		{
 		case 0:
@@ -993,7 +1010,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 
 	if (nullptr == Network::GetNetwork()->mMyCharacter) return;
-	if (0 == Network::GetNetwork()->mMyCharacter->l_socket) return;
+	if (INVALID_SOCKET == Network::GetNetwork()->mMyCharacter->l_socket) return;
 
 	int to_process_data = num_bytes + Network::GetNetwork()->mMyCharacter->l_prev_size;
 	unsigned char* packet = over->getBuf();

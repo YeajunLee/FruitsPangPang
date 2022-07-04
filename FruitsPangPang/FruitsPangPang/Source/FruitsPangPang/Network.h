@@ -54,6 +54,7 @@ public:
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
 	FString MyCharacterName;
+	FString MyCharacterPassWord;
 	UPROPERTY()
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];
@@ -62,8 +63,9 @@ public:
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
+	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
+	bool bLoginFlag = false;	//로그인시 true
 	short GameServerPort = -1;		//게임서버 접속용 port
-	//int mGameMode = 0;	//0 = PlayerMode, 1= AIMode
 	Network();
 	~Network();
 private:
