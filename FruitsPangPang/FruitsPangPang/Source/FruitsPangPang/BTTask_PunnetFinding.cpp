@@ -151,7 +151,7 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 		{
 			// 방해하는 플레이어가 없다면 GoToTheTree(Punnet)
 			//OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::PunnetKey, punnets[TargetPunnetIndex].mPunnet);
-			UE_LOG(LogTemp, Warning, TEXT("%s"), punnets[TargetPunnetIndex].mPunnet);
+			//UE_LOG(LogTemp, Warning, TEXT("%s"), punnets[TargetPunnetIndex].mPunnet);
 			UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), punnets[TargetPunnetIndex].mPunnet);
 			break;
 		}
