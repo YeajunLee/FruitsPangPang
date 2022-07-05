@@ -5,6 +5,7 @@
 //#include "AI_SwordCharacter.h"
 #include "AICharacter.h"
 #include "AI_Sword_Controller_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "MyCharacter.h"
 
@@ -24,13 +25,23 @@ EBTNodeResult::Type UBTTask_SwordAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	if (nullptr == swordAI)
 		return EBTNodeResult::Failed;
 
-	//auto Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey));
-	auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey));
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), Target);
+	auto swordAIController = Cast<AAI_Sword_Controller_Custom>(swordAI->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(swordAI->Controller);
+
+	ABaseCharacter* Target = nullptr;
+
+	if(swordAIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey));
+	else if(smartAIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
+
 	if (nullptr == Target)
 		return EBTNodeResult::Failed;
 	if (Target->bIsDie) {
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, nullptr);
+		if (swordAIController)
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, nullptr);
+		else if (smartAIController)
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
 		return EBTNodeResult::Failed;
 	}
 	if (swordAI->bIsDie)

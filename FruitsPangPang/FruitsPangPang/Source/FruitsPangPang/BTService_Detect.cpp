@@ -4,6 +4,7 @@
 #include "BTService_Detect.h"
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 //#include "MyCharacter.h"
@@ -20,6 +21,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn) return;
+
+	//2022-07-05
+	AAICharacter* ai = Cast<AAICharacter>(ControllingPawn);
+
+	auto AIController = Cast<AAIController_Custom>(ai->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(ai->Controller);
+	//
 
 	UWorld* World = ControllingPawn->GetWorld();
 	if (nullptr == World) return;
@@ -49,9 +57,15 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 			if (nullptr != character)
 			{
-				UE_LOG(LogTemp, Log, TEXT("find enemy!!"));
-				// Character면, 블랙보드에 저장한다.
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, character);
+				if (AIController)
+				{
+					// Character면, 블랙보드에 저장한다.
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, character);
+				}
+				else if (smartAIController)
+				{
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, character);
+				}
 
 				// 디버깅 용.
 				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
@@ -63,7 +77,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 	else
 	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+		if(AIController)
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+		else if(smartAIController)
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
 	}
 
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);

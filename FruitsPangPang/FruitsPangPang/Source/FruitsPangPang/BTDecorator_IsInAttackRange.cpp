@@ -3,6 +3,7 @@
 
 #include "BTDecorator_IsInAttackRange.h"
 #include "AIController_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "AICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "MyCharacter.h"
@@ -18,8 +19,17 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn) return false;
 
-	//AMyCharacter* Target = Cast<AMyCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
-	auto Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	//2022-07-05
+	AAICharacter* ai = Cast<AAICharacter>(ControllingPawn);
+
+	auto AIController = Cast<AAIController_Custom>(ai->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(ai->Controller);
+
+	ABaseCharacter* Target = nullptr;
+	if(AIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
+	else if(smartAIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
 
 	if (nullptr == Target) return false;
 

@@ -4,6 +4,7 @@
 #include "BTTaskNode_Farming.h"
 #include "AICharacter.h"
 #include "AIController_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Inventory.h"
 #include "Tree.h"
@@ -25,10 +26,15 @@ EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	ai->GetFruits();
 
-	//int FruitAmount = ai->mInventory->mSlots[ai->SelectedHotKeySlotNum].Amount;
-	//OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+	//2022-07-05
+	auto AIController = Cast<AAIController_Custom>(ai->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(ai->Controller);
 
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+	if(AIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+	else if(smartAIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
+
 
 	return EBTNodeResult::InProgress;
 }
@@ -40,16 +46,42 @@ void UBTTaskNode_Farming::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	auto AICharacter = Cast<AAICharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == AICharacter)
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsInt(AAIController_Custom::AmountKey) > 0)
-	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
 
-	ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
-	if (targetTree->CanHarvest == false) 
+	//2022-07-05
+	auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
+
+	if (AIController)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsInt(AAIController_Custom::AmountKey) > 0)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+
+		ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey));
+		if (targetTree->CanHarvest == false)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+		else
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
-	else
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	else if (smartAIController)
+	{
+		if (OwnerComp.GetBlackboardComponent()->GetValueAsInt(AAI_Smart_Controller_Custom::AmountKey) > 0)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+
+		ATree* targetTree = static_cast<ATree*>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TreePosKey));
+		if (targetTree->CanHarvest == false)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+		else
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
+	
+
+	
 }
