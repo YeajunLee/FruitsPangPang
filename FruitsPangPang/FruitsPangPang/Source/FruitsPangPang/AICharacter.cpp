@@ -341,7 +341,7 @@ void AAICharacter::DropSwordAnimation()
 
 void AAICharacter::Throw()
 {
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket2");
 
 	auto ToTarget = UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsRotator(AAIController_Custom::TrackingTargetKey);
 
