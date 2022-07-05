@@ -543,7 +543,7 @@ void Network::process_packet(unsigned char* p)
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->SlashMontage)
 					{
-						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->SlashMontage, 2.f);
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->SlashMontage, 1.5f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->SlashMontage);
 
 					}
@@ -562,7 +562,7 @@ void Network::process_packet(unsigned char* p)
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
 					{
-						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->StabbingMontage, 2.f);
+						AnimInstance->Montage_Play(mOtherCharacter[packet->id]->StabbingMontage, 1.2f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->StabbingMontage);
 
 					}
