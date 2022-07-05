@@ -949,7 +949,7 @@ void AMyCharacter::Throw()
 	}
 	else
 	{
-		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
+		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket2");
 		
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
 		CameraRotate.Pitch += 14;
