@@ -131,7 +131,6 @@ void AMyCharacter::BeginPlay()
 	CarrotBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CarrotBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotBag"));
 	SkinParts->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("NifeSkinSocket"));
 
 	GreenOnionBag->SetHiddenInGame(true, false);
 	CarrotBag->SetHiddenInGame(true, false);
@@ -1244,18 +1243,23 @@ void AMyCharacter::EquipSkin()
 	switch (skinType)
 	{
 	case 1:
+		SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("NifeSkinSocket"));
 		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Knife/Nife_0.Nife_0'")));
 		break;
-	case 2: 
+	case 2:
+		SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CandySkinSocket"));
 		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/Assets/CharacterSkins/Candy/candy.candy")));
 		break;
 	case 3:
+		SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("LeafSkinSocket"));
 		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Leaf/leaf.leaf'")));
 		break;
 	case 4:
+		SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("StrawSkinSocket"));
 		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Straw/straw.straw'")));
 		break;
 	case 5:
+		SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("SunflowerSkinSocket"));
 		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/SunFlower/SM_SunFlower.SM_SunFlower'")));
 		break;
 	}
