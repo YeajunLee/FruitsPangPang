@@ -79,7 +79,10 @@ AMyCharacter::AMyCharacter()
 
 	//-----------------------------------------------------------------------------------------------------
 	
-	GetCharacterMovement()->bOrientRotationToMovement = true; //캐릭터 방향에 따라
+	//2022 - 07 - 06 OrientRotationToMoveMent를 true로 하면 뒤로갈때 옆을보는 말도안되는 버그가 생긴다.
+	//문제가 심각해보이면 가장 쉬운것 부터 찾아보자.
+	//이 문제는 아~주 극 초반부터 있었던 문제였지만 인지하지도 못하다가 이번에 이슈가 되어 찾은 내용. 
+	GetCharacterMovement()->bOrientRotationToMovement = false; //캐릭터 방향에 따라 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 1080.f, 0.f); // 회전
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -949,7 +952,7 @@ void AMyCharacter::Throw()
 	}
 	else
 	{
-		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket2");
+		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 		
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
 		CameraRotate.Pitch += 14;

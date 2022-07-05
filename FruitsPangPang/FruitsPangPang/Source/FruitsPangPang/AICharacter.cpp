@@ -195,7 +195,7 @@ void AAICharacter::Attack()
 				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
 				//UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
 
-				AnimInstance->Montage_Play(ThrowMontage_AI, 2.f);
+				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 				send_anim_packet(s_socket, Network::AnimType::Throw);
 			}
@@ -226,7 +226,7 @@ void AAICharacter::Attack()
 				SM_Carrot->SetHiddenInGame(false);
 				if (AnimInstance && StabMontage_AI)
 				{
-					AnimInstance->Montage_Play(StabMontage_AI, 1.2f);
+					AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
 					send_anim_packet(s_socket, Network::AnimType::Stab);
 				}
@@ -253,7 +253,7 @@ void AAICharacter::Attack()
 				SM_Carrot->SetHiddenInGame(false);
 				if (AnimInstance && StabMontage_AI)
 				{
-					AnimInstance->Montage_Play(StabMontage_AI, 1.2f);
+					AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
 					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
 					send_anim_packet(s_socket, Network::AnimType::Stab);
 				}
@@ -341,7 +341,7 @@ void AAICharacter::DropSwordAnimation()
 
 void AAICharacter::Throw()
 {
-	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket2");
+	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 
 	auto ToTarget = UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsRotator(AAIController_Custom::TrackingTargetKey);
 
