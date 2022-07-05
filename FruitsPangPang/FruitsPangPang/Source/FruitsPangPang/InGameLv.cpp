@@ -9,6 +9,7 @@
 
 void AInGameLv::BeginPlay() {
 
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*
 	
 	1. Loading Widget을 띄우고

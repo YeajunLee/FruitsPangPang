@@ -20,6 +20,7 @@ ABaseCharacter::ABaseCharacter()
 	, bStepBanana(false)
 	, bHitbyFruit(false)
 	, CharacterName(FString(""))
+	, s_socket(INVALID_SOCKET)
 	, l_socket(INVALID_SOCKET)
 	, l_prev_size(0)
 {
