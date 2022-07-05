@@ -8,6 +8,7 @@
 
 void AInLobbyLv::BeginPlay() {
 
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*
 
 	1. 캐릭터를 스폰하고 Network mMyCharacter에 연결
@@ -39,8 +40,15 @@ void AInLobbyLv::Conn()
 	if (nullptr != player)
 	{
 		player->ConnLobbyServer();
-		player->ShowLoginHUD();
-		//send_login_packet(player->s_socket, 0);
+		if(!Network::GetNetwork()->bLoginFlag)
+			player->ShowLoginHUD();
+		else
+		{
+			const char* tmpid = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName);
+			const char* tmppass = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord);
+			if (nullptr != Network::GetNetwork()->mMyCharacter)
+				send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+		}
 		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 
 	}

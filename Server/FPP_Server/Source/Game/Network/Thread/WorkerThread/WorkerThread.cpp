@@ -76,6 +76,28 @@ void WorkerThread()
 			mServer->recvPacket();
 			break;
 		}
+		case CMD_DBSERVER_RECV: {
+			if (bytes == 0) {
+				//Disconnect(client_id);
+				break;
+			}
+			int To_Process_Bytes = bytes + mDBServer->_prev_size;
+			unsigned char* packets = wsa_ex->getBuf();	//wsa_ex == mDBServer->wsa_ex.buf
+			if (To_Process_Bytes >= packets[0])
+			{
+				do {
+					process_packet_for_Server(packets);
+					To_Process_Bytes -= packets[0];
+					packets += packets[0];
+				} while ((To_Process_Bytes & ~0) && (To_Process_Bytes >= packets[0]));
+			}
+			//To_Process_Bytes != 0 이면 packets보다 큰지 확인해야 알 수 있지만
+			//to_Process_Bytes가 packets보다 크면, To_Process_Bytes != 0인건 확실하므로, 이때는 필요없는 구문
+			//뒷구문이 앞으로오는건 의미가 없음. 앞구문에서 성공하여 cmp를 한 번 만으로 끝낼 수 있는 기대효과
+			mDBServer->PreRecvPacket(packets, To_Process_Bytes);
+			mDBServer->recvPacket();
+			break;
+		}
 		case CMD_SEND: {
 			//if (num_byte != wsa_ex->_wsa_buf.len) {
 			//	Disconnect(client_id);

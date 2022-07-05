@@ -10,6 +10,10 @@ const int GAMEPLAYTIME_CHEAT_MILLI = 10'000;
 const int  MAX_NAME_SIZE = 21;
 const int USER_START = 0;
 const int  MAX_USER = 8;
+const int MAX_USER_LOBBY = 1000;
+const int MAX_NPC_LOBBY = 1;
+const int NPC_ID_START_LOBBY = MAX_USER_LOBBY;
+constexpr int NPC_ID_END_LOBBY = NPC_ID_START_LOBBY + MAX_NPC_LOBBY;
 const int TREE_CNT = 56;
 const int GREEN_TREE_CNT = 41;
 const int PUNNET_CNT = 11;
@@ -22,6 +26,7 @@ const int HEALID_START = PUNNETID_END;
 const int HEALID_END = HEALID_START + HEAL_CNT;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
+const int PLAYER_HAVE_ITEM_LOBBY = 20;
 
 const char POS_TYPE_DURIAN = 1;
 
@@ -46,6 +51,8 @@ const char CL_PACKET_MATCH_REQUEST = 14;
 const char CL_PACKET_LOGIN = 15;
 const char CL_PACKET_SIGNUP = 16;
 const char CS_PACKET_GETFRUITS_HEAL = 17;
+const char CL_PACKET_BUY = 18;
+const char CL_PACKET_EQUIP = 19;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -76,6 +83,8 @@ const char LC_PACKET_LOGIN_OK = 1;
 const char LC_PACKET_MATCH_RESPONSE = 2;
 const char LC_PACKET_MATCH_UPDATE = 3;
 const char LC_PACKET_SIGNUP_OK = 4;
+const char LC_PACKET_BUYITEM_RESULT = 5;
+const char LC_PACKET_EQUIP_RESPONSE = 6;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -189,11 +198,24 @@ struct cl_packet_signup {
 	char	name[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
 };
+
+struct cl_packet_buy {
+	unsigned char size;
+	char	type;
+	unsigned char itemcode;
+};
+
+struct cl_packet_equip {
+	unsigned char size;
+	char	type;
+	char itemcode;
+};
 //-------------------- Gameserver to client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
+	short skintype;
 	char name[MAX_NAME_SIZE];
 	char TreeFruits[TREE_CNT];
 	char PunnetFruits[PUNNET_CNT];
@@ -217,6 +239,7 @@ struct sc_packet_put_object {
 	float rx, ry, rz, rw;
 	char object_type;
 	char	name[MAX_NAME_SIZE];
+	short skintype;
 };
 
 struct sc_packet_remove_object {
@@ -336,6 +359,8 @@ struct lc_packet_login_ok {
 	char loginsuccess;			//1 성공, 0이하 - 실패
 	int coin;
 	short skintype;
+	char numberofitemshave;		//아래변수의 index용
+	unsigned char haveitems[PLAYER_HAVE_ITEM_LOBBY];	//플레이어가 보유중인 아이템의 코드
 };
 
 struct lc_packet_match_response {
@@ -355,5 +380,18 @@ struct lc_packet_signup_ok {
 	unsigned char size;
 	char type;
 	char loginsuccess;
+};
+
+struct lc_packet_buyitem_result {
+	unsigned char size;
+	char type;
+	int Coin;
+	unsigned char itemcode;
+};
+
+struct lc_packet_equip_response {
+	unsigned char size;
+	char type;
+	unsigned char itemcode;
 };
 #pragma pack(pop)

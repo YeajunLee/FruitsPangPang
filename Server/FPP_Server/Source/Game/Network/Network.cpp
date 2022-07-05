@@ -16,6 +16,7 @@ SOCKET s_socket;
 
 std::array<Object*, MAX_OBJECT> objects;
 Server* mServer;
+Server* mDBServer;
 std::atomic_int loginPlayerCnt;
 std::atomic_bool GameActive = true;
 std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
@@ -108,6 +109,19 @@ void Disconnect(int c_id)
 }
 
 
+void send_get_player_info_packet(const int& player_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	gd_packet_get_player_info packet{};
+
+	packet.size = sizeof(packet);
+	packet.type = GD_PACKET_GET_PLAYER_INFO;
+	strcpy_s(packet.name, player->name);
+	packet.id = player_id;
+	mDBServer->sendPacket(&packet, sizeof(packet));
+}
+
+
 void send_login_ok_packet(int player_id, const char* playername)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
@@ -131,7 +145,7 @@ void send_login_ok_packet(int player_id, const char* playername)
 	{
 		packet.HealFruits[heal] = static_cast<char>(reinterpret_cast<Heal*>(objects[i])->_ftype);
 	}
-
+	packet.skintype = player->skintype;
 	packet.id = player_id;
 	strcpy_s(packet.name, playername);
 	player->sendPacket(&packet, sizeof(packet));
@@ -356,7 +370,8 @@ void process_packet(int client_id, unsigned char* p)
 
 		strcpy_s(character->name, packet->name);
 		character->bAi = packet->cType;
-		//Ai는 이름을 랜덤으로 부여받음.
+		//Ai는 이름을 랜덤으로 부여받음. AI는 스킨이 없기때문에 바로 로그인 ok이지만,
+		//플레이어블 캐릭터는 스킨 정보를 받아와야하기때문에 DB를 한번 거침.
 		if (packet->cType == 1)
 		{
 			random_device rd;
@@ -364,69 +379,78 @@ void process_packet(int client_id, unsigned char* p)
 			uniform_int_distribution<int> randName(0, 32);
 			int randCnt = randName(rng);
 			strcpy_s(character->name, RandomAIName[randCnt]);
-		}
 
-		send_login_ok_packet(client_id, character->name);
 
-		FPP_LOG("플레이어[%s] 접속", character->name);
+			send_login_ok_packet(client_id, character->name);
 
-		for (auto& other : objects) {
-			if (!other->isPlayer()) break;
-			if (other->_id == client_id) continue;
+			FPP_LOG("플레이어[%s] 접속", character->name);
 
-			auto OtherPlayer = reinterpret_cast<Character*>(other);
-			if (character->bAi && OtherPlayer->bAi) continue;
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				if (other->_id == client_id) continue;
 
-			OtherPlayer->state_lock.lock();
-			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+				auto OtherPlayer = reinterpret_cast<Character*>(other);
+				if (character->bAi && OtherPlayer->bAi) continue;
+
+				OtherPlayer->state_lock.lock();
+				if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+					OtherPlayer->state_lock.unlock();
+					continue;
+				}
 				OtherPlayer->state_lock.unlock();
-				continue;
+
+				sc_packet_put_object packet;
+				packet.id = client_id;
+				strcpy_s(packet.name, character->name);
+				packet.object_type = 0;
+				packet.size = sizeof(packet);
+				packet.type = SC_PACKET_PUT_OBJECT;
+				packet.x = character->x;
+				packet.y = character->y;
+				packet.z = character->z;
+				packet.rx = character->rx;
+				packet.ry = character->ry;
+				packet.rz = character->rz;
+				packet.rw = character->rw;
+				packet.skintype = 0;
+				OtherPlayer->sendPacket(&packet, sizeof(packet));
 			}
-			OtherPlayer->state_lock.unlock();
 
-			sc_packet_put_object packet;
-			packet.id = client_id;
-			strcpy_s(packet.name, character->name);
-			packet.object_type = 0;
-			packet.size = sizeof(packet);
-			packet.type = SC_PACKET_PUT_OBJECT;
-			packet.x = character->x;
-			packet.y = character->y;
-			packet.z = character->z;
-			packet.rx = character->rx;
-			packet.ry = character->ry;
-			packet.rz = character->rz;
-			packet.rw = character->rw;
-			OtherPlayer->sendPacket(&packet, sizeof(packet));
-		}
-
-		for (auto& other : objects) {
-			if (!other->isPlayer()) break;
-			if (other->_id == client_id) continue;
-			auto OtherPlayer = reinterpret_cast<Character*>(other);
-			if (character->bAi && OtherPlayer->bAi) continue;
-			OtherPlayer->state_lock.lock();
-			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				if (other->_id == client_id) continue;
+				auto OtherPlayer = reinterpret_cast<Character*>(other);
+				if (character->bAi && OtherPlayer->bAi) continue;
+				OtherPlayer->state_lock.lock();
+				if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+					OtherPlayer->state_lock.unlock();
+					continue;
+				}
 				OtherPlayer->state_lock.unlock();
-				continue;
+
+				sc_packet_put_object packet;
+				packet.id = OtherPlayer->_id;
+				strcpy_s(packet.name, OtherPlayer->name);
+				packet.object_type = 0;
+				packet.size = sizeof(packet);
+				packet.type = SC_PACKET_PUT_OBJECT;
+				packet.x = OtherPlayer->x;
+				packet.y = OtherPlayer->y;
+				packet.skintype = 0;
+
+				character->sendPacket(&packet, sizeof(packet));
 			}
-			OtherPlayer->state_lock.unlock();
 
-			sc_packet_put_object packet;
-			packet.id = OtherPlayer->_id;
-			strcpy_s(packet.name, OtherPlayer->name);
-			packet.object_type = 0;
-			packet.size = sizeof(packet);
-			packet.type = SC_PACKET_PUT_OBJECT;
-			packet.x = OtherPlayer->x;
-			packet.y = OtherPlayer->y;
+			character->state_lock.lock();
+			character->_state = Character::STATE::ST_INGAME;
+			character->state_lock.unlock();
 
-			character->sendPacket(&packet, sizeof(packet));
+
+		}
+		else {
+			send_get_player_info_packet(client_id);
 		}
 
-		character->state_lock.lock();
-		character->_state = Character::STATE::ST_INGAME;
-		character->state_lock.unlock();
 		break;
 	}
 	case CS_PACKET_MOVE: {
@@ -741,6 +765,75 @@ void process_packet_for_Server(unsigned char* p)
 		mServer->sendPacket(&spacket, sizeof(spacket));
 
 		break;
+	}
+	case DG_PACKET_REQUEST_PLAYER_INFO: {
+		dg_packet_request_player_info* packet = reinterpret_cast<dg_packet_request_player_info*>(p);
+		Character* character = reinterpret_cast<Character*>(objects[packet->id]);
+		character->skintype = packet->skintype;
+
+		send_login_ok_packet(packet->id, character->name);
+
+		FPP_LOG("플레이어[%s] 접속", character->name);
+
+		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
+			if (other->_id == packet->id) continue;
+
+			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+
+			OtherPlayer->state_lock.lock();
+			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+				OtherPlayer->state_lock.unlock();
+				continue;
+			}
+			OtherPlayer->state_lock.unlock();
+
+			sc_packet_put_object sendpacket;
+			sendpacket.id = packet->id;
+			strcpy_s(sendpacket.name, character->name);
+			sendpacket.object_type = 0;
+			sendpacket.size = sizeof(sendpacket);
+			sendpacket.type = SC_PACKET_PUT_OBJECT;
+			sendpacket.x = character->x;
+			sendpacket.y = character->y;
+			sendpacket.z = character->z;
+			sendpacket.rx = character->rx;
+			sendpacket.ry = character->ry;
+			sendpacket.rz = character->rz;
+			sendpacket.rw = character->rw;
+			sendpacket.skintype = character->skintype;
+			OtherPlayer->sendPacket(&sendpacket, sizeof(sendpacket));
+		}
+
+		for (auto& other : objects) {
+			if (!other->isPlayer()) break;
+			if (other->_id == packet->id) continue;
+			auto OtherPlayer = reinterpret_cast<Character*>(other);
+			if (character->bAi && OtherPlayer->bAi) continue;
+			OtherPlayer->state_lock.lock();
+			if (Character::STATE::ST_INGAME != OtherPlayer->_state) {
+				OtherPlayer->state_lock.unlock();
+				continue;
+			}
+			OtherPlayer->state_lock.unlock();
+
+			sc_packet_put_object sendpacket;
+			sendpacket.id = OtherPlayer->_id;
+			strcpy_s(sendpacket.name, OtherPlayer->name);
+			sendpacket.object_type = 0;
+			sendpacket.size = sizeof(sendpacket);
+			sendpacket.type = SC_PACKET_PUT_OBJECT;
+			sendpacket.x = OtherPlayer->x;
+			sendpacket.y = OtherPlayer->y;
+			sendpacket.skintype = OtherPlayer->skintype;
+
+			character->sendPacket(&sendpacket, sizeof(sendpacket));
+		}
+
+		character->state_lock.lock();
+		character->_state = Character::STATE::ST_INGAME;
+		character->state_lock.unlock();
 	}
 	}
 }

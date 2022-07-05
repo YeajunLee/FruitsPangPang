@@ -138,6 +138,46 @@ int main(int argc, char* argv[])
 	//--------------------------------------------
 
 
+	//---------------
+	mDBServer = new Server();
+	mDBServer->_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	ZeroMemory(&mDBServer->server_addr, sizeof(mDBServer->server_addr));
+	mDBServer->server_addr.sin_family = AF_INET;
+	mDBServer->server_addr.sin_port = htons(DBSERVER_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &mDBServer->server_addr.sin_addr);
+	mDBServer->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(mDBServer->wsa_ex_recv.getBuf());
+	mDBServer->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
+	mDBServer->wsa_ex_recv.setCmd(CMD_DBSERVER_RECV);
+	ZeroMemory(&mDBServer->wsa_ex_recv.getWsaOver(), sizeof(mDBServer->wsa_ex_recv.getWsaOver()));
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mDBServer->_socket), hiocp, 1, 0);
+
+	rt = connect(mDBServer->_socket, reinterpret_cast<sockaddr*>(&mDBServer->server_addr), sizeof(mDBServer->server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		error_display(err_num);
+		system("pause");
+		//exit(0);
+		closesocket(mDBServer->_socket);
+		return false;
+	}
+
+	recv_flag = 0;
+	ret = WSARecv(mDBServer->_socket, &mDBServer->wsa_ex_recv.getWsaBuf(), 1, NULL, &recv_flag, &mDBServer->wsa_ex_recv.getWsaOver(), NULL);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
+	//---------
+
+
+
+
 	for (auto& th : worker_threads)
 		th.join();
 

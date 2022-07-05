@@ -97,5 +97,7 @@ void UGameResultWidget::NativeDestruct()
 
 void UGameResultWidget::GoToLobby()
 {
-	FGenericPlatformMisc::RequestExit(false);
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+	UGameplayStatics::OpenLevel(GetWorld(), FName("NewWorld"));
+	
 }

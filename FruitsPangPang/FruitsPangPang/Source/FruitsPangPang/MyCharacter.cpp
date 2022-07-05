@@ -90,6 +90,8 @@ AMyCharacter::AMyCharacter()
 	CarrotBag = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarrotBag"));
 	CarrotBag->SetupAttachment(GetMesh());
 	
+	SkinParts = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SkinParts"));
+	SkinParts->SetupAttachment(GetMesh());
 
 	collisionTest = CreateDefaultSubobject < UStaticMeshComponent>(TEXT("Test"));
 	collisionTest->SetupAttachment(GetRootComponent());
@@ -128,9 +130,12 @@ void AMyCharacter::BeginPlay()
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
 	CarrotBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CarrotBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("CarrotBag"));
-	
+	SkinParts->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SkinParts->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("NifeSkinSocket"));
+
 	GreenOnionBag->SetHiddenInGame(true, false);
 	CarrotBag->SetHiddenInGame(true, false);
+	SkinParts->SetHiddenInGame(true);
 
 	if (nullptr == GetController())
 	{
@@ -402,11 +407,6 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 			
 		}
 	}
-	else if (Key == EKeys::R)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Please Call Shop Widget Here!!!!!"));
-		this->mMainWidget->ShowStoreWidget();
-	}
 	else if (Key == EKeys::P)
 	{
 		send_Cheat(s_socket, CHEAT_TYPE_GAMETIME);
@@ -586,20 +586,8 @@ void AMyCharacter::InteractNpc()
 		ShowMatchHUD();
 		break;
 	case 1:
-	{
-		//auto controller = GetWorld()->GetFirstPlayerController();
-		//FInputModeUIOnly gamemode;
-		//if (nullptr != controller)
-		//{
-		//	controller->SetInputMode(gamemode);
-		//	controller->SetShowMouseCursor(true);
-		//}
-		//FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
-		//auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		//auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(GetWorld(), WidgetClass);
-		//MessageBoxWGT->AddToViewport();
-		//MessageBoxWGT->MakeMessageBoxWithCode(3);
-	}
+		mMainWidget->ShowStoreWidget();
+		break;
 	break;
 	}
 }
@@ -1250,7 +1238,33 @@ void AMyCharacter::ShowMatchHUD()
 }
 
 
-
+void AMyCharacter::EquipSkin()
+{
+	UStaticMesh* skinmesh = nullptr;
+	switch (skinType)
+	{
+	case 1:
+		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Knife/Nife_0.Nife_0'")));
+		break;
+	case 2: 
+		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/Assets/CharacterSkins/Candy/candy.candy")));
+		break;
+	case 3:
+		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Leaf/leaf.leaf'")));
+		break;
+	case 4:
+		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/Straw/straw.straw'")));
+		break;
+	case 5:
+		skinmesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("StaticMesh'/Game/Assets/CharacterSkins/SunFlower/SM_SunFlower.SM_SunFlower'")));
+		break;
+	}
+	if (nullptr != skinmesh)
+	{
+		SkinParts->SetStaticMesh(skinmesh);
+		SkinParts->SetHiddenInGame(false);
+	}
+}
 
 
 

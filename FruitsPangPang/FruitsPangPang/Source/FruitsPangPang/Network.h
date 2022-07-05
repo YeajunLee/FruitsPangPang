@@ -38,6 +38,8 @@ void send_PreGameSettingComplete_packet(SOCKET& sock);
 void send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType = 0);
 void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotate, const int& bananaid);
 void send_match_request(SOCKET& sock,const short& Amount = -1);
+void send_buy_packet(SOCKET& sock, const int& itemcode);
+void send_equip_packet(SOCKET& sock, const int& itemcode);
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {
@@ -52,6 +54,7 @@ public:
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];
 	FString MyCharacterName;
+	FString MyCharacterPassWord;
 	UPROPERTY()
 	class AMyCharacter* mOtherCharacter[MAX_USER];
 	class ATree* mTree[TREE_CNT];
@@ -60,8 +63,9 @@ public:
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
+	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
+	bool bLoginFlag = false;	//로그인시 true
 	short GameServerPort = -1;		//게임서버 접속용 port
-	//int mGameMode = 0;	//0 = PlayerMode, 1= AIMode
 	Network();
 	~Network();
 private:

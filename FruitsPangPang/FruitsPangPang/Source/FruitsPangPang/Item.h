@@ -4,10 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/DataTable.h"
 #include "Item.generated.h"
 
 
-//구조체 앞에 F 붙이는건 댕글링 포인터 방지용
+USTRUCT(BlueprintType)
+struct FStoreItemInfo : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Store")
+		int ItemCode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Store")
+		FText Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Store")
+		int Price;
+};
+
+//구조체 앞에 F 붙이는건 댕글링 포인터 방지용 ----------이건 InGame에서 사용되는 아이템이다.  Atomic은 이 구조체가 항상 하나의 단위로 직렬화(Serialize)됨을 의미
 USTRUCT(Atomic, BlueprintType)
 struct FItemInfo
 {

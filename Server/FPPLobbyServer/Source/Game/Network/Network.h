@@ -11,7 +11,7 @@
 extern HANDLE hiocp;
 extern SOCKET s_socket;
 
-extern std::array<class Object*, MAX_OBJECT> objects;
+extern std::array<class Object*, MAX_USER_LOBBY + MAX_NPC_LOBBY> objects;
 extern std::array<class Server*, MAX_SERVER> servers;
 extern class DBServer* dbserver;
 extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
@@ -23,11 +23,17 @@ void process_packet_for_Server(int client_id, unsigned char* p);
 void process_packet_for_DB(unsigned char* p);
 
 void send_login_authorization_packet(const int& player_id, const char* id, const char* pass);
+void send_request_iteminfo_packet();
+void send_buyitem_updateDB_packet(const char* name, const unsigned char& itemcode, const int& coin);
+void send_updateDB_skintype_packet(const char* name, const short& skintype);
+
 void send_login_ok_packet(const int& player_id, const char& succestype, const int& coin, const short& skintype);
 void send_signup_packet(const int& player_id, const char* id, const char* pass);
 void send_signup_ok_packet(const int& player_id, const char& succestype);
 void send_enter_ingame_packet(const int& player_id,const short& server_port);
 void send_match_update_packet(const int& player_id, const int& player_cnt);
+void send_buyitem_result_packet(const int& player_id, const int& remaincoin, const unsigned char& itemcode);
+void send_equip_response_packet(const int& player_id, const unsigned char& itemcode);
 
 struct Timer_Event {
 	enum class TIMER_TYPE 
