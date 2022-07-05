@@ -8,6 +8,7 @@
 
 void AInGameAiLv::BeginPlay() {
 
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//∑π∫ß Ω√¿€µ∆¿∏¥œ ∆Æ∏Æ∞≈ ≤®¡‹.
 	ConnAi();
 }
 

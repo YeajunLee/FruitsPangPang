@@ -22,12 +22,15 @@ void AHealSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		ABaseCharacter* player = Cast<ABaseCharacter>(OtherActor);
 		if (player && CanHarvest)
 		{
-			CanHarvest = false;
-			send_getfruits_healspawner_packet(player->s_socket, HealSpanwerId);
+            if (INVALID_SOCKET != player->s_socket)
+            {
+                CanHarvest = false;
+                send_getfruits_healspawner_packet(player->s_socket, HealSpanwerId);
 
-            player->bIsUndertheHealSpawner = true;
+                player->bIsUndertheHealSpawner = true;
 
-            UE_LOG(LogTemp, Warning, TEXT("Heal Overlap!"));
+                UE_LOG(LogTemp, Warning, TEXT("Heal Overlap!"));
+            }
 		}
     }
 }
@@ -83,6 +86,7 @@ void AHealSpawner::HarvestFruit()
 	}
 
     CanHarvest = false;
+    UE_LOG(LogTemp, Warning, TEXT("Heal Harvested!"));
 
 }
 // Called when the game starts or when spawned
