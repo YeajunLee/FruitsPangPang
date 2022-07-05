@@ -26,10 +26,15 @@ EBTNodeResult::Type UBTTaskNode_Farming::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	ai->GetFruits();
 
-	//int FruitAmount = ai->mInventory->mSlots[ai->SelectedHotKeySlotNum].Amount;
-	//OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
+	//2022-07-05
+	auto AIController = Cast<AAIController_Custom>(ai->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(ai->Controller);
 
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+	if(AIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+	else if(smartAIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
+
 
 	return EBTNodeResult::InProgress;
 }

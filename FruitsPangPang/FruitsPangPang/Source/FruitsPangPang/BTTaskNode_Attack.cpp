@@ -69,10 +69,24 @@ void UBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
     if (nullptr == AICharacter)
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
-    if (0 == AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount)
+    auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
+    auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
+
+    if (AIController)
     {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        if (0 == AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount)
+        {
+            FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        }
     }
+    else if (smartAIController)
+    {
+        if (0 == AICharacter->mInventory->mSlots[AICharacter->SelectedHotKeySlotNum].Amount)
+        {
+            FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        }
+    }
+    
 
     if (!IsAttacking)
     {

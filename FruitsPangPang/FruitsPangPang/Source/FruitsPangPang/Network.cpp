@@ -24,6 +24,7 @@
 #include "MessageBoxWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
 #include "PointOfInterestComponent.h"
@@ -1291,9 +1292,16 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 		//sword_ai
 		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(PacketOwner->Controller);
+		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(PacketOwner->Controller);
+
 		if (swordAIController && (packet->itemCode == 7 || packet->itemCode == 8)) // update when ItemCode is only 7 or 8
 		{
 			swordAIController->SavedItemCode = packet->itemCode;
+			PacketOwner->PickSwordAnimation();
+		}
+		else if (smartAIController && (packet->itemCode == 7 || packet->itemCode == 8))
+		{
+			smartAIController->SavedItemCode = packet->itemCode;
 			PacketOwner->PickSwordAnimation();
 		}
 

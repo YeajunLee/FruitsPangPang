@@ -4,6 +4,7 @@
 #include "AICharacter.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
+#include "AI_Smart_Controller_Custom.h"
 #include "Inventory.h"
 #include "Projectile.h"
 #include "Tree.h"
@@ -200,8 +201,10 @@ void AAICharacter::Attack()
 			}
 		}
 		
-		//Sword AI
+		//Sword AI or Smart AI
 		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(GetController());
+		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
+
 		if (swordAIController)
 		{
 			if (swordAIController->SavedItemCode == 7) //대파
@@ -229,8 +232,34 @@ void AAICharacter::Attack()
 				}
 			}
 		}
+		else if (smartAIController)
+		{
+			if (smartAIController->SavedItemCode == 7) //대파
+			{
+				//PickSwordAnimation();
+				SM_GreenOnion->SetHiddenInGame(false);
+				SM_Carrot->SetHiddenInGame(true);
+				if (AnimInstance && SlashMontage_AI)
+				{
+					AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
+					send_anim_packet(s_socket, Network::AnimType::Slash);
+				}
+			}
+			else if (smartAIController->SavedItemCode == 8) //당근
+			{
+				//PickSwordAnimation();
+				SM_GreenOnion->SetHiddenInGame(true);
+				SM_Carrot->SetHiddenInGame(false);
+				if (AnimInstance && StabMontage_AI)
+				{
+					AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
+					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
+					send_anim_packet(s_socket, Network::AnimType::Stab);
+				}
+			}
+		}
 		
-
 		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
 		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
 	}

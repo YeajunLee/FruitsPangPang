@@ -29,17 +29,13 @@ EBTNodeResult::Type UBTTask_SwordFarming::ExecuteTask(UBehaviorTreeComponent& Ow
 
 	//sword_ai
 	auto swordAIController = Cast<AAI_Sword_Controller_Custom>(swordAI->Controller);
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(swordAI->Controller);
 
-	OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAI_Sword_Controller_Custom::PunnetItemKey, swordAIController->SavedItemCode);
-	//auto swordAIController = Cast<AAI_Sword_Controller_Custom>(PacketOwner->Controller);
-	//if ((packet->itemCode == 7 || packet->itemCode == 8))
-	//	swordAIController->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAI_Sword_Controller_Custom::PunnetItemKey, packet->itemCode);
+	if(swordAIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAI_Sword_Controller_Custom::PunnetItemKey, swordAIController->SavedItemCode);
+	else if(smartAIController)
+		OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAI_Smart_Controller_Custom::PunnetItemKey, smartAIController->SavedItemCode);
 
-	//OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, nullptr);
-
-	// fail하고 다시 blackboard에서 key값으로 어디로갈지 결정하기 위해 key값 세팅
-	//OwnerComp.GetBlackboardComponent()->SetValueAsInt(AAI_Sword_Controller_Custom::PunnetItemKey, getWhat);
-	
 
 	return EBTNodeResult::InProgress;
 }

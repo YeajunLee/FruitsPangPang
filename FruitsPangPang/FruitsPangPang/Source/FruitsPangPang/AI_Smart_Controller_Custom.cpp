@@ -17,6 +17,7 @@ FName AAI_Smart_Controller_Custom::TrackingTargetKey(TEXT("TrackingTarget"));
 
 
 AAI_Smart_Controller_Custom::AAI_Smart_Controller_Custom()
+	:SavedItemCode{ -1 }
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("BlackboardData'/Game/Character/AICharacter/SmartAI/BB_SmartAI.BB_SmartAI'"));
 

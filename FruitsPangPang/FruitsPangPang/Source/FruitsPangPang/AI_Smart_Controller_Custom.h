@@ -27,6 +27,8 @@ public:
 	static FName AmountKey;
 	static FName TrackingTargetKey;
 
+public:
+	int SavedItemCode;
 
 private:
 	UPROPERTY();
