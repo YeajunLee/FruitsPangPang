@@ -1006,7 +1006,6 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 
 	}
 	else {
-		rotation.Pitch += 14;
 		FTransform trans(rotation.Quaternion(), location);
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
@@ -1050,7 +1049,6 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 
 	}
 	else {
-		rotation.Pitch += 14;
 		FTransform trans(rotation.Quaternion(), location);
 		UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
