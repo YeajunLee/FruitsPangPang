@@ -64,7 +64,7 @@ void AHealSpawner::GenerateFruit(int _FruitType)
             UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
             FActorSpawnParameters SpawnParams;
             SpawnParams.Owner = this;
-            FRotator rotator;
+            FRotator rotator{};
             FVector  SpawnLocation = GetActorLocation();
             SpawnLocation.Z += 40.0f;
             mFruitMesh = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
