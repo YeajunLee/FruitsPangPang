@@ -144,7 +144,8 @@ int main(int argc, char* argv[])
 	ZeroMemory(&mDBServer->server_addr, sizeof(mDBServer->server_addr));
 	mDBServer->server_addr.sin_family = AF_INET;
 	mDBServer->server_addr.sin_port = htons(DBSERVER_PORT);
-	inet_pton(AF_INET, "127.0.0.1", &mDBServer->server_addr.sin_addr);
+	//112.153.53.142
+	inet_pton(AF_INET, "112.153.53.142", &mDBServer->server_addr.sin_addr);
 	mDBServer->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(mDBServer->wsa_ex_recv.getBuf());
 	mDBServer->wsa_ex_recv.getWsaBuf().len = BUFSIZE;
 	mDBServer->wsa_ex_recv.setCmd(CMD_DBSERVER_RECV);
