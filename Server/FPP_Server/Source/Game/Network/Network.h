@@ -31,6 +31,7 @@ void process_packet(int client_id, unsigned char* p);
 void process_packet_for_Server(unsigned char* p);
 
 void send_get_player_info_packet(const int& player_id);
+void send_update_player_result(const int& player_id,const int& rank);
 
 
 void send_login_ok_packet(int player_id,const char* playername);
