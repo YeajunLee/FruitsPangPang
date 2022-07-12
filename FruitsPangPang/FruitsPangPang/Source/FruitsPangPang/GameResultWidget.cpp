@@ -53,11 +53,18 @@ void UGameResultWidget::NativePreConstruct()
 		return;
 	auto ResultBoard = mScoreWidget->ScoreBoard;
 	int myid = Network::GetNetwork()->mMyCharacter->c_id;
-
 #define LOCTEXT_NAMESPACE "score"
-	for (int i = 0; i < mTextBlockRank.size(); ++i)
+	for (int i = 0,skiprank = 0, samerank = 1, judgeSameRank = TNumericLimits<int>::Max(); i < mTextBlockRank.size(); ++i)
 	{
-		mTextBlockRank[i]->SetText(FText::Format(LOCTEXT("score", "{0}. "), i + 1));
+		if (judgeSameRank == ResultBoard[i].GetScore())
+			skiprank++;
+		else
+		{
+			samerank += skiprank;
+			skiprank = 1;
+		}
+		judgeSameRank = ResultBoard[i].GetScore();
+		mTextBlockRank[i]->SetText(FText::Format(LOCTEXT("score", "{0}. "), samerank));
 	}
 
 	for (int i = 0; i < ResultBoard.size(); ++i)

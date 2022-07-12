@@ -302,7 +302,10 @@ void WorkerThread()
 		}
 		case CMD_GAME_END: {
 			if (!GameActive)
+			{
+				delete wsa_ex;
 				break;
+			}
 
 			GameActive = false;
 			
@@ -329,7 +332,6 @@ void WorkerThread()
 				int RankAdder = 0;
 				for (auto iter = rangeIter.first; iter != rangeIter.second; ++iter)	// 그 iter로 공동 n위 계산을 처리함.
 				{
-
 					send_update_player_result((*iter).second, Rank);	//GameResult Update DB
 					++start;	//여기서 밖 포문의 증감연산
 					RankAdder++;	//공동 n위가 몇명인지

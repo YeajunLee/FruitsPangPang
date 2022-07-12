@@ -124,9 +124,11 @@ void send_get_player_info_packet(const int& player_id)
 void send_update_player_result(const int& player_id, const int& rank)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	if (1 == player->bAi) return;	//ai는 돈계산 X
 	int Cash = player->mKillCount * 10;
 	double adjust = 1.8 - (rank * 0.1);
 	Cash *= adjust;
+	FPP_LOG("%s에게 최종 결산된 금액:%d", player->name, Cash);
 	//gd_packet_get_player_info packet{};
 	//
 	//packet.size = sizeof(packet);
