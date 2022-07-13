@@ -47,6 +47,16 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		CollisionQueryParam
 	);
 
+	//2022-07-14
+	if (smartAIController)
+	{
+		if (ai->bIsDie)
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
+		}
+	}
+
+
 	// 오브젝트가 감지가 되면, 그 오브젝트가 Character인지 검사한다.
 	if (bResult)
 	{
@@ -61,16 +71,23 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				{
 					// Character면, 블랙보드에 저장한다.
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, character);
+
+					// 디버깅 용.
+					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+					DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
 				}
 				else if (smartAIController)
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, character);
+
+					// 디버깅 용.
+					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
+					DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
 				}
 
-				// 디버깅 용.
-				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-				DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
+				
 				return;
 			}
 		}
@@ -83,5 +100,9 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
 	}
 
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	if (AIController)
+		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	else if(smartAIController)
+		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Orange, false, 0.2f);
+
 }

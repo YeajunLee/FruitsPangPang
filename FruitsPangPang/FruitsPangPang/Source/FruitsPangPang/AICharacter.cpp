@@ -180,85 +180,91 @@ void AAICharacter::Attack()
 	if (!bAttacking)
 	{
 		AnimInstance = GetMesh()->GetAnimInstance();
+		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(GetController());
+		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
 		
 		//Play Throw Montage	
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
 			bAttacking = true;
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
-			//mInventory->RemoveItemAtSlotIndex(SelectedHotKeySlotNum, 1);
-			//if (c_id == Network::GetNetwork()->mId) 		
-			//send_useitem_packet(s_socket, SelectedHotKeySlotNum, 1);
+			
+			if (smartAIController)
+			{
+				if(SM_GreenOnion->bHiddenInGame == false)
+					SM_GreenOnion->SetHiddenInGame(true);
+				else if(SM_Carrot->bHiddenInGame == false)
+					SM_Carrot->SetHiddenInGame(true);
+			}
 			
 			if (AnimInstance && ThrowMontage_AI)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Attack!"));
-				//UE_LOG(LogTemp, Warning, TEXT("left tomato: %d"), mInventory->mSlots[SelectedHotKeySlotNum].Amount)
-
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 				send_anim_packet(s_socket, Network::AnimType::Throw);
 			}
 		}
-		
-		//Sword AI or Smart AI
-		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(GetController());
-		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
+		else {
+			//Sword AI or Smart AI
 
-		if (swordAIController)
-		{
-			if (swordAIController->SavedItemCode == 7) //대파
+			if (swordAIController)
 			{
-				//PickSwordAnimation();
-				SM_GreenOnion->SetHiddenInGame(false);
-				SM_Carrot->SetHiddenInGame(true);
-				if (AnimInstance && SlashMontage_AI)
+				if (swordAIController->SavedItemCode == 7) //대파
 				{
-					AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
-					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-					send_anim_packet(s_socket, Network::AnimType::Slash);
+					//PickSwordAnimation();
+					SM_GreenOnion->SetHiddenInGame(false);
+					SM_Carrot->SetHiddenInGame(true);
+					if (AnimInstance && SlashMontage_AI)
+					{
+						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Slash);
+					}
+				}
+				else if (swordAIController->SavedItemCode == 8) //당근
+				{
+					//PickSwordAnimation();
+					SM_GreenOnion->SetHiddenInGame(true);
+					SM_Carrot->SetHiddenInGame(false);
+					if (AnimInstance && StabMontage_AI)
+					{
+						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Stab);
+					}
 				}
 			}
-			else if (swordAIController->SavedItemCode == 8) //당근
+			else if (smartAIController)
 			{
-				//PickSwordAnimation();
-				SM_GreenOnion->SetHiddenInGame(true);
-				SM_Carrot->SetHiddenInGame(false);
-				if (AnimInstance && StabMontage_AI)
+				if (smartAIController->SavedItemCode == 7) //대파
 				{
-					AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
-					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-					send_anim_packet(s_socket, Network::AnimType::Stab);
+					//PickSwordAnimation();
+					SM_GreenOnion->SetHiddenInGame(false);
+					SM_Carrot->SetHiddenInGame(true);
+					if (AnimInstance && SlashMontage_AI)
+					{
+						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Slash);
+						UE_LOG(LogTemp, Warning, TEXT("smartSlash!"));
+					}
+				}
+				else if (smartAIController->SavedItemCode == 8) //당근
+				{
+					//PickSwordAnimation();
+					SM_GreenOnion->SetHiddenInGame(true);
+					SM_Carrot->SetHiddenInGame(false);
+					if (AnimInstance && StabMontage_AI)
+					{
+						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Stab);
+						UE_LOG(LogTemp, Warning, TEXT("smartStab!"));
+					}
 				}
 			}
 		}
-		else if (smartAIController)
-		{
-			if (smartAIController->SavedItemCode == 7) //대파
-			{
-				//PickSwordAnimation();
-				SM_GreenOnion->SetHiddenInGame(false);
-				SM_Carrot->SetHiddenInGame(true);
-				if (AnimInstance && SlashMontage_AI)
-				{
-					AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
-					AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-					send_anim_packet(s_socket, Network::AnimType::Slash);
-				}
-			}
-			else if (smartAIController->SavedItemCode == 8) //당근
-			{
-				//PickSwordAnimation();
-				SM_GreenOnion->SetHiddenInGame(true);
-				SM_Carrot->SetHiddenInGame(false);
-				if (AnimInstance && StabMontage_AI)
-				{
-					AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
-					AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-					send_anim_packet(s_socket, Network::AnimType::Stab);
-				}
-			}
-		}
+		
 		
 		//에러가 계속 나서 AddDynamic을 AddUniqueDynamic으로 바꿈.
 		AnimInstance->OnMontageEnded.AddUniqueDynamic(this, &AAICharacter::OnAttackMontageEnded);
