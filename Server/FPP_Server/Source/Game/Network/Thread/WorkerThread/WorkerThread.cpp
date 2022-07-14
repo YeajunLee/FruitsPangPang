@@ -304,7 +304,7 @@ void WorkerThread()
 			if (!GameActive)
 			{
 				delete wsa_ex;
-				break;
+				return;
 			}
 
 			GameActive = false;
