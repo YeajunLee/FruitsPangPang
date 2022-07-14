@@ -1151,6 +1151,7 @@ UMainWidget* AMyCharacter::MakeMainHUD()
 		if (mMainWidget != nullptr)
 		{
 			//... Do Something
+			mMainWidget->WidgetType = GameState;
 			mMainWidget->mInventory = mInventory;
 			mInventory->mMainWidget = mMainWidget;
 			mMainWidget->mOwnerCharacter = this;
@@ -1236,7 +1237,6 @@ void AMyCharacter::ShowMatchHUD()
 	}
 	mMatchWidget->AddToViewport();
 }
-
 
 void AMyCharacter::EquipSkin()
 {
