@@ -23,7 +23,6 @@ void WorkerThread()
 			int err_no = WSAGetLastError();
 			std::cout << "GQCS Error";
 			error_display(err_no);
-			//Disconnect(client_id);
 			if (wsa_ex->getCmd() == CMD_SEND)
 				delete wsa_ex;
 			continue;

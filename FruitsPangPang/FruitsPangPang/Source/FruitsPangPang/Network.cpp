@@ -1414,7 +1414,9 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 		if (packet->id == PacketOwner->c_id) {
 
-			PacketOwner->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			bool Success = PacketOwner->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			if (!Success)
+				UE_LOG(LogTemp, Error, TEXT("SetActorLocation Failed! -%d- AI do Move %lf %lf %lf"), packet->id, packet->lx, packet->ly, packet->lz);
 			PacketOwner->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 			PacketOwner->GroundSpeed_AI = 0;
 			
@@ -1507,6 +1509,8 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 	}
 	case SC_PACKET_GAMEEND: {
 		PacketOwner->GetController()->UnPossess();
+		Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+		UGameplayStatics::OpenLevel(PacketOwner->GetWorld(), FName("NewWorld"));
 		break;
 
 	}
