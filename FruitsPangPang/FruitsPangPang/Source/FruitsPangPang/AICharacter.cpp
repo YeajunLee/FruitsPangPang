@@ -206,7 +206,6 @@ void AAICharacter::Attack()
 		}
 		else {
 			//Sword AI or Smart AI
-
 			if (swordAIController)
 			{
 				if (swordAIController->SavedItemCode == 7) //´ëÆÄ
