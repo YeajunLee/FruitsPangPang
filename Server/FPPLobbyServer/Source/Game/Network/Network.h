@@ -17,6 +17,8 @@ extern class DBServer* dbserver;
 extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 void error_display(int err_no);
 int Generate_Id();
+void DisConnectClient(const int& clientid);
+int DisConnect(const int& clientid,const enum COMMAND_IOCP& command);
 int Generate_ServerId();
 void process_packet(int client_id, unsigned char* p);
 void process_packet_for_Server(int client_id, unsigned char* p);

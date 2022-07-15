@@ -73,6 +73,36 @@ int Generate_Id()
 	return -1;
 }
 
+void DisConnectClient(const int& clientid)
+{
+	//player disconnect
+	auto player = reinterpret_cast<Player*>(objects[clientid]);
+	player->state_lock.lock();
+	closesocket(player->_socket);
+	player->_state = Player::STATE::ST_FREE;
+	player->bisAI = false;
+	player->state_lock.unlock();
+}
+
+int DisConnect(const int& clientid, const enum COMMAND_IOCP& command)
+{
+	switch (command)
+	{
+	case CMD_RECV:
+	{
+		//player disconnect
+		DisConnectClient(clientid);
+		break;
+	}
+	case CMD_SERVER_RECV:
+	{
+		//GameServer Disconnect
+		break;
+	}
+	}
+	return 0;
+}
+
 int Generate_ServerId()
 {
 	static int g_serverid = 0;
