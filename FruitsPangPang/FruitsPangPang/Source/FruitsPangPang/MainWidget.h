@@ -55,6 +55,10 @@ public:
 		void UpdateCountDown(const FText& minute, const FText& second);
 	UFUNCTION(BlueprintCallable)
 		const float ReduceRemainTime(const float& deltatime);
+
+	UFUNCTION(BlueprintCallable)
+		void GameEndSoon();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		bool bActivate = false;
 	TArray<class UInventorySlotWidget*> minventorySlot;

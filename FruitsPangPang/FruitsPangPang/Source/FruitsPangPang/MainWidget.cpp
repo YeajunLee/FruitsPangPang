@@ -15,6 +15,8 @@
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -123,6 +125,14 @@ const float UMainWidget::ReduceRemainTime(const float& deltatime)
 {
 	fRemainTime = FMath::Max<float>(fRemainTime - deltatime, 0.0f);
 	return fRemainTime;
+}
+
+void UMainWidget::GameEndSoon()
+{
+	
+	UGameplayStatics::SpawnSound2D(this, Network::GetNetwork()->mMyCharacter->TickTockBGM);
+	Network::GetNetwork()->mMyCharacter->SpawnedInGameBGM->FadeOut(10.0f, 0.0f);
+	RemainGameTimeText->SetColorAndOpacity(FSlateColor(FLinearColor(1, 0, 0)));
 }
 
 
