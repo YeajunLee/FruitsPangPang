@@ -18,7 +18,7 @@ bool UBTDecorator_CheckHP::CalculateRawConditionValue(UBehaviorTreeComponent& Ow
 
 	auto ai = Cast<AAICharacter>(ControllingPawn);
 
-	bool bResult = (ai->hp <= 10);
+	bool bResult = (ai->hp <= 6);
 
 	return bResult;
 }

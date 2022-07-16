@@ -1358,7 +1358,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		if (nullptr != AIController)
 			AIController->BrainComponent->GetBlackboardComponent()->SetValueAsInt(AAIController_Custom::AmountKey, FruitAmount);
 
-		//sword_ai
+		//sword_ai, smart_ai
 		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(PacketOwner->Controller);
 		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(PacketOwner->Controller);
 

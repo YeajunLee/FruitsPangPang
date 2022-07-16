@@ -34,7 +34,7 @@ void UBTService_SwordDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 		OverlapResults,
 		Center,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeSphere(DetectRadius),
 		CollisionQueryParam
 	);
@@ -49,7 +49,7 @@ void UBTService_SwordDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 
 			if (nullptr != Character)
 			{
-				UE_LOG(LogTemp, Log, TEXT("find enemy!!(sword_AI)"));
+				//UE_LOG(LogTemp, Log, TEXT("find enemy!!(sword_AI)"));
 
 				// Character면, 블랙보드에 저장한다.
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey, Character);
