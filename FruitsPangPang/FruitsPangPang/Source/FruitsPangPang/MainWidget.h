@@ -27,7 +27,7 @@ public:
 		class UHorizontalBox* InventoryBar;
 
 	UPROPERTY(meta = (BindWidget))
-		class UHorizontalBox* MinimapBox;
+		class UHorizontalBox* RespawnBox;
 
 	UPROPERTY(meta = (BindWidget))
 		class UHorizontalBox* ScoreBox;
@@ -59,6 +59,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void GameEndSoon();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
+		int WidgetType = -1;	//  -1 - Invalid, 0 - Lobby, 1 - Ingame
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		bool bActivate = false;
 	TArray<class UInventorySlotWidget*> minventorySlot;

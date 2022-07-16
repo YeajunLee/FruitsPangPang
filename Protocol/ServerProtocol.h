@@ -35,6 +35,7 @@ const char LD_PACKET_REQUESTITEMINFO = 3;
 const char LD_PACKET_BUYITEMUPDATE = 4;
 const char LD_PACKET_UPDATE_SKINTYPE = 5;
 const char GD_PACKET_GET_PLAYER_INFO = 6;
+const char GD_PACKET_UPDATE_PLAYER_INFO = 7;
 
 const char DL_PACKET_LOGIN_AUTHOR_OK = 1;
 const char DL_PACKET_SIGNUP_OK = 2;
@@ -61,6 +62,12 @@ struct gd_packet_get_player_info {
 	int id;
 };
 
+struct gd_packet_update_player_info {
+	unsigned char size;
+	char type;
+	char name[MAX_NAME_LEN];
+	int coin;
+};
 //---------------- DBServer to GameServer
 
 struct dg_packet_request_player_info {

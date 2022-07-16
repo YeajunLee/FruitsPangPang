@@ -24,6 +24,7 @@ public:
 	SOCKET  _socket;
 	int		_prev_size;
 	int		_id;
+	virtual void ResetServer();
 	void recvPacket();
 	void PreRecvPacket(unsigned char* RemainMsg, int RemainBytes);
 	void sendPacket(void* packet, int bytes);

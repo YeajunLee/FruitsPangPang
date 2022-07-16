@@ -38,6 +38,7 @@ public:
 
 
 	std::vector<ScoreInfo>  ScoreBoard;
+	TArray<FText> RankText;
 	void UpdateRank();
 	void UpdateScoreBoard();
 

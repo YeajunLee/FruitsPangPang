@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include "WorkerThread.h"
 #include "../../Network.h"
 #include "../../../Object/Character/Character.h"
@@ -22,7 +23,6 @@ void WorkerThread()
 			int err_no = WSAGetLastError();
 			std::cout << "GQCS Error";
 			error_display(err_no);
-			//Disconnect(client_id);
 			if (wsa_ex->getCmd() == CMD_SEND)
 				delete wsa_ex;
 			continue;
@@ -301,9 +301,14 @@ void WorkerThread()
 		}
 		case CMD_GAME_END: {
 			if (!GameActive)
-				break;
+			{
+				delete wsa_ex;
+				return;
+			}
 
 			GameActive = false;
+			
+			multimap<int, int,greater<int>> ranks;
 			for (auto& other : objects)
 			{
 				if (!other->isPlayer())break;
@@ -312,9 +317,25 @@ void WorkerThread()
 				if (Character::STATE::ST_INGAME == character->_state)
 				{
 					character->state_lock.unlock();
-					send_gameend_packet(character->_id);
+					send_gameend_packet(character->_id);				//GameEnd Packet
+					ranks.insert(make_pair((character->mKillCount * 2) - character->mDeathCount, character->_id));	//key - score , value - id
 				}
 				else character->state_lock.unlock();
+			}
+
+			int Rank = 1;
+			for (auto start = ranks.begin(); start != ranks.end();)	//탐색. 증감연산자는 내부에서 해줌.
+			{
+				int key = (*start).first;	//처음 인자의 키값을 받아
+				auto rangeIter = ranks.equal_range(key);	//같은 키가 있는지 iter를 받음
+				int RankAdder = 0;
+				for (auto iter = rangeIter.first; iter != rangeIter.second; ++iter)	// 그 iter로 공동 n위 계산을 처리함.
+				{
+					send_update_player_result((*iter).second, Rank);	//GameResult Update DB
+					++start;	//여기서 밖 포문의 증감연산
+					RankAdder++;	//공동 n위가 몇명인지
+				}
+				Rank += RankAdder;	//그다음 n위를 처리하기 위함.
 			}
 			//Stop Receiving
 			//all Thread Exit();

@@ -8,6 +8,7 @@ public:
 	GameServer();
 	virtual ~GameServer();
 public:
+	virtual void ResetServer() override;
 	int CurrentMatchingPlayerCnt;
 	std::mutex CurrentMatchingPlayerCnt_lock;
 
@@ -17,6 +18,6 @@ public:
 	int SaveAI_id;
 	bool Match(const int& player_id,const short& amount = 1);
 	void AIMatch();
-	void ServerReset();
+
 };
 

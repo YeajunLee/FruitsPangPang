@@ -50,7 +50,7 @@ int main()
 	std::cout << "Creating Worker Threads\n";
 	thread timer_thread{ TimerThread };
 	vector<thread> worker_threads;
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 1; ++i)
 		worker_threads.emplace_back(WorkerThread);
 
 

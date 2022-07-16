@@ -21,7 +21,7 @@ void WorkerThread()
 			int err_no = WSAGetLastError();
 			std::cout << "GQCS Error";
 			error_display(err_no);
-			//Disconnect(client_id);
+			DisConnect(client_id, overlapped);
 			if (wsa_ex->getCmd() == CMD_SEND)
 				delete wsa_ex;
 			continue;
@@ -162,7 +162,7 @@ void WorkerThread()
 				}
 				else {
 					gameserver->state_lock.unlock();
-					cout << "WorkerTHread에서 서버가 켜진곳이 없어서 예외상황이 발생했습니다. 아직 코딩 안한 부분입니다\n";
+					cout << "WorkerTHread에서 서버가 켜지지않아서 예외상황이 발생했습니다. 안켜진 서버 id:" << gameserver->_id << endl;
 				}
 			}
 			delete wsa_ex;

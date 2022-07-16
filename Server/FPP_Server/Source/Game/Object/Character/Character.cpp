@@ -50,8 +50,7 @@ void Character::recvPacket()
 		int err = WSAGetLastError();
 		if (ERROR_IO_PENDING != err)
 		{
-			_state = Character::STATE::ST_FREE;
-			closesocket(_socket);
+			Disconnect(_id);
 			error_display(err);
 		}
 	}
@@ -66,6 +65,7 @@ void Character::sendPacket(void* packet, int bytes)
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			Disconnect(_id);
 		}
 	}
 }
@@ -270,4 +270,6 @@ void Character::Respawn(const int& RespawnSpot)
 		break; 
 		}
 	}
+
+	FPP_LOG("%d 플레이어 %d로 리스폰", this->_id, RespawnSpot);
 }

@@ -364,3 +364,27 @@ int GetPlayerInfo(const char* name, LoginInfo& p_info)
 	SQLCancel(hstmt);
 	return -2;
 }
+
+int UpdatePlayerInfo(const char* name, const int& coin)
+{
+	SQLRETURN retcode{};
+
+	wstring ProcessResultQuery{ L"EXEC process_gameresult " };
+	USES_CONVERSION;
+	ProcessResultQuery += A2W(name);
+	ProcessResultQuery += L",";
+	ProcessResultQuery += coin;
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)ProcessResultQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		return 1;
+	}
+	else if (retcode == SQL_ERROR) {
+		//키 중복때문에 들어올 가능성이 높음.
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+		return -1;	// 알 수 없는 이유로 실패
+	}
+
+	return -1;// 알수없는 이유로 실패.
+}

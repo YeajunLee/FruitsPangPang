@@ -3,7 +3,6 @@
 
 Player::Player(OBJTYPE type, STATE state)
 	:_state(state)
-	, _is_active(true)
 	, mCoin(0)
 	, bisAI(false)
 {
@@ -42,6 +41,7 @@ void Player::recvPacket()
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			DisConnectClient(_id);
 		}
 	}
 }
@@ -55,6 +55,7 @@ void Player::sendPacket(void* packet, int bytes)
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			DisConnectClient(_id);
 		}
 	}
 }

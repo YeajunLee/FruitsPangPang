@@ -179,5 +179,10 @@ void process_packet(int client_id, unsigned char* p)
 		send_request_player_info(client_id, packet->id,info);
 		break;
 	}
+	case GD_PACKET_UPDATE_PLAYER_INFO: {
+		gd_packet_update_player_info* packet = reinterpret_cast<gd_packet_update_player_info*>(p);
+		UpdatePlayerInfo(packet->name, packet->coin);
+		break;
+	}
 	}
 }

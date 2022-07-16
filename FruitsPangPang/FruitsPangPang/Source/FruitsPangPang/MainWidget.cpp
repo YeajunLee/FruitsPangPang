@@ -25,32 +25,47 @@ void UMainWidget::NativePreConstruct()
 {
 	HPBar->Percent = 1.0f;
 	fRemainTime = GAMEPLAYTIME_MILLI / 1000;
+	switch (WidgetType)
 	{
-		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MRespawnWindowWidget.MRespawnWindowWidget_C'"));
-		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		auto RespawnWGT = CreateWidget<URespawnWindowWidget>(GetWorld(), WidgetClass);
-		MinimapBox->AddChildToHorizontalBox(RespawnWGT);
-		mRespawnWindowWidget = RespawnWGT;
-		HideRespawnWidget();
+	case -1:
+		UE_LOG(LogTemp, Error, TEXT("Widget Type Wrong !"));
+		break;
+	case 0: {
+		{
+			RemainGameTimeText->SetVisibility(ESlateVisibility::Hidden);
+			W_MiniMap_0->SetVisibility(ESlateVisibility::Hidden);
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreWidget.MStoreWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto StoreWGT = CreateWidget<UStoreWidget>(GetWorld(), WidgetClass);
+			W_Store = StoreWGT;
+			auto SettupStoreBox = StoreBox->AddChildToHorizontalBox(StoreWGT);
+			FSlateChildSize Rules;
+			Rules.SizeRule = ESlateSizeRule::Fill;
+			SettupStoreBox->SetSize(Rules);
+			HideStoreWidget();
+		}
+		break;
 	}
-	{
-		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MScoreWidget.MScoreWidget_C'"));
-		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		auto ScoreWGT = CreateWidget<UScoreWidget>(GetWorld(), WidgetClass);
-		ScoreBox->AddChildToHorizontalBox(ScoreWGT);
-		mScoreWidget = ScoreWGT;
+	case 1: {
+		{
+			RemainGameTimeText->SetVisibility(ESlateVisibility::Visible);
+			W_MiniMap_0->SetVisibility(ESlateVisibility::Visible);
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MRespawnWindowWidget.MRespawnWindowWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto RespawnWGT = CreateWidget<URespawnWindowWidget>(GetWorld(), WidgetClass);
+			RespawnBox->AddChildToHorizontalBox(RespawnWGT);
+			mRespawnWindowWidget = RespawnWGT;
+			HideRespawnWidget();
+		}
+		{
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MScoreWidget.MScoreWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto ScoreWGT = CreateWidget<UScoreWidget>(GetWorld(), WidgetClass);
+			ScoreBox->AddChildToHorizontalBox(ScoreWGT);
+			mScoreWidget = ScoreWGT;
+		}
+		break;
 	}
-	
-	{
-		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MStoreWidget.MStoreWidget_C'"));
-		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-		auto StoreWGT = CreateWidget<UStoreWidget>(GetWorld(), WidgetClass);
-		W_Store = StoreWGT;
-		auto SettupStoreBox = StoreBox->AddChildToHorizontalBox(StoreWGT);
-		FSlateChildSize Rules;
-		Rules.SizeRule = ESlateSizeRule::Fill;
-		SettupStoreBox->SetSize(Rules);
-		HideStoreWidget();
 	}
 }
 
