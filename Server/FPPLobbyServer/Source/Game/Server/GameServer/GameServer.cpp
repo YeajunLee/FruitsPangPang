@@ -16,6 +16,20 @@ GameServer::~GameServer()
 {
 }
 
+void GameServer::ResetServer()
+{
+	Server::ResetServer();
+	CurrentMatchingPlayerCnt = 0;
+	mServerPort = 0;
+	isAIEntered = false;
+	SaveAI_id = -1;
+	_id = -1;
+	for (auto& p : CurrentMatchingPlayer)
+	{
+		p = -1;
+	}
+}
+
 bool GameServer::Match(const int& player_id, const short& amount)
 {
 	CurrentMatchingPlayerCnt_lock.lock();
@@ -144,17 +158,4 @@ void GameServer::AIMatch()
 		CurrentMatchingPlayerCnt_lock.unlock();
 	}
 
-}
-
-void GameServer::ServerReset()
-{
-	CurrentMatchingPlayerCnt = 0;
-	mServerPort = 0;
-	isAIEntered = false;
-	SaveAI_id = -1;
-	_id = -1;
-	for (auto& p : CurrentMatchingPlayer)
-	{
-		p = -1;
-	}
 }

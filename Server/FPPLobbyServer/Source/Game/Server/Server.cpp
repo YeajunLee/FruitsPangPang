@@ -11,6 +11,10 @@ Server::~Server()
 {
 }
 
+void Server::ResetServer()
+{
+}
+
 void Server::recvPacket()
 {
 	ZeroMemory(&wsa_server_recv.getWsaOver(), sizeof(wsa_server_recv.getWsaOver()));
@@ -24,6 +28,7 @@ void Server::recvPacket()
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			DisConnectServer(_id);
 		}
 	}
 }
@@ -47,6 +52,7 @@ void Server::sendPacket(void* packet, int bytes)
 		if (ERROR_IO_PENDING != err)
 		{
 			error_display(err);
+			DisConnectServer(_id);
 		}
 	}
 }

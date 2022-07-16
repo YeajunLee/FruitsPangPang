@@ -77,16 +77,28 @@ void DisConnectClient(const int& clientid)
 {
 	//player disconnect
 	auto player = reinterpret_cast<Player*>(objects[clientid]);
-	player->state_lock.lock();
 	closesocket(player->_socket);
+	player->state_lock.lock();
 	player->_state = Player::STATE::ST_FREE;
 	player->bisAI = false;
 	player->state_lock.unlock();
 }
 
-int DisConnect(const int& clientid, const enum COMMAND_IOCP& command)
+void DisConnectServer(const int& serverid)
 {
-	switch (command)
+	auto server = reinterpret_cast<Server*>(servers[serverid]);
+	closesocket(server->_socket);
+	server->state_lock.lock();
+	server->_state = Server::STATE::ST_FREE;
+	server->state_lock.unlock();
+	server->ResetServer();
+	cout << "서버 종료" << serverid << endl;
+}
+
+int DisConnect(const int& clientid,WSAOVERLAPPED* overlapped)
+{
+	WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
+	switch (wsa_ex->getCmd())
 	{
 	case CMD_RECV:
 	{
@@ -97,6 +109,8 @@ int DisConnect(const int& clientid, const enum COMMAND_IOCP& command)
 	case CMD_SERVER_RECV:
 	{
 		//GameServer Disconnect
+		WSA_OVER_ONLY_SERVER* server_wsa = reinterpret_cast<WSA_OVER_ONLY_SERVER*>(overlapped);
+		DisConnectServer(server_wsa->getID());
 		break;
 	}
 	}
