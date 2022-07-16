@@ -6,6 +6,7 @@
 #include "MyCharacter.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Components/AudioComponent.h"
 
 
 
@@ -43,4 +44,10 @@ void ULoginWidget::TrySignUp()
 	const char* tmppass = TCHAR_TO_ANSI(*Password->GetText().ToString());
 	if (nullptr != Network::GetNetwork()->mMyCharacter)
 		send_signup_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+}
+
+void ULoginWidget::SoundStop()
+{
+	if (mLoginBGM)
+		mLoginBGM->Stop();
 }

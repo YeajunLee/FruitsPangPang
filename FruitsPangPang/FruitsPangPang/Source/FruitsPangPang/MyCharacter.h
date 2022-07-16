@@ -51,9 +51,24 @@ public:
 
 	UParticleSystemComponent* P_Star;
 
+public:
 	USoundBase* dizzySound;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+		class USoundCue* LobbyBGM;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+		class USoundCue* InGameBGM;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+		class USoundCue* ResultBGM;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+		class USoundCue* TickTockBGM;
+	UPROPERTY()
+	class UAudioComponent* SpawnedInGameBGM;
+
+public:
 	FTimerHandle TimerHandle;
 
 	UFUNCTION()
@@ -107,6 +122,7 @@ public:
 		class UGameMatchWidget* mMatchWidget;
 	UPROPERTY()
 		class UStoreWidget* mStoreWidget;
+
 	class UMainWidget* MakeMainHUD();
 
 	void ShowedInMinimap();

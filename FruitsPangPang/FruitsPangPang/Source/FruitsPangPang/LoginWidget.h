@@ -31,9 +31,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UButton* SignUpButton;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UAudioComponent* mLoginBGM;
 	UFUNCTION()
 		void TryLogin();
 	UFUNCTION()
 		void TrySignUp();
+	void SoundStop();
 public:
 };
