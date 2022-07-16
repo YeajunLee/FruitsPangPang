@@ -32,6 +32,7 @@
 #include "StoreWidget.h"
 #include "Particles/ParticleSystemComponent.h "
 #include "Sound/SoundBase.h"
+#include "Sound/SoundCue.h"
 #include "PointOfInterestComponent.h"
 #include "ScoreWidget.h"
 #include "Components/Image.h"

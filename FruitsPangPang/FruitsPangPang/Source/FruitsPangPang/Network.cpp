@@ -30,6 +30,9 @@
 #include "PointOfInterestComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "StoreWidget.h"
+#include "Sound/SoundCue.h"
+#include "LoginWidget.h"
+#include "Components/AudioComponent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
@@ -804,6 +807,9 @@ void Network::process_packet(unsigned char* p)
 		UE_LOG(LogTemp, Warning, TEXT("START CALLED"));
 		mMyCharacter->mWaitingWidget->RemoveFromParent();
 		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+
+		mMyCharacter->SpawnedInGameBGM = UGameplayStatics::SpawnSound2D(mMyCharacter, mMyCharacter->InGameBGM);
+
 		mMyCharacter->mMainWidget->bActivate = true;
 		FInputModeGameOnly gamemode;
 		if (nullptr != controller)
@@ -814,9 +820,17 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->mMainWidget->W_MiniMap_0->mSilverIconWidget->bTickActive = true;
 		mMyCharacter->mMainWidget->W_MiniMap_0->mGoldIconWidget->bTickActive = true;
 		mMyCharacter->mMainWidget->W_MiniMap_0->mBronzeIconWidget->bTickActive = true;
+
+
+
 		break;
 	}
 	case SC_PACKET_GAMEEND: {
+		if (mMyCharacter->SpawnedInGameBGM)
+			mMyCharacter->SpawnedInGameBGM->Stop();
+
+		UGameplayStatics::SpawnSound2D(mMyCharacter, mMyCharacter->ResultBGM);
+
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameResultWidget.MGameResultWidget_C'"));
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
 		auto GameResultWGT = CreateWidget<UGameResultWidget>(mMyCharacter->GetWorld(), WidgetClass);
@@ -880,8 +894,15 @@ void Network::process_LobbyPacket(unsigned char* p)
 		switch (packet->loginsuccess)
 		{
 		case 1: {
-			if(mMyCharacter->mLoginWidget)
+			if (mMyCharacter->mLoginWidget)
+			{
+				auto loginwgt = Cast< ULoginWidget>(mMyCharacter->mLoginWidget);
+				loginwgt->SoundStop();
 				mMyCharacter->mLoginWidget->RemoveFromParent();
+			}
+			//lobby bgm
+			UGameplayStatics::PlaySound2D(mMyCharacter, mMyCharacter->LobbyBGM);
+
 			auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 			mMyCharacter->mMainWidget->bActivate = true;
 			mMyCharacter->CharacterName = FString(ANSI_TO_TCHAR(packet->name));

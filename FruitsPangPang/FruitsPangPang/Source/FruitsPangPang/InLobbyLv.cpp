@@ -5,6 +5,9 @@
 #include "Network.h"
 #include "MyCharacter.h"
 #include "Blueprint/UserWidget.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
+
 
 void AInLobbyLv::BeginPlay() {
 

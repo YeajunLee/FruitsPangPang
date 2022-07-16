@@ -55,6 +55,10 @@ public:
 		void UpdateCountDown(const FText& minute, const FText& second);
 	UFUNCTION(BlueprintCallable)
 		const float ReduceRemainTime(const float& deltatime);
+
+	UFUNCTION(BlueprintCallable)
+		void GameEndSoon();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		int WidgetType = -1;	//  -1 - Invalid, 0 - Lobby, 1 - Ingame
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")

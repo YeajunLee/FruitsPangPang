@@ -78,7 +78,7 @@ int main()
 	dbserver->server_addr.sin_port = htons(DBSERVER_PORT);
 
 	// 112.152.55.49 . 112.153.53.142
-	inet_pton(AF_INET, "112.153.53.142", &dbserver->server_addr.sin_addr);
+	inet_pton(AF_INET, "112.152.55.49", &dbserver->server_addr.sin_addr);
 	dbserver->wsa_server_recv.getWsaBuf().buf = reinterpret_cast<char*>(dbserver->wsa_server_recv.getBuf());
 	dbserver->wsa_server_recv.getWsaBuf().len = BUFSIZE;
 	dbserver->wsa_server_recv.setCmd(CMD_DB_RECV);
