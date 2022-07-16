@@ -204,6 +204,8 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 	if (mAI->bIsUndertheTree)
 	{
 		trees.clear();
+		//UE_LOG(LogTemp, Error, TEXT("YesUndertheTree"));
+
 		return EBTNodeResult::Succeeded;
 	}
 
