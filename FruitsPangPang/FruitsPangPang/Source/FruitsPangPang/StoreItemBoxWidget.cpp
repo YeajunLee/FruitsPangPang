@@ -62,19 +62,19 @@ UTexture2D* UStoreItemBoxWidget::ItemCodeToShopItemIcon(const int& itemCode)
 	switch (itemCode)
 	{
 	case 1:
-		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/CharacterSkins/Knife/Nife_Icon.Nife_Icon'"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Widget/Assets/T_knife1.T_knife1'"), NULL, LOAD_None, NULL);
 		break;
 	case 2:
-		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/CharacterSkins/Candy/Candy_Icon.Candy_Icon'"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Widget/Assets/T_candy.T_candy'"), NULL, LOAD_None, NULL);
 		break;
 	case 3:
-		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/CharacterSkins/Leaf/Leaf_Icon.Leaf_Icon'"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Widget/Assets/T_leaf1.T_leaf1'"), NULL, LOAD_None, NULL);
 		break;
 	case 4:
-		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/CharacterSkins/Straw/Straw_Icon.Straw_Icon'"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Widget/Assets/T_straw1.T_straw1'"), NULL, LOAD_None, NULL);
 		break;
 	case 5:
-		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Assets/CharacterSkins/SunFlower/SunFlower_Icon.SunFlower_Icon'"), NULL, LOAD_None, NULL);
+		res = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Widget/Assets/T_sunflower1.T_sunflower1'"), NULL, LOAD_None, NULL);
 		break;
 	case 6:
 		break;
