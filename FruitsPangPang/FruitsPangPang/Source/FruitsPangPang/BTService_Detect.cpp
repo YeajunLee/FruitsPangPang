@@ -35,6 +35,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	FVector Center = ControllingPawn->GetActorLocation();
 	float DetectRadius = 900.0f;
 
+	//2022-07-16
+	if (smartAIController)
+	{
+		DetectRadius = 1500.f;
+	}
+
 	// 600의 반지름을 가진 구체를 만들어서 오브젝트를 감지한다.
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
@@ -42,7 +48,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		OverlapResults,
 		Center,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeSphere(DetectRadius),
 		CollisionQueryParam
 	);
@@ -56,6 +62,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		}
 	}
 
+	
 
 	// 오브젝트가 감지가 되면, 그 오브젝트가 Character인지 검사한다.
 	if (bResult)
@@ -63,29 +70,49 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		for (FOverlapResult OverlapResult : OverlapResults)
 		{
 			//AMyCharacter* myCharacter = Cast<AMyCharacter>(OverlapResult.GetActor());
-			ABaseCharacter* character = Cast<ABaseCharacter>(OverlapResult.GetActor());
+			ABaseCharacter* newbie = Cast<ABaseCharacter>(OverlapResult.GetActor());
 
-			if (nullptr != character)
+			if (nullptr != newbie)
 			{
 				if (AIController)
 				{
-					// Character면, 블랙보드에 저장한다.
-					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, character);
-
-					// 디버깅 용.
-					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-					DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-					DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
-				}
-				else if (smartAIController)
-				{
-					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, character);
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, newbie);
 
 					// 디버깅 용.
 					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
-					DrawDebugPoint(World, character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-					DrawDebugLine(World, ControllingPawn->GetActorLocation(), character->GetActorLocation(), FColor::Blue, false, 0.2f);
+					DrawDebugPoint(World, newbie->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), newbie->GetActorLocation(), FColor::Blue, false, 0.2f);
 				}
+
+				else if (smartAIController)
+				{
+					//2022-07-16
+					auto oldman = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
+					if (nullptr != oldman)
+					{
+						if (oldman->bIsDie) {
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+							return;
+						}
+						if (oldman->hp > newbie->hp)
+						{
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, newbie); // Character면, 블랙보드에 저장한다.
+							// 디버깅 용.
+							DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+							DrawDebugPoint(World, newbie->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+							DrawDebugLine(World, ControllingPawn->GetActorLocation(), newbie->GetActorLocation(), FColor::Blue, false, 0.2f);
+						}
+						return;
+
+					}
+					//
+
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, newbie);
+					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+					DrawDebugPoint(World, newbie->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), newbie->GetActorLocation(), FColor::Blue, false, 0.2f);
+				}
+				
 
 				
 				return;

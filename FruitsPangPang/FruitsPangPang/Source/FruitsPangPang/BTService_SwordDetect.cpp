@@ -34,7 +34,7 @@ void UBTService_SwordDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 		OverlapResults,
 		Center,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeSphere(DetectRadius),
 		CollisionQueryParam
 	);

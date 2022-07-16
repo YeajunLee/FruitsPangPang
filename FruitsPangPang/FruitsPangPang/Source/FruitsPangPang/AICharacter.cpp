@@ -165,6 +165,13 @@ void AAICharacter::Tick(float DeltaTime)
 	//Update GroundSpeedd (22-04-05)
 	float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 	GroundSpeed_AI = CharXYVelocity;
+
+	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
+	if (smartAIController)
+	{
+		if (mInventory->mSlots[1].Amount > 0)
+			SelectedHotKeySlotNum = 1;
+	}
 }
 
 // Called to bind functionality to input
