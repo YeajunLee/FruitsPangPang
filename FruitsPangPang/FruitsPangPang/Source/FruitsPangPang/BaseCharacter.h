@@ -110,7 +110,7 @@ public:
 
 public:
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
-	const char* SERVER_ADDR = "127.0.0.1";
+	const char* SERVER_ADDR = "112.152.55.49";
 public:
 	//Game Server
 	virtual bool ConnServer();
