@@ -28,6 +28,14 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
     auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
 
+    if (smartAIController)
+    {
+        if (AICharacter->mInventory->mSlots[1].Amount > 0)
+            AICharacter->SelectedHotKeySlotNum = 1;
+        else if(AICharacter->mInventory->mSlots[0].Amount > 0)
+            AICharacter->SelectedHotKeySlotNum = 0;
+    }
+
     ABaseCharacter* Target = nullptr;
     if(AIController)
         Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
