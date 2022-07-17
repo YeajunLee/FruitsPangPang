@@ -133,7 +133,7 @@ void send_update_player_result(const int& player_id, const int& rank)
 
 
 	packet.size = sizeof(packet);
-	packet.type = GD_PACKET_GET_PLAYER_INFO;
+	packet.type = GD_PACKET_UPDATE_PLAYER_INFO;
 	strcpy_s(packet.name, player->name);
 	packet.coin = Cash;
 	mDBServer->sendPacket(&packet, sizeof(packet));

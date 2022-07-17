@@ -181,6 +181,7 @@ void process_packet(int client_id, unsigned char* p)
 	}
 	case GD_PACKET_UPDATE_PLAYER_INFO: {
 		gd_packet_update_player_info* packet = reinterpret_cast<gd_packet_update_player_info*>(p);
+		cout << "ÀÌ¸§ : " << packet->name << "µ· Áö±Þ:" << packet->coin << endl;
 		UpdatePlayerInfo(packet->name, packet->coin);
 		break;
 	}

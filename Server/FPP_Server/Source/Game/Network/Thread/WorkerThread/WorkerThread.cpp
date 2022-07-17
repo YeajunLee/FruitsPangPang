@@ -337,6 +337,7 @@ void WorkerThread()
 				}
 				Rank += RankAdder;	//그다음 n위를 처리하기 위함.
 			}
+			cout << "여기까진 나오니?" << endl;
 			//Stop Receiving
 			//all Thread Exit();
 			//Post Game Ending()
