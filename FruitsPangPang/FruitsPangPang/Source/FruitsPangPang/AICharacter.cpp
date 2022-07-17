@@ -167,11 +167,7 @@ void AAICharacter::Tick(float DeltaTime)
 	GroundSpeed_AI = CharXYVelocity;
 
 	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
-	if (smartAIController)
-	{
-		if (mInventory->mSlots[1].Amount > 0)
-			SelectedHotKeySlotNum = 1;
-	}
+	
 }
 
 // Called to bind functionality to input
@@ -189,30 +185,44 @@ void AAICharacter::Attack()
 		AnimInstance = GetMesh()->GetAnimInstance();
 		auto swordAIController = Cast<AAI_Sword_Controller_Custom>(GetController());
 		auto smartAIController = Cast<AAI_Smart_Controller_Custom>(GetController());
-		
+	
 		//Play Throw Montage	
 		if (mInventory->mSlots[SelectedHotKeySlotNum].Amount > 0)
 		{
+			int HotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
+
 			bAttacking = true;
 			SavedHotKeySlotNum = SelectedHotKeySlotNum;
-			
-			if (smartAIController)
-			{
-				if (SM_GreenOnion->bHiddenInGame == false) {
-					SM_GreenOnion->SetHiddenInGame(true);
-					send_anim_packet(s_socket, Network::AnimType::DropSword);
-				}
-				else if (SM_Carrot->bHiddenInGame == false) {
-					SM_Carrot->SetHiddenInGame(true);
-					send_anim_packet(s_socket, Network::AnimType::DropSword);
-				}
-			}
-			
+				
 			if (AnimInstance && ThrowMontage_AI)
 			{
 				AnimInstance->Montage_Play(ThrowMontage_AI, 2.5f);
 				AnimInstance->Montage_JumpToSection(FName("Default"), ThrowMontage_AI);
 				send_anim_packet(s_socket, Network::AnimType::Throw);
+			}
+
+			if (smartAIController)
+			{
+				if (HotKeyItemCode == 7) //대파
+				{
+					if (AnimInstance && SlashMontage_AI)
+					{
+						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Slash);
+						UE_LOG(LogTemp, Warning, TEXT("smartSlash!"));
+					}
+				}
+				else if (HotKeyItemCode == 8) //당근
+				{
+					if (AnimInstance && StabMontage_AI)
+					{
+						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
+						AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
+						send_anim_packet(s_socket, Network::AnimType::Stab);
+						UE_LOG(LogTemp, Warning, TEXT("smartStab!"));
+					}
+				}
 			}
 		}
 		else {
@@ -244,33 +254,7 @@ void AAICharacter::Attack()
 					}
 				}
 			}
-			else if (smartAIController)
-			{
-				if (smartAIController->SavedItemCode == 7) //대파
-				{
-					//PickSwordAnimation();
-					
-					if (AnimInstance && SlashMontage_AI)
-					{
-						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
-						AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
-						send_anim_packet(s_socket, Network::AnimType::Slash);
-						UE_LOG(LogTemp, Warning, TEXT("smartSlash!"));
-					}
-				}
-				else if (smartAIController->SavedItemCode == 8) //당근
-				{
-					//PickSwordAnimation();
-					
-					if (AnimInstance && StabMontage_AI)
-					{
-						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
-						AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
-						send_anim_packet(s_socket, Network::AnimType::Stab);
-						UE_LOG(LogTemp, Warning, TEXT("smartStab!"));
-					}
-				}
-			}
+			
 		}
 		
 		

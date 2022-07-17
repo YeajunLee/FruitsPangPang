@@ -30,6 +30,12 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
 
     if (smartAIController)
     {
+        if (AICharacter->SelectedHotKeySlotNum == 2) {
+            AICharacter->SM_GreenOnion->SetHiddenInGame(true);
+            AICharacter->SM_Carrot->SetHiddenInGame(true);
+            send_anim_packet(AICharacter->s_socket, Network::AnimType::DropSword);
+        }
+
         if (AICharacter->mInventory->mSlots[1].Amount > 0)
             AICharacter->SelectedHotKeySlotNum = 1;
         else if(AICharacter->mInventory->mSlots[0].Amount > 0)
