@@ -242,7 +242,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AnyKeyPressed(FKey Key);
-	void ChangeSelectedHotKey(int WannaChange);
+	virtual void ChangeSelectedHotKey(int WannaChange) override;
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return SpringArm; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

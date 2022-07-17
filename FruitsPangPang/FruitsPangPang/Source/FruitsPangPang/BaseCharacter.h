@@ -64,15 +64,18 @@ public:
 public:
 	//related inventory
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 		int SelectedHotKeySlotNum;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 		int SavedHotKeySlotNum;		//Save HotKey's Slot Num When Attack() Because it will be use for Throww() to get Fruits Path
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 		class AInventory* mInventory;
+
+	virtual void ChangeSelectedHotKey(int WannaChange);
+
 public:
 	//related throw
 	UFUNCTION(BlueprintCallable)
@@ -106,7 +109,7 @@ public:
 		bool bIsUnderthePunnet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HealSpawner")
-		bool bIsUndertheHealSpawner;
+		bool bIsUndertheHealSpawner;	
 
 public:
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
@@ -133,4 +136,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "network")
 		int l_c_id; //received id from server
 	virtual void recvLobbyPacket();
+
+
 };

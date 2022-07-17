@@ -1391,7 +1391,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		else if (smartAIController && (packet->itemCode == 7 || packet->itemCode == 8))
 		{
 			smartAIController->SavedItemCode = packet->itemCode;
-			PacketOwner->PickSwordAnimation();
+			//PacketOwner->PickSwordAnimation();
 		}
 
 		break;

@@ -112,6 +112,12 @@ public:
 	//	int OverlapInteractId;
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "interact")
 	//	bool OverlapType;	//true == Tree , false == Punnet
+
+public:
+	//related inventory
+	virtual void ChangeSelectedHotKey(int WannaChange) override;
+
+
 protected:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

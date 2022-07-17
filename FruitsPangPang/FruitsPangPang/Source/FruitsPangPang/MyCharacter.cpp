@@ -309,7 +309,7 @@ void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
 	{
 		mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 		mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-		send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
+		//send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 	}
 }
 

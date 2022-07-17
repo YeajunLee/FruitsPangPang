@@ -28,6 +28,13 @@ EBTNodeResult::Type UBTTask_SwordAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	auto swordAIController = Cast<AAI_Sword_Controller_Custom>(swordAI->Controller);
 	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(swordAI->Controller);
 
+	if (smartAIController)
+	{
+		if (swordAI->SelectedHotKeySlotNum != 2)
+			swordAI->PickSwordAnimation();
+		swordAI->SelectedHotKeySlotNum = 2;
+	}
+
 	ABaseCharacter* Target = nullptr;
 
 	if(swordAIController)

@@ -198,10 +198,14 @@ void AAICharacter::Attack()
 			
 			if (smartAIController)
 			{
-				if(SM_GreenOnion->bHiddenInGame == false)
+				if (SM_GreenOnion->bHiddenInGame == false) {
 					SM_GreenOnion->SetHiddenInGame(true);
-				else if(SM_Carrot->bHiddenInGame == false)
+					send_anim_packet(s_socket, Network::AnimType::DropSword);
+				}
+				else if (SM_Carrot->bHiddenInGame == false) {
 					SM_Carrot->SetHiddenInGame(true);
+					send_anim_packet(s_socket, Network::AnimType::DropSword);
+				}
 			}
 			
 			if (AnimInstance && ThrowMontage_AI)
@@ -218,8 +222,8 @@ void AAICharacter::Attack()
 				if (swordAIController->SavedItemCode == 7) //대파
 				{
 					//PickSwordAnimation();
-					SM_GreenOnion->SetHiddenInGame(false);
-					SM_Carrot->SetHiddenInGame(true);
+					//SM_GreenOnion->SetHiddenInGame(false);
+					//SM_Carrot->SetHiddenInGame(true);
 					if (AnimInstance && SlashMontage_AI)
 					{
 						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
@@ -230,8 +234,8 @@ void AAICharacter::Attack()
 				else if (swordAIController->SavedItemCode == 8) //당근
 				{
 					//PickSwordAnimation();
-					SM_GreenOnion->SetHiddenInGame(true);
-					SM_Carrot->SetHiddenInGame(false);
+					//SM_GreenOnion->SetHiddenInGame(true);
+					//SM_Carrot->SetHiddenInGame(false);
 					if (AnimInstance && StabMontage_AI)
 					{
 						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
@@ -245,8 +249,8 @@ void AAICharacter::Attack()
 				if (smartAIController->SavedItemCode == 7) //대파
 				{
 					//PickSwordAnimation();
-					SM_GreenOnion->SetHiddenInGame(false);
-					SM_Carrot->SetHiddenInGame(true);
+					//SM_GreenOnion->SetHiddenInGame(false);
+					//SM_Carrot->SetHiddenInGame(true);
 					if (AnimInstance && SlashMontage_AI)
 					{
 						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
@@ -258,8 +262,8 @@ void AAICharacter::Attack()
 				else if (smartAIController->SavedItemCode == 8) //당근
 				{
 					//PickSwordAnimation();
-					SM_GreenOnion->SetHiddenInGame(true);
-					SM_Carrot->SetHiddenInGame(false);
+					//SM_GreenOnion->SetHiddenInGame(true);
+					//SM_Carrot->SetHiddenInGame(false);
 					if (AnimInstance && StabMontage_AI)
 					{
 						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
@@ -282,24 +286,21 @@ void AAICharacter::Attack()
 
 void AAICharacter::PickSwordAnimation()
 {
+	FItemInfo info;
+	bool isempty;
+	int amount;
+	mInventory->GetItemInfoAtSlotIndex(2, isempty, info, amount);
+	if (!isempty)
 	{
-		FItemInfo info;
-		bool isempty;
-		int amount;
-		mInventory->GetItemInfoAtSlotIndex(2, isempty, info, amount);
-		if (!isempty)
+		switch (info.ItemCode)
 		{
-			switch (info.ItemCode)
-			{
-			case 7:
-				send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
-				break;
-			case 8:
-				send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
-				break;
-			}
+		case 7:
+			send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
+			break;
+		case 8:
+			send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
+			break;
 		}
-
 	}
 }
 
@@ -555,6 +556,12 @@ void AAICharacter::CarrotAttackEnd()
 	}
 	DamagedActorCollector.clear();
 	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AAICharacter::ChangeSelectedHotKey(int WannaChange)
+{
+	int tmp = SelectedHotKeySlotNum;
+	SelectedHotKeySlotNum = WannaChange;
 }
 
 float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

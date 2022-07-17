@@ -111,6 +111,10 @@ void ABaseCharacter::GetFruits()
 
 }
 
+void ABaseCharacter::ChangeSelectedHotKey(int WannaChange)
+{
+}
+
 bool ABaseCharacter::ConnServer()
 {
 	return true;
