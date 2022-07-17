@@ -686,7 +686,7 @@ void process_packet(int client_id, unsigned char* p)
 			//reset Game Play Time
 			Timer_Event instq;
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_END;
-			instq.exec_time = chrono::system_clock::now() + chrono::milliseconds(10000);
+			instq.exec_time = chrono::system_clock::now() + chrono::milliseconds(20000);
 			timer_queue.push(instq);
 
 			//게임플레이시간이 바뀐걸 모든 유저에게 알린다.
