@@ -163,6 +163,10 @@ int main(int argc, char* argv[])
 		closesocket(mDBServer->_socket);
 		return false;
 	}
+	else {
+
+		cout << "디비서버와 연결 완료\n";
+	}
 
 	recv_flag = 0;
 	ret = WSARecv(mDBServer->_socket, &mDBServer->wsa_ex_recv.getWsaBuf(), 1, NULL, &recv_flag, &mDBServer->wsa_ex_recv.getWsaOver(), NULL);

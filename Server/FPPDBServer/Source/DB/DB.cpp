@@ -369,11 +369,13 @@ int UpdatePlayerInfo(const char* name, const int& coin)
 {
 	SQLRETURN retcode{};
 
+	char MoneyTemp[20];
+	_itoa_s(static_cast<int>(coin), MoneyTemp, 10);
 	wstring ProcessResultQuery{ L"EXEC process_gameresult " };
 	USES_CONVERSION;
 	ProcessResultQuery += A2W(name);
 	ProcessResultQuery += L",";
-	ProcessResultQuery += coin;
+	ProcessResultQuery += A2W(MoneyTemp);
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)ProcessResultQuery.c_str(), SQL_NTS);
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
