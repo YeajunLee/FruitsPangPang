@@ -249,8 +249,7 @@ void AAICharacter::Attack()
 				if (smartAIController->SavedItemCode == 7) //대파
 				{
 					//PickSwordAnimation();
-					//SM_GreenOnion->SetHiddenInGame(false);
-					//SM_Carrot->SetHiddenInGame(true);
+					
 					if (AnimInstance && SlashMontage_AI)
 					{
 						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
@@ -262,8 +261,7 @@ void AAICharacter::Attack()
 				else if (smartAIController->SavedItemCode == 8) //당근
 				{
 					//PickSwordAnimation();
-					//SM_GreenOnion->SetHiddenInGame(true);
-					//SM_Carrot->SetHiddenInGame(false);
+					
 					if (AnimInstance && StabMontage_AI)
 					{
 						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
@@ -295,9 +293,13 @@ void AAICharacter::PickSwordAnimation()
 		switch (info.ItemCode)
 		{
 		case 7:
+			SM_GreenOnion->SetHiddenInGame(false);
+			SM_Carrot->SetHiddenInGame(true);
 			send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
 			break;
 		case 8:
+			SM_GreenOnion->SetHiddenInGame(true);
+			SM_Carrot->SetHiddenInGame(false);
 			send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
 			break;
 		}
