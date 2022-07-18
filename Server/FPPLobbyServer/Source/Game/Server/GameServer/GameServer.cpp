@@ -98,7 +98,17 @@ void GameServer::AIMatch()
 		auto player = reinterpret_cast<Player*>(obj);
 		if (player->bisAI)
 		{
-			ai_ID = player->_id;
+			player->state_lock.lock();
+			if (Player::STATE::ST_INGAME != player->_state)
+			{
+				player->_state = Player::STATE::ST_INMATCHING;
+				player->state_lock.unlock();
+				ai_ID = player->_id;
+			}
+			else {
+				player->state_lock.unlock();
+			}
+
 			break;
 		}
 	}
@@ -149,9 +159,17 @@ void GameServer::AIMatch()
 			if (isAIEntered)
 				if (CurrentMatchingPlayer[i] == SaveAI_id)
 					continue;
-			send_enter_ingame_packet(CurrentMatchingPlayer[i], mServerPort);
+			//ai 매칭완 (needAiNum을 같이 보내줌)
 			if (CurrentMatchingPlayer[i] == SaveAI_id)
+			{
+				send_enter_ingame_packet(CurrentMatchingPlayer[i], mServerPort, needAiNum);
 				isAIEntered = true;	//AI는 딱 한번만 접속하게 끔
+			}
+			//player 매칭완 ( default 인게임 패킷을 보냄 )
+			else
+			{
+				send_enter_ingame_packet(CurrentMatchingPlayer[i], mServerPort);
+			}
 		}
 	}
 	else {

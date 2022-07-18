@@ -585,7 +585,7 @@ void process_packet(int client_id, unsigned char* p)
 		if (character->mSlot[character->mActivationSlot].amount > 0)
 		{
 			character->mSlot[character->mActivationSlot].amount -= 1;
-			//cout << client_id << "번째 유저의" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
+			cout << client_id << "번째 유저의여긴안돼" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
 		}
 		else {
 			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함. - CS_PACKET_USEITEM", client_id, character->mActivationSlot.load());

@@ -368,6 +368,7 @@ struct lc_packet_match_response {
 	char type;
 	short port;
 	short playertype;
+	short aiamount;
 };
 
 struct lc_packet_match_update {

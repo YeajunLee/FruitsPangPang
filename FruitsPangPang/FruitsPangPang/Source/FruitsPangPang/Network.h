@@ -32,7 +32,7 @@ void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId);
 void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount);
 void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType = 0);
 void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum);
-void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type);
+void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type);	//in use nut,durian
 void send_respawn_packet(SOCKET& sock, const char& WannaRespawn);
 void send_PreGameSettingComplete_packet(SOCKET& sock);
 void send_Cheat(SOCKET& sock, const char& cheatNum, const char& FruitType = 0);
@@ -63,6 +63,7 @@ public:
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
+	short mAiAmount = - 1;	//들어와야 할 Ai의 갯수
 	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
 	bool bLoginFlag = false;	//로그인시 true
 	short GameServerPort = -1;		//게임서버 접속용 port

@@ -946,6 +946,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));
 			break;
 		case 1:
+			mAiAmount = packet->aiamount;
 			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_AI"));
 			break;
 		}

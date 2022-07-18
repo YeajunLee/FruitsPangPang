@@ -25,41 +25,25 @@ void AInGameAiLv::ConnAi()
 
 	FTransform trans;
 	trans.SetLocation(FVector(23660, 10195, 5610));
-	if (ACTIVE_AI_CNT > 0)
+	int GenerateAiAmount = 0;
+	if (Network::GetNetwork()->mAiAmount > 0)
+		GenerateAiAmount = Network::GetNetwork()->mAiAmount;
+	else
+		GenerateAiAmount = ACTIVE_AI_CNT;
+	for (int i = 0; i < GenerateAiAmount; ++i)
 	{
-		
-		for (int i = 0; i < ACTIVE_AI_CNT; ++i)
-		{
-			trans.SetLocation(trans.GetLocation() + FVector(200, 0, 0));
-			AAICharacter* mc1;
-			if(i == 0)
-				mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP2, trans);
-			else if(i == 1)
-				mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP3, trans);
-			else
-				mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP, trans);
+		trans.SetLocation(trans.GetLocation() + FVector(200, 0, 0));
+		AAICharacter* mc1;
+		if (i == 0)
+			mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP2, trans);
+		else if (i == 1)
+			mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP3, trans);
+		else
+			mc1 = GetWorld()->SpawnActorDeferred<AAICharacter>(GeneratedCharacterBP, trans);
 
-			mc1->AutoPossessPlayer = EAutoReceiveInput::Disabled;
-			mc1->bIsDie = true;
-			mc1->FinishSpawning(trans);
-			send_PreGameSettingComplete_packet(mc1->s_socket);
-		}
+		mc1->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+		mc1->bIsDie = true;
+		mc1->FinishSpawning(trans);
+		send_PreGameSettingComplete_packet(mc1->s_socket);
 	}
-	//int i = 0;
-	//for (auto ai : Network::GetNetwork()->mAiCharacter)
-	//{
-	//	if (nullptr != ai)
-	//	{
-	//		ai->ConnServer();
-	//		Network::GetNetwork()->send_login_packet(ai->s_socket, 1);
-	//		UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Try Conn"), i);
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//			FString::Printf(TEXT("server conn")));
-	//	}
-	//	++i;
-	//}
-
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-	//	FString::Printf(TEXT("server conn")));
-	//UE_LOG(LogTemp, Log, TEXT("Begin Played"));
 }

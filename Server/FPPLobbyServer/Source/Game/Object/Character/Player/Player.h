@@ -9,7 +9,7 @@ class Player : public Character
 {
 public:
 
-	enum class STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
+	enum class STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_INMATCHING };
 	Player(OBJTYPE type = OBJTYPE::PLAYER, STATE state = STATE::ST_FREE);
 	virtual ~Player();
 	
