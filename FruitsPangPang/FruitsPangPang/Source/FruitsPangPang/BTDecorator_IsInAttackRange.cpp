@@ -4,6 +4,7 @@
 #include "BTDecorator_IsInAttackRange.h"
 #include "AIController_Custom.h"
 #include "AI_Smart_Controller_Custom.h"
+#include "AI_Sword_Controller_Custom.h"
 #include "AICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "MyCharacter.h"
@@ -25,11 +26,17 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	auto AIController = Cast<AAIController_Custom>(ai->Controller);
 	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(ai->Controller);
 
+	//2022-07-19 swordAIµµ isAttackRange »ç¿ë.
+	auto swordAIController = Cast<AAI_Sword_Controller_Custom>(ai->Controller);
+
+
 	ABaseCharacter* Target = nullptr;
 	if(AIController)
 		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TargetKey));
 	else if(smartAIController)
 		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
+	else if(swordAIController)
+		Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Sword_Controller_Custom::SwordTargetKey));
 
 	if (nullptr == Target) return false;
 
