@@ -46,7 +46,7 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 		OverlapResults,
 		source,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_WorldStatic,
 		FCollisionShape::MakeSphere(DetectRadius),
 		CollisionQueryParam
 	);
