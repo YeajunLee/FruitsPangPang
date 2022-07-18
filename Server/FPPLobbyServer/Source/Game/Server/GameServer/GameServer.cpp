@@ -104,7 +104,7 @@ void GameServer::AIMatch()
 		if (player->bisAI)
 		{
 			player->state_lock.lock();
-			if (Player::STATE::ST_INGAME != player->_state)
+			if (Player::STATE::ST_INGAME == player->_state)
 			{
 				player->_state = Player::STATE::ST_INMATCHING;
 				player->state_lock.unlock();

@@ -64,15 +64,14 @@ void APunnet::GenerateFruit(int _FruitType)
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			FRotator rotator = GetActorRotation();
-			FVector  SpawnLocation = GetActorLocation();
-            SpawnLocation.X += 25.0f;
-            SpawnLocation.Y -= 45.0f;
+            FVector  SpawnLocation = this->GetActorLocation();
+            SpawnLocation -= this->GetActorRightVector() * 50;
             rotator.Yaw += 45.f;
             rotator.Roll -= 20.f;
 			mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-			SpawnLocation.X -= 25.0f;
+			SpawnLocation -= this->GetActorForwardVector() * 40.f; 
 			mFruitMesh[1] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
-			SpawnLocation.X -= 25.0f;
+			SpawnLocation += this->GetActorForwardVector() * 80.f;
 			mFruitMesh[2] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
 		}
 		CanHarvest = true;
