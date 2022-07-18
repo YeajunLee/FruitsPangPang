@@ -29,9 +29,7 @@ void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const 
 void send_getfruits_tree_packet(SOCKET& sock, const int& treeId);
 void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId);
 void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId);
-void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount);
 void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType = 0);
-void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum);
 void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type);	//in use nut,durian
 void send_respawn_packet(SOCKET& sock, const char& WannaRespawn);
 void send_PreGameSettingComplete_packet(SOCKET& sock);

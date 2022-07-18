@@ -127,7 +127,7 @@ void send_update_player_result(const int& player_id, const int& rank)
 	if (1 == player->bAi) return;	//ai는 돈계산 X
 	int Cash = player->mKillCount * 10;
 	double adjust = 1.8 - (rank * 0.1);
-	Cash *= adjust;
+	Cash = static_cast<int>(Cash * adjust);
 	FPP_LOG("%s에게 최종 결산된 금액:%d", player->name, Cash);
 	gd_packet_update_player_info packet{};
 
@@ -578,35 +578,12 @@ void process_packet(int client_id, unsigned char* p)
 		heal->interact(object);
 		break;
 	}
-	case CS_PACKET_USEITEM: {
-
-		cs_packet_useitem* packet = reinterpret_cast<cs_packet_useitem*>(p);
-		Character* character = reinterpret_cast<Character*>(object);
-		if (character->mSlot[character->mActivationSlot].amount > 0)
-		{
-			character->mSlot[character->mActivationSlot].amount -= 1;
-			cout << client_id << "번째 유저의여긴안돼" << character->mActivationSlot << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[character->mActivationSlot].amount << endl;
-		}
-		else {
-			FPP_LOG("[%d]번째 유저가 %d 번째 슬롯의 아이템이 없는데 사용하려고 시도함. - CS_PACKET_USEITEM", client_id, character->mActivationSlot.load());
-		}
-		
-		break;
-	}
 	case CS_PACKET_HIT: {
 		cs_packet_hit* packet = reinterpret_cast<cs_packet_hit*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 		//cout << "HurtBy ID:" << packet->attacker_id << endl;
 		if (!(USER_START <= packet->attacker_id && packet->attacker_id < MAX_USER)) break;
 		character->HurtBy(packet->fruitType, packet->attacker_id);
-		break;
-	}
-	case CS_PACKET_CHANGE_HOTKEYSLOT: {
-		cs_packet_change_hotkeyslot* packet = reinterpret_cast<cs_packet_change_hotkeyslot*>(p);
-
-		Character* character = reinterpret_cast<Character*>(object);
-		character->mActivationSlot = packet->HotkeySlotNum;
-
 		break;
 	}
 	case CS_PACKET_POS: {

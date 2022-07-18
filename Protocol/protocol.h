@@ -40,9 +40,9 @@ const char CS_PACKET_ANIM = 3;
 const char CS_PACKET_SPAWNITEMOBJ = 4;
 const char CS_PACKET_GETFRUITS_PUNNET = 5;
 const char CS_PACKET_GETFRUITS_TREE = 6;
-const char CS_PACKET_USEITEM = 7;
+//const char CS_PACKET_USEITEM = 7; 안쓰는 프로토콜. 수정가능
 const char CS_PACKET_HIT = 8;
-const char CS_PACKET_CHANGE_HOTKEYSLOT = 9;
+//const char CS_PACKET_CHANGE_HOTKEYSLOT = 9; 안쓰는 프로토콜. 수정가능
 const char CS_PACKET_POS = 10;
 const char CS_PACKET_SELECT_RESPAWN = 11;
 const char CS_PACKET_PREGAMESETTINGCOMPLETE = 12;
@@ -125,24 +125,11 @@ struct cs_packet_getfruits {
 	int obj_id;
 };
 
-struct cs_packet_useitem {
-	unsigned char size;
-	char type;
-	short slotNum;
-	short Amount;
-};
-
 struct cs_packet_hit {
 	unsigned char size;
 	char type;
 	int fruitType;
 	int attacker_id;
-};
-
-struct cs_packet_change_hotkeyslot {
-	unsigned char size;
-	char type;
-	int HotkeySlotNum;	//activated inventory slot num
 };
 
 struct cs_packet_pos {

@@ -15,6 +15,7 @@ Character::Character(OBJTYPE type, STATE state)
 	,mDeathCount(0)
 	,bAi(false)
 	,skintype(0)
+	,_prev_size(0)
 {
 	_type = type;
 }
@@ -233,7 +234,7 @@ void Character::Heal(const int& amount)
 void Character::Respawn(const int& RespawnSpot)
 {
 	hp = maxhp;
-	rx = 0, ry = 0, rz = 0, rw = 1;
+	rx = 0.f, ry = 0.f, rz = 0.f, rw = 1.f;
 
 	random_device rd;
 	mt19937 rng(rd());
@@ -241,28 +242,28 @@ void Character::Respawn(const int& RespawnSpot)
 	switch (RespawnSpot)
 	{
 	case 0:
-		x = 17980 + RespawnControl(rng), y = 1780 + RespawnControl(rng), z = 100;
+		x = 17980.f + RespawnControl(rng), y = 1780.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 1:
-		x = 18350 + RespawnControl(rng), y = 9610 + RespawnControl(rng), z = 100;
+		x = 18350.f + RespawnControl(rng), y = 9610.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 2:
-		x = 18090 + RespawnControl(rng), y = 17480 + RespawnControl(rng), z = 100;
+		x = 18090.f + RespawnControl(rng), y = 17480.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 3:
-		x = 9730 + RespawnControl(rng), y = 1620 + RespawnControl(rng), z = 100;
+		x = 9730.f + RespawnControl(rng), y = 1620.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 4:
-		x = 9880 + RespawnControl(rng), y = 18390 + RespawnControl(rng), z = 100;
+		x = 9880.f + RespawnControl(rng), y = 18390.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 5:
-		x = 1990 + RespawnControl(rng), y = 1740 + RespawnControl(rng), z = 100;
+		x = 1990.f + RespawnControl(rng), y = 1740.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 6:
-		x = 1750 + RespawnControl(rng), y = 10220 + RespawnControl(rng), z = 100;
+		x = 1750.f + RespawnControl(rng), y = 10220.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 7:
-		x = 2200 + RespawnControl(rng), y = 18140 + RespawnControl(rng), z = 100;
+		x = 2200.f + RespawnControl(rng), y = 18140.f + RespawnControl(rng), z = 100.f;
 		break;
 	case 8:	{
 		uniform_int_distribution<int> randomRespawn(0, 7);

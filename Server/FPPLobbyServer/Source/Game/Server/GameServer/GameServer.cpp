@@ -10,6 +10,11 @@ GameServer::GameServer()
 	, isAIEntered(false)
 	, SaveAI_id(-1)
 {
+
+	for (auto& p : CurrentMatchingPlayer)
+	{
+		p = -1;
+	}
 }
 
 GameServer::~GameServer()

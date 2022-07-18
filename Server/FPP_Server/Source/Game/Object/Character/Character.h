@@ -22,7 +22,7 @@ public:
 	enum class STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
 	Character(OBJTYPE type = OBJTYPE::PLAYER, STATE state = STATE::ST_FREE);
 	virtual ~Character();
-	char name[MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE]{};
 	STATE	_state;
 	std::mutex state_lock;
 	std::atomic_bool _is_active;

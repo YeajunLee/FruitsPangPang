@@ -5,6 +5,9 @@ Player::Player(OBJTYPE type, STATE state)
 	:_state(state)
 	, mCoin(0)
 	, bisAI(false)
+	, _prev_size(0)
+	, _socket(INVALID_SOCKET)
+	,name()
 {
 	_otype = type;
 }

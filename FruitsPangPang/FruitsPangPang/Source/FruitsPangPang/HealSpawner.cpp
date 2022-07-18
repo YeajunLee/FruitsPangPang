@@ -8,8 +8,8 @@
 #include "Inventory.h"
 
 AHealSpawner::AHealSpawner()
-    : CanHarvest(false)
-    , HealSpanwerId(-1)
+    :HealSpanwerId(-1)
+    ,CanHarvest(false)
 {
 }
 
