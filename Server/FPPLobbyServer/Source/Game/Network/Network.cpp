@@ -232,7 +232,7 @@ void send_signup_ok_packet(const int& player_id, const char& succestype)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_enter_ingame_packet(const int& player_id, const short& server_port)
+void send_enter_ingame_packet(const int& player_id, const short& server_port, const short& aiamount)
 {
 	auto player = reinterpret_cast<Player*>(objects[player_id]);
 	lc_packet_match_response packet;
@@ -242,6 +242,7 @@ void send_enter_ingame_packet(const int& player_id, const short& server_port)
 	packet.size = sizeof(packet);
 	packet.type = LC_PACKET_MATCH_RESPONSE;
 	packet.playertype = player->bisAI;
+	packet.aiamount = aiamount;
 	player->sendPacket(&packet, sizeof(packet));
 }
 

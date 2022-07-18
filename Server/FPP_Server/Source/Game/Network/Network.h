@@ -97,11 +97,11 @@ struct Timer_Event {
 		TYPE_DURIAN_DMG,
 		TYPE_GAME_WAIT,TYPE_GAME_START,TYPE_GAME_END
 	};
-	int object_id;
-	int player_id;
-	int x;
-	int y;
-	int z;
+	int object_id{};
+	int player_id{};
+	int x{};
+	int y{};
+	int z{};
 	std::chrono::system_clock::time_point exec_time;
 	TIMER_TYPE type;
 

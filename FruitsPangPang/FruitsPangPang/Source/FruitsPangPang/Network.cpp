@@ -270,18 +270,6 @@ void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void send_useitem_packet(SOCKET& sock, const int& slotNum, const int& amount)
-{
-	cs_packet_useitem packet;
-	packet.size = sizeof(cs_packet_useitem);
-	packet.type = CS_PACKET_USEITEM;
-	packet.slotNum = slotNum;
-	packet.Amount = amount;
-
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_useitem), &packet);
-	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
-}
-
 void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& FruitType)
 {
 	cs_packet_hit packet;
@@ -292,18 +280,6 @@ void send_hitmyself_packet(SOCKET& sock, const int& AttackerId, const int& Fruit
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_hit), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 
-}
-
-void send_change_hotkeyslot_packet(SOCKET& sock, const int& slotNum)
-{
-
-	cs_packet_change_hotkeyslot packet;
-	packet.size = sizeof(cs_packet_change_hotkeyslot);
-	packet.type = CS_PACKET_CHANGE_HOTKEYSLOT;
-	packet.HotkeySlotNum = slotNum;
-
-	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(cs_packet_change_hotkeyslot), &packet);
-	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
 void send_pos_packet(SOCKET& sock, const float& x, const float& y, const float& z, const char& type)
@@ -946,6 +922,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_Player"));
 			break;
 		case 1:
+			mAiAmount = packet->aiamount;
 			UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("FruitsPangPangMap_AI"));
 			break;
 		}

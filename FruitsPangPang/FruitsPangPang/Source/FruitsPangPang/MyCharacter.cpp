@@ -374,7 +374,6 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 			
 			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(SelectedHotKeySlotNum))
 			{
@@ -397,7 +396,6 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		{
 			mInventory->mMainWidget->minventorySlot[tmp]->UnSelect();
 			mInventory->mMainWidget->minventorySlot[SelectedHotKeySlotNum]->Select();
-			send_change_hotkeyslot_packet(s_socket, SelectedHotKeySlotNum);
 			if (SelectedHotKeySlotNum == 2 && mInventory->IsSlotValid(2))
 			{
 				PickSwordAnimation();
