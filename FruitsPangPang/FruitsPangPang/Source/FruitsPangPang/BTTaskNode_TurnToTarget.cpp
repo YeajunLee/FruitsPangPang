@@ -23,6 +23,9 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 
+	if (AICharacter->bIsDie)
+		EBTNodeResult::Failed;
+
 	//2022-07-05
 	auto AIController = Cast<AAIController_Custom>(AICharacter->Controller);
 	auto smartAIController = Cast<AAI_Smart_Controller_Custom>(AICharacter->Controller);
@@ -46,8 +49,7 @@ EBTNodeResult::Type UBTTaskNode_TurnToTarget::ExecuteTask(UBehaviorTreeComponent
 	//	TargetRot, GetWorld()->GetDeltaSeconds(),
 	//	2.f));
 
-	if (AICharacter->bIsDie) 
-		EBTNodeResult::Failed;
+	
 	return EBTNodeResult::Succeeded;
 }
 
