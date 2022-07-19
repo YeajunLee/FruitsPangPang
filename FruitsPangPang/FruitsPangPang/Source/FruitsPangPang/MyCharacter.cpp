@@ -241,7 +241,9 @@ void AMyCharacter::Tick(float DeltaTime)
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 
-			send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
+
+			if (!bIsDie)
+				send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
 			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();

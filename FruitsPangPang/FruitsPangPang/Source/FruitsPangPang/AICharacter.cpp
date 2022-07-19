@@ -160,7 +160,8 @@ void AAICharacter::Tick(float DeltaTime)
 	auto rot = GetTransform().GetRotation();
 	if(overID == 0)
 		SleepEx(0, true);
-	send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
+	if(!bIsDie)
+		send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
 
 	//Update GroundSpeedd (22-04-05)
 	float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
