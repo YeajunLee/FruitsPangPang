@@ -60,6 +60,11 @@ void Heal::interact(Object* interactobj)
 	timer_queue.push(instq);
 }
 
+void Heal::ResetObject()
+{
+	Interaction::ResetObject();
+}
+
 void Heal::GenerateFruit()
 {
 	Interaction::GenerateFruit();

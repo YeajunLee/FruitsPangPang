@@ -9,6 +9,7 @@ public:
 	virtual ~GameServer();
 public:
 	virtual void ResetServer() override;
+	void ReCycleServer();
 	int CurrentMatchingPlayerCnt;
 	std::mutex CurrentMatchingPlayerCnt_lock;
 

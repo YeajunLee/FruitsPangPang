@@ -300,13 +300,6 @@ void WorkerThread()
 			break;
 		}
 		case CMD_GAME_END: {
-			if (!GameActive)
-			{
-				delete wsa_ex;
-				return;
-			}
-
-			GameActive = false;
 			
 			multimap<int, int,greater<int>> ranks;
 			for (auto& other : objects)
@@ -337,14 +330,32 @@ void WorkerThread()
 				}
 				Rank += RankAdder;	//그다음 n위를 처리하기 위함.
 			}
-			cout << "여기까진 나오니?" << endl;
 			//Stop Receiving
-			//all Thread Exit();
-			//Post Game Ending()
-			// End Event Push to TimerThread And ALL Thread Terminate.  
-			//
+			// All Object reset for recycle
+			//Game reset()
+			// 
+			{
+				Timer_Event instq;
+				instq.type = Timer_Event::TIMER_TYPE::TYPE_GAME_RESET;
+				instq.exec_time = chrono::system_clock::now() + 10000ms;
+				timer_queue.push(instq);
+			}
+			cout << "The Game is Over Server Restart after 10 seconds...\n";
 			delete wsa_ex;
-			return;
+			break;
+		}
+		case CMD_GAME_RESET: {
+
+			ResetGame();
+			for (auto& object : objects)
+			{
+				if (nullptr != object)
+					object->ResetObject();
+			}
+			send_recycle_gameserver_packet();
+			cout << "GameServer Resets done Successfully!\n";
+			delete wsa_ex;
+			break;
 		}
 		}
 	}

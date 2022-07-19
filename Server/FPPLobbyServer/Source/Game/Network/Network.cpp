@@ -336,8 +336,6 @@ void process_packet(int client_id, unsigned char* p)
 				server->wsa_server_recv.setCmd(CMD_SERVER_RECV);	//이제 서버관련 패킷은 따로 처리 해준다.
 				ZeroMemory(&server->wsa_server_recv.getWsaOver(), sizeof(server->wsa_server_recv.getWsaOver()));
 
-				//GameServer* gameserver = reinterpret_cast<GameServer*>(server);
-				//gameserver->mServerPort = 4100 + newid;	//포트넘버
 
 				server->recvPacket();
 				server->state_lock.lock();
@@ -391,7 +389,6 @@ void process_packet(int client_id, unsigned char* p)
 					timer_queue.push(instq);
 				}
 				else {
-
 					cout << "매칭성공\n";
 				}
 				
@@ -413,15 +410,6 @@ void process_packet(int client_id, unsigned char* p)
 			wchar_t tmp[20];
 			_itow_s(gameserver->mServerPort, tmp, 10);
 			ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), tmp, NULL, SW_SHOW);
-
-			{
-				Timer_Event instq;
-				instq.player_id = server->_id;
-				instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_WAITING_TIMEOUT;
-				instq.exec_time = chrono::system_clock::now() + 10000ms;		//10초간 대기하고 반응이없다면 AI넣어줌.
-
-				timer_queue.push(instq);
-			}
 
 			cout << "서버 열린곳이 없음. 매칭 재시도\n";
 			{
@@ -494,6 +482,15 @@ void process_packet_for_Server(int client_id, unsigned char* p)
 
 		cout << client_id << "번째 접속 완\n";
 
+		break;
+	}
+	case GL_PACKET_SERVER_RESET: {
+		gl_packet_server_reset* packet = reinterpret_cast<gl_packet_server_reset*>(p);
+		auto gameserver = reinterpret_cast<GameServer*>(server);
+		gameserver->ReCycleServer();
+		gameserver->state_lock.lock();
+		gameserver->_state = Server::STATE::ST_MATHCING;
+		gameserver->state_lock.unlock();
 		break;
 	}
 	}

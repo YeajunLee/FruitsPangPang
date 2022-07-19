@@ -7,6 +7,7 @@ public:
 	virtual ~Heal();
 	FRUITTYPE _ftype;
 
+	virtual void ResetObject() override;
 	virtual void GenerateFruit() override;
 	virtual void interact(class Object* interactobj) override;
 };

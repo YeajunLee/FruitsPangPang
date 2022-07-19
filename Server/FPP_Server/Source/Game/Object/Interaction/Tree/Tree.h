@@ -17,6 +17,7 @@ public:
 
 	FRUITTYPE _ftype;
 	TREETYPE _ttype;
+	virtual void ResetObject() override;
 	virtual void GenerateFruit() override;
 	virtual void interact(class Object* interactobj) override;
 };

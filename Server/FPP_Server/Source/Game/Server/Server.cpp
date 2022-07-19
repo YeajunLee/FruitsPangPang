@@ -9,6 +9,7 @@ Server::Server()
 
 Server::~Server()
 {
+	closesocket(_socket);
 }
 
 void Server::recvPacket()

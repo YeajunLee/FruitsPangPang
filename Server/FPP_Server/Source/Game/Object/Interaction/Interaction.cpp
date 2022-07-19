@@ -14,6 +14,12 @@ Interaction::~Interaction()
 
 }
 
+void Interaction::ResetObject()
+{
+	Object::ResetObject();
+	CanInteract = true;
+}
+
 
 void Interaction::interact(Object* interactobj)
 {

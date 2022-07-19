@@ -35,6 +35,18 @@ void GameServer::ResetServer()
 	}
 }
 
+void GameServer::ReCycleServer()
+{
+	//portnum,id  aren't reset
+	CurrentMatchingPlayerCnt = 0;
+	isAIEntered = false;
+	SaveAI_id = -1;
+	for (auto& p : CurrentMatchingPlayer)
+	{
+		p = -1;
+	}
+}
+
 bool GameServer::Match(const int& player_id, const short& amount)
 {
 	CurrentMatchingPlayerCnt_lock.lock();
@@ -81,6 +93,15 @@ bool GameServer::Match(const int& player_id, const short& amount)
 			send_match_update_packet(CurrentMatchingPlayer[i], currentplayer);
 		}
 
+		if(1 == currentplayer)	//첫 번째 접속, 그러니까 게임서버가 매칭이 시작된 이후로, AI자동매칭을 넣어줌.
+		{
+			Timer_Event instq;
+			instq.player_id = this->_id;
+			instq.type = Timer_Event::TIMER_TYPE::TYPE_MATCH_WAITING_TIMEOUT;
+			instq.exec_time = chrono::system_clock::now() + 10000ms;		//10초간 대기하고 반응이없다면 AI넣어줌.
+
+			timer_queue.push(instq);
+		}
 
 		return true;	//Match Succeed
 	}

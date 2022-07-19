@@ -10,10 +10,12 @@ public:
 
 	Interaction(OBJTYPE type = OBJTYPE::INTERACT, INTERTYPE itype = INTERTYPE::NONE);
 	virtual ~Interaction();
+	virtual void ResetObject() override;
 	virtual void interact(class Object* interactobj);
 	virtual void GenerateFruit();
 	bool CanInteract;
 	std::mutex CanInteract_lock;
 	INTERTYPE _itype;
+
 };
 

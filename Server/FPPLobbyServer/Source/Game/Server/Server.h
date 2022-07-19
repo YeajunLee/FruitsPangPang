@@ -9,7 +9,7 @@ class Server
 public:
 
 	enum class STATE { 
-		ST_FREE,ST_MATHCING,ST_USING,	//GameServer
+		ST_FREE,ST_MATHCING,ST_USING,	//GameServer ST_FREE - Not connected server, ST_MATCHING - waiting for match, ST_USING - playing game server
 		ST_DB							//DB
 	};
 	Server();

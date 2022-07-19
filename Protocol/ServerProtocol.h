@@ -24,6 +24,7 @@ const char GL_PACKET_LOGIN = 100;
 
 const char LG_PACKET_LOGIN_OK = 1;
 const char DG_PACKET_REQUEST_PLAYER_INFO = 2;
+const char GL_PACKET_SERVER_RESET = 3;
 //----------------------------------
 
 
@@ -52,6 +53,11 @@ struct gl_packet_login {
 	char type;
 	short port;
 
+};
+
+struct gl_packet_server_reset {
+	unsigned char size;
+	char type;
 };
 
 //----------------- GameServer to DBServer
