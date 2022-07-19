@@ -49,7 +49,7 @@ void Tree::interact(Object* interactobj)
 	if (false == this->CanInteract)
 	{
 		CanInteract_lock.unlock();
-		cout << " 수확할 수 없습니다!" << endl;
+		//cout << " 수확할 수 없습니다!" << endl;
 		return;
 	}
 	else {
