@@ -65,7 +65,6 @@ void APunnet::GenerateFruit(int _FruitType)
 			SpawnParams.Owner = this;
 			FRotator rotator = GetActorRotation();
             FVector  SpawnLocation = this->GetActorLocation();
-            SpawnLocation -= this->GetActorRightVector() * 50;
             rotator.Yaw += 45.f;
             rotator.Roll -= 20.f;
 			mFruitMesh[0] = world->SpawnActor<AFruit>(GeneratedBP, SpawnLocation, rotator, SpawnParams);
