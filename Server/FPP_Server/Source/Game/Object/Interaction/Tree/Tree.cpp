@@ -19,15 +19,18 @@ Tree::Tree(TREETYPE ttype)
 	, _ttype(ttype)
 	, _ftype(FRUITTYPE::NONE)
 {
+	random_device rd;
+	mt19937 rng(rd());
+	uniform_int_distribution<int> GreenTree(static_cast<int>(FRUITTYPE::T_TOMATO), static_cast<int>(FRUITTYPE::T_APPLE));
+	uniform_int_distribution<int> OrangeTree(static_cast<int>(FRUITTYPE::T_WATERMELON), static_cast<int>(FRUITTYPE::T_PUMPKIN));
 
-	/*나중에 랜덤으로 바꿔야함*/
 	if (ttype == TREETYPE::GREEN)
 	{
-		_ftype = FRUITTYPE::T_TOMATO;
+		_ftype = static_cast<FRUITTYPE>(GreenTree(rng));
 	}
 	else if (ttype == TREETYPE::ORANGE)
 	{
-		_ftype = FRUITTYPE::T_WATERMELON;
+		_ftype = static_cast<FRUITTYPE>(OrangeTree(rng));
 	}
 }
 
@@ -84,6 +87,25 @@ void Tree::interact(Object* interactobj)
 	instq.type = Timer_Event::TIMER_TYPE::TYPE_TREE_RESPAWN;
 	instq.object_id = _id;
 	timer_queue.push(instq);
+}
+
+void Tree::ResetObject()
+{
+	Interaction::ResetObject();
+
+	random_device rd;
+	mt19937 rng(rd());
+	uniform_int_distribution<int> GreenTree(static_cast<int>(FRUITTYPE::T_TOMATO), static_cast<int>(FRUITTYPE::T_APPLE));
+	uniform_int_distribution<int> OrangeTree(static_cast<int>(FRUITTYPE::T_WATERMELON), static_cast<int>(FRUITTYPE::T_PUMPKIN));
+
+	if (_ttype == TREETYPE::GREEN)
+	{
+		_ftype = static_cast<FRUITTYPE>(GreenTree(rng));
+	}
+	else if (_ttype == TREETYPE::ORANGE)
+	{
+		_ftype = static_cast<FRUITTYPE>(OrangeTree(rng));
+	}
 }
 
 void Tree::GenerateFruit()

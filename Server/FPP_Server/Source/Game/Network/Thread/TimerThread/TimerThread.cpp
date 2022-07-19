@@ -79,6 +79,12 @@ void TimerThread()
 						wsa_ex->setCmd(CMD_GAME_END);
 						PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
 					}
+					else if (is_already.type == Timer_Event::TIMER_TYPE::TYPE_GAME_RESET)
+					{
+						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+						wsa_ex->setCmd(CMD_GAME_RESET);
+						PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+					}
 					triger = false;
 
 				}
@@ -146,6 +152,12 @@ void TimerThread()
 				{
 					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
 					wsa_ex->setCmd(CMD_GAME_END);
+					PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
+				}
+				else if (exec_event.type == Timer_Event::TIMER_TYPE::TYPE_GAME_RESET)
+				{
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->setCmd(CMD_GAME_RESET);
 					PostQueuedCompletionStatus(hiocp, 1, NULL, &wsa_ex->getWsaOver());
 				}
 			}

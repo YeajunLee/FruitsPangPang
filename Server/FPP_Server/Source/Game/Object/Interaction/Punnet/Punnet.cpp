@@ -84,6 +84,17 @@ void Punnet::interact(Object* interactobj)
 	timer_queue.push(instq);
 }
 
+void Punnet::ResetObject()
+{
+	Interaction::ResetObject();
+
+	random_device rd;
+	mt19937 rng(rd());
+	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_GREENONION), static_cast<int>(FRUITTYPE::T_BANANA));
+
+	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
+}
+
 void Punnet::GenerateFruit()
 {
 	Interaction::GenerateFruit();

@@ -12,6 +12,11 @@ struct InventorySlot {
 	{
 
 	}
+	void ResetInventory()
+	{
+		type = FRUITTYPE::NONE;
+		amount = 0;
+	}
 	FRUITTYPE type;
 	short amount;
 };
@@ -25,7 +30,6 @@ public:
 	char name[MAX_NAME_SIZE]{};
 	STATE	_state;
 	std::mutex state_lock;
-	std::atomic_bool _is_active;
 public:
 	WSA_OVER_EX wsa_ex_recv;
 	SOCKET  _socket;
@@ -35,12 +39,12 @@ public:
 	void sendPacket(void* packet, int bytes);
 
 public:
+	virtual void ResetObject() override;
 	bool bAi;
 	short maxhp;
 	std::atomic_short hp;
 	short skintype;
 	InventorySlot mSlot[5];
-	std::atomic_int mActivationSlot;
 	std::atomic_int mKillCount;
 	std::atomic_int mDeathCount;
 	void UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount);

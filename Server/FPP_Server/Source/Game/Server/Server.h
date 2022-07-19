@@ -12,7 +12,6 @@ public:
 
 	STATE	_state;
 	std::mutex state_lock;
-	std::atomic_bool _is_active;
 
 public:
 	WSA_OVER_EX wsa_ex_recv;

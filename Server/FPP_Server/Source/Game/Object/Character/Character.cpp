@@ -8,7 +8,6 @@ using namespace std;
 
 Character::Character(OBJTYPE type, STATE state)
 	:_state(state)
-	, _is_active(true)
 	,maxhp(PLAYER_HP)
 	,hp(maxhp)
 	, mKillCount(0)
@@ -16,6 +15,7 @@ Character::Character(OBJTYPE type, STATE state)
 	,bAi(false)
 	,skintype(0)
 	,_prev_size(0)
+	,_socket(INVALID_SOCKET)
 {
 	_type = type;
 }
@@ -69,6 +69,24 @@ void Character::sendPacket(void* packet, int bytes)
 			Disconnect(_id);
 		}
 	}
+}
+
+void Character::ResetObject()
+{
+	Object::ResetObject();
+	_state = STATE::ST_FREE;
+	maxhp = PLAYER_HP;
+	hp = maxhp;
+	mKillCount = 0;
+	mDeathCount = 0;
+	bAi = false;
+	skintype = 0;
+	_prev_size = 0;
+	closesocket(_socket);
+	_id = -1;
+	_socket = INVALID_SOCKET;
+	for (auto& slot : mSlot)
+		slot.ResetInventory();
 }
 
 void Character::UpdateInventorySlotAtIndex(const int& index, FRUITTYPE itemcode, const int& amount)

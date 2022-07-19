@@ -17,13 +17,14 @@ SOCKET s_socket;
 std::array<Object*, MAX_OBJECT> objects;
 Server* mServer;
 Server* mDBServer;
-std::atomic_int loginPlayerCnt;
-std::atomic_bool GameActive = true;
+std::atomic_int loginPlayerCnt = 0;
 std::atomic_bool CheatGamePlayTime = false; //GamePlayTimeCheat must Played 1 Time 
 concurrency::concurrent_priority_queue <Timer_Event> timer_queue;
 concurrency::concurrent_queue <Log> logger;
 const char* RandomAIName[] = { "Anderson","Allen","Adams","Brown","Baker","Bailey","Bell","Brooks","Clark","Collins","Davis","Evans","Flores","Howard","Garcia","Jones","Kelly",
 "Miller","Martin","Nelson","Ortiz","Lewis","Phillips","Parker","Robinson","Rivera","Ross","Smith","Scott","Taylor","Turner","Wright","Ward" };
+
+const int WorkerThreadsAmount = 6;
 
 WSA_OVER_EX::WSA_OVER_EX(COMMAND_IOCP cmd, char bytes, void* msg)
 	: _cmd(cmd)
@@ -70,7 +71,6 @@ void error_display(int err_no)
 
 int Generate_Id()
 {
-	static int g_id = 0;
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		auto user = reinterpret_cast<Character*>(objects[i]);
@@ -108,6 +108,14 @@ void Disconnect(int c_id)
 	}
 }
 
+
+void send_recycle_gameserver_packet()
+{
+	gl_packet_server_reset packet;
+	packet.size = sizeof(packet);
+	packet.type = GL_PACKET_SERVER_RESET;
+	mServer->sendPacket(&packet, sizeof(packet));
+}
 
 void send_get_player_info_packet(const int& player_id)
 {
@@ -397,7 +405,7 @@ void process_packet(int client_id, unsigned char* p)
 			uniform_int_distribution<int> randName(0, 32);
 			int randCnt = randName(rng);
 			strcpy_s(character->name, RandomAIName[randCnt]);
-
+		
 
 			send_login_ok_packet(client_id, character->name);
 
@@ -831,4 +839,10 @@ void process_packet_for_Server(unsigned char* p)
 		character->state_lock.unlock();
 	}
 	}
+}
+
+void ResetGame()
+{
+	CheatGamePlayTime = false;
+	loginPlayerCnt = 0;
 }

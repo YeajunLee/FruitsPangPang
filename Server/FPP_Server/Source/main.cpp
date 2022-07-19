@@ -55,6 +55,8 @@ int main(int argc, char* argv[])
 		sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex.getWsaOver());
 	std::cout << "Accept Called\n";
 
+	for (auto object : objects)
+		object = nullptr;
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		objects[i] = new Character();
@@ -88,7 +90,7 @@ int main(int argc, char* argv[])
 	vector<thread> worker_threads;
 	thread timer_thread{ TimerThread };
 	thread logger_thread{ LogThread };
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < WorkerThreadsAmount; ++i)
 		worker_threads.emplace_back(WorkerThread);
 
 
@@ -104,7 +106,7 @@ int main(int argc, char* argv[])
 	mServer->wsa_ex_recv.setCmd(CMD_SERVER_RECV);
 	ZeroMemory(&mServer->wsa_ex_recv.getWsaOver(), sizeof(mServer->wsa_ex_recv.getWsaOver()));
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mServer->_socket), hiocp, 1, 0);
-
+	
 	int rt = connect(mServer->_socket, reinterpret_cast<sockaddr*>(&mServer->server_addr), sizeof(mServer->server_addr));
 	if (SOCKET_ERROR == rt)
 	{
@@ -116,7 +118,7 @@ int main(int argc, char* argv[])
 		closesocket(mServer->_socket);
 		return false;
 	}
-
+	
 	DWORD recv_flag = 0;
 	int ret = WSARecv(mServer->_socket, &mServer->wsa_ex_recv.getWsaBuf(), 1, NULL, &recv_flag, &mServer->wsa_ex_recv.getWsaOver(), NULL);
 	if (SOCKET_ERROR == ret)
@@ -127,17 +129,17 @@ int main(int argc, char* argv[])
 			//error ! 
 		}
 	}
-
+	
 	gl_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = GL_PACKET_LOGIN;
 	packet.port = server_port;
 	mServer->sendPacket(&packet, sizeof(packet));
-
-
+	
+	
 	//--------------------------------------------
-
-
+	
+	
 	//---------------
 	mDBServer = new Server();
 	mDBServer->_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -151,7 +153,7 @@ int main(int argc, char* argv[])
 	mDBServer->wsa_ex_recv.setCmd(CMD_DBSERVER_RECV);
 	ZeroMemory(&mDBServer->wsa_ex_recv.getWsaOver(), sizeof(mDBServer->wsa_ex_recv.getWsaOver()));
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mDBServer->_socket), hiocp, 1, 0);
-
+	
 	rt = connect(mDBServer->_socket, reinterpret_cast<sockaddr*>(&mDBServer->server_addr), sizeof(mDBServer->server_addr));
 	if (SOCKET_ERROR == rt)
 	{
@@ -164,10 +166,10 @@ int main(int argc, char* argv[])
 		return false;
 	}
 	else {
-
+	
 		cout << "디비서버와 연결 완료\n";
 	}
-
+	
 	recv_flag = 0;
 	ret = WSARecv(mDBServer->_socket, &mDBServer->wsa_ex_recv.getWsaBuf(), 1, NULL, &recv_flag, &mDBServer->wsa_ex_recv.getWsaOver(), NULL);
 	if (SOCKET_ERROR == ret)
@@ -192,8 +194,8 @@ int main(int argc, char* argv[])
 	for (auto& object : objects) {
 		if (!object->isPlayer()) break;
 		auto character = reinterpret_cast<Character*>(object);
-		//if (Character::STATE::ST_INGAME == character->_state)
-			// Disconnect(character->_id);
+		if (Character::STATE::ST_INGAME == character->_state)
+			Disconnect(character->_id);
 	}
 
 	for (auto& object : objects)
@@ -201,6 +203,11 @@ int main(int argc, char* argv[])
 		if(object)
 			delete object;
 	}
+	if (mServer)
+		delete mServer;
+	if (mDBServer)
+		delete mDBServer;
+
 	closesocket(s_socket);
 	WSACleanup();
 }

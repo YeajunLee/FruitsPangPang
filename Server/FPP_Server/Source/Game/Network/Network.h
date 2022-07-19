@@ -18,18 +18,19 @@ extern std::array<class Object*, MAX_OBJECT> objects;
 extern class Server* mServer;
 extern class Server* mDBServer;
 extern std::atomic_int loginPlayerCnt;
-extern std::atomic_bool GameActive;
 extern std::atomic_bool CheatGamePlayTime;
 extern concurrency::concurrent_priority_queue <struct Timer_Event> timer_queue;
 extern concurrency::concurrent_queue <struct Log> logger;
 extern const char* RandomAIName[];
+extern const int WorkerThreadsAmount;
 
 void error_display(int err_no);
 int Generate_Id();
 void Disconnect(int id);
 void process_packet(int client_id, unsigned char* p);
 void process_packet_for_Server(unsigned char* p);
-
+void ResetGame();
+void send_recycle_gameserver_packet();
 void send_get_player_info_packet(const int& player_id);
 void send_update_player_result(const int& player_id,const int& rank);
 
@@ -67,7 +68,7 @@ enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
 	CMD_TREE_RESPAWN, CMD_PUNNET_RESPAWN, CMD_HEAL_RESPAWN, CMD_PLAYER_RESPAWN, //Respawn
 	CMD_DURIAN_DMG, //Damage
-	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END //Game Cycle
+	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET //Game Cycle
 };
 
 class WSA_OVER_EX {
@@ -95,7 +96,7 @@ struct Timer_Event {
 	{
 		TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN, TYPE_PUNNET_RESPAWN, TYPE_HEAL_RESPAWN,
 		TYPE_DURIAN_DMG,
-		TYPE_GAME_WAIT,TYPE_GAME_START,TYPE_GAME_END
+		TYPE_GAME_WAIT,TYPE_GAME_START,TYPE_GAME_END,TYPE_GAME_RESET
 	};
 	int object_id{};
 	int player_id{};
