@@ -4,6 +4,7 @@
 #include "GameMatchWidget.h"
 #include "Network.h"
 #include "MyCharacter.h"
+#include "MainWidget.h"
 #include "Components/Button.h"
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
@@ -13,12 +14,8 @@
 void UGameMatchWidget::NativePreConstruct()
 {
 	MatchforPlayer->OnClicked.AddDynamic(this, &UGameMatchWidget::TryMatchingPlayer);
-
-	mMatchWaitOverlay->SetVisibility(ESlateVisibility::Hidden);
-#define LOCTEXT_NAMESPACE "match"
-	MatchingText->SetText(FText::FromString("Matching..."));
-	CurrentMatchingPlayerCnt->SetText(FText::Format(LOCTEXT("match","(0/{0})"), MAX_PLAYER_CONN));	
-#undef LOCTEXT_NAMESPACE
+	if(Network::GetNetwork()->bIsAlreadyMatching)
+		MatchforPlayer->SetIsEnabled(false);
 }
 
 void UGameMatchWidget::NativeDestruct()
@@ -29,16 +26,19 @@ void UGameMatchWidget::NativeDestruct()
 
 void UGameMatchWidget::TryMatchingPlayer()
 {
-	send_match_request(Network::GetNetwork()->mMyCharacter->l_socket);
-}
-
-
-
-void UGameMatchWidget::UpdatePlayerCntText(const int& cnt)
-{
-	mMatchWaitOverlay->SetVisibility(ESlateVisibility::Visible);
-	MatchforPlayer->SetIsEnabled(false);
-#define LOCTEXT_NAMESPACE "match"
-	CurrentMatchingPlayerCnt->SetText(FText::Format(LOCTEXT("match", "({0}/{1})"),cnt,MAX_PLAYER_CONN));
-#undef LOCTEXT_NAMESPACE
+	if (!Network::GetNetwork()->bIsAlreadyMatching)
+	{
+		Network::GetNetwork()->bIsAlreadyMatching = true;
+		if(Network::GetNetwork()->mMyCharacter->mMainWidget)
+			Network::GetNetwork()->mMyCharacter->mMainWidget->ShowMatchWaitingWidget();
+		send_match_request(Network::GetNetwork()->mMyCharacter->l_socket);
+		FInputModeGameOnly gamemode;
+		auto controller = GetWorld()->GetFirstPlayerController();
+		if (nullptr != controller)
+		{
+			controller->SetInputMode(gamemode);
+			controller->SetShowMouseCursor(false);
+		}
+		this->RemoveFromParent();
+	}
 }

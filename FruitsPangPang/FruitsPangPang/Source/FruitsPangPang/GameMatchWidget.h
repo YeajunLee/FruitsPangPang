@@ -20,16 +20,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 		class UButton* MatchforPlayer;
-	UPROPERTY(meta = (BindWidget))
-		class UOverlay* mMatchWaitOverlay;
-	UPROPERTY(meta = (BindWidget))
-		class UTextBlock* MatchingText;
-	UPROPERTY(meta = (BindWidget))
-		class UTextBlock* CurrentMatchingPlayerCnt;
 
 
 	UFUNCTION()
 		void TryMatchingPlayer();
 
-	void UpdatePlayerCntText(const int& cnt);
 };

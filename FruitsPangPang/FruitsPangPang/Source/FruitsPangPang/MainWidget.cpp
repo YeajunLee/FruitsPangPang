@@ -11,6 +11,7 @@
 #include "KillLogTextWidget.h"
 #include "MiniMapWidget.h"
 #include "StoreWidget.h"
+#include "GameMatchWaitingWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
@@ -43,6 +44,14 @@ void UMainWidget::NativePreConstruct()
 			Rules.SizeRule = ESlateSizeRule::Fill;
 			SettupStoreBox->SetSize(Rules);
 			HideStoreWidget();
+		}
+		{
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MGameMatchWaitingWidget.MGameMatchWaitingWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto GameMatchWaitingWGT = CreateWidget<UGameMatchWaitingWidget>(GetWorld(), WidgetClass);
+			W_MatchWaiting = GameMatchWaitingWGT;
+			MatchWaitingBox->AddChildToHorizontalBox(GameMatchWaitingWGT);
+			HideMatchWaitingWidget();
 		}
 		break;
 	}
@@ -128,6 +137,15 @@ void UMainWidget::HideStoreWidget()
 	W_Store->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void UMainWidget::ShowMatchWaitingWidget()
+{
+	W_MatchWaiting->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UMainWidget::HideMatchWaitingWidget()
+{
+	W_MatchWaiting->SetVisibility(ESlateVisibility::Hidden);
+}
 
 void UMainWidget::UpdateCountDown(const FText& minute, const FText& second)
 {

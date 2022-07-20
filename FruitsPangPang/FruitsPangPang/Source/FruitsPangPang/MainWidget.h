@@ -47,6 +47,10 @@ public:
 
 	class UStoreWidget* W_Store;
 
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* MatchWaitingBox;
+
+	class UGameMatchWaitingWidget* W_MatchWaiting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		float fRemainTime;	//Game Remain Time
@@ -77,5 +81,7 @@ public:
 	void HideRespawnWidget();
 	void ShowStoreWidget();
 	void HideStoreWidget();
+	void ShowMatchWaitingWidget();
+	void HideMatchWaitingWidget();
 	void UpdateKillLog(const FString& Attacker,const FString& Victim);
 };

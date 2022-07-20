@@ -64,6 +64,7 @@ public:
 	short mAiAmount = - 1;	//들어와야 할 Ai의 갯수
 	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
 	bool bLoginFlag = false;	//로그인시 true
+	bool bIsAlreadyMatching = false;	//이미 매칭중이라면 true
 	short GameServerPort = -1;		//게임서버 접속용 port
 	Network();
 	~Network();

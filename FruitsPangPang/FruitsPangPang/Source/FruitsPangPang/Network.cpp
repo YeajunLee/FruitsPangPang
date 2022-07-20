@@ -22,6 +22,7 @@
 #include "BronzeIconWidget.h"
 #include "MiniMapWidget.h"
 #include "MessageBoxWidget.h"
+#include "GameMatchWaitingWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "AI_Smart_Controller_Custom.h"
@@ -94,6 +95,7 @@ void Network::release()
 {
 	if (isInit)
 	{
+		bIsAlreadyMatching = false;
 		mGeneratedID = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mAiCharacter)
@@ -930,8 +932,8 @@ void Network::process_LobbyPacket(unsigned char* p)
 	}
 	case LC_PACKET_MATCH_UPDATE: {
 		lc_packet_match_update* packet = reinterpret_cast<lc_packet_match_update*>(p);
-		if (mMyCharacter->mMatchWidget != nullptr)
-			mMyCharacter->mMatchWidget->UpdatePlayerCntText(packet->playercnt);
+		if (mMyCharacter->mMainWidget->W_MatchWaiting != nullptr)
+			mMyCharacter->mMainWidget->W_MatchWaiting->UpdatePlayerCntText(packet->playercnt);
 		break;
 	}
 	case LC_PACKET_SIGNUP_OK: {
