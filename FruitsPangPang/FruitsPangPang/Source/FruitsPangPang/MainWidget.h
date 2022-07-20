@@ -52,6 +52,11 @@ public:
 
 	class UGameMatchWaitingWidget* W_MatchWaiting;
 
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* ChatBox;
+
+	class UChatWidget* W_Chat;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 		float fRemainTime;	//Game Remain Time
 

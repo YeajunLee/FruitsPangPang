@@ -283,6 +283,19 @@ void send_equip_response_packet(const int& player_id, const unsigned char& itemc
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_chat_packet(const int& receiver_id, const char* senderName, WCHAR* msg)
+{
+	auto player = reinterpret_cast<Player*>(objects[receiver_id]);
+	lc_packet_chat packet;
+	memset(&packet, 0, sizeof(lc_packet_chat));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_CHAT;
+	strcpy_s(packet.name, senderName);
+	wcscpy_s(packet.msg, msg);
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -463,6 +476,25 @@ void process_packet(int client_id, unsigned char* p)
 		send_equip_response_packet(client_id, packet->itemcode);
 		send_updateDB_skintype_packet(character->name, character->mSkinType);
 		break;
+	}
+	case CL_PACKET_CHAT: {
+		cl_packet_chat* packet = reinterpret_cast<cl_packet_chat*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+		
+		for (auto& object : objects)
+		{
+			if (!object->isPlayer()) break;
+			Player* other = reinterpret_cast<Player*>(object);
+			other->state_lock.lock();
+			if (other->_state == Player::STATE::ST_INGAME)
+			{
+				other->state_lock.unlock();
+				send_chat_packet(object->_id, character->name, packet->msg);
+			}
+			else {
+				other->state_lock.unlock();
+			}
+		}
 	}
 	}
 }

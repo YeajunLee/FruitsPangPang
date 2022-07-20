@@ -57,6 +57,7 @@ int main()
 	for (int i = NPC_ID_START_LOBBY; i < NPC_ID_END_LOBBY; ++i)
 	{
 		objects[i] = new Npc();
+		objects[i]->_id = i;
 	}
 	dbserver = new DBServer();
 	for (int i = GAMESERVER_START; i < MAX_SERVER; ++i)

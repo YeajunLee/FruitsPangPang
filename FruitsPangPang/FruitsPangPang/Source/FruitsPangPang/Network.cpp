@@ -23,6 +23,7 @@
 #include "MiniMapWidget.h"
 #include "MessageBoxWidget.h"
 #include "GameMatchWaitingWidget.h"
+#include "ChatWidget.h"
 #include "AIController_Custom.h"
 #include "AI_Sword_Controller_Custom.h"
 #include "AI_Smart_Controller_Custom.h"
@@ -374,6 +375,16 @@ void send_equip_packet(SOCKET& sock, const int& itemcode)
 	packet.size = sizeof(packet);
 	packet.type = CL_PACKET_EQUIP;
 	packet.itemcode = itemcode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
+void send_chat_packet(SOCKET& sock,const WCHAR* msg)
+{
+	cl_packet_chat packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_PACKET_CHAT;
+	wcscpy_s(packet.msg, msg);
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
@@ -970,6 +981,11 @@ void Network::process_LobbyPacket(unsigned char* p)
 		lc_packet_equip_response* packet = reinterpret_cast<lc_packet_equip_response*>(p);
 		mMyCharacter->skinType = packet->itemcode;
 		mMyCharacter->EquipSkin();
+		break;
+	}
+	case LC_PACKET_CHAT: {
+		lc_packet_chat* packet = reinterpret_cast<lc_packet_chat*>(p);
+		mMyCharacter->mMainWidget->W_Chat->UpdateChat(FString(packet->name),FText::FromString(FString(packet->msg)));
 		break;
 	}
 	}

@@ -13,6 +13,6 @@ public:
 	OBJTYPE	_otype;
 
 
-	bool isPlayer() { return _id < MAX_USER; }
+	bool isPlayer() { return _id < MAX_USER_LOBBY; }
 };
 

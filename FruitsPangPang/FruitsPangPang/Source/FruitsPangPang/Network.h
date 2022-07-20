@@ -38,6 +38,7 @@ void send_sync_banana(SOCKET& sock, const FVector& locate, const FRotator& rotat
 void send_match_request(SOCKET& sock,const short& Amount = -1);
 void send_buy_packet(SOCKET& sock, const int& itemcode);
 void send_equip_packet(SOCKET& sock, const int& itemcode);
+void send_chat_packet(SOCKET& sock,const WCHAR* msg);
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {

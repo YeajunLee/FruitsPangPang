@@ -25,6 +25,7 @@
 #include "InventorySlotWidget.h"
 #include "MainWidget.h"
 #include "MessageBoxWidget.h"
+#include "ChatWidget.h"
 #include "Projectile.h"
 #include "RespawnWindowWidget.h"
 #include "RespawnWidget.h"
@@ -318,7 +319,16 @@ void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
 void AMyCharacter::AnyKeyPressed(FKey Key)
 {
 	if (bAttacking) return;
-	if (Key == EKeys::One)
+	if (Key == EKeys::Enter)
+	{
+		if (0 == GameState)
+		{
+			if (mMainWidget)
+				if (mMainWidget->W_Chat)
+					mMainWidget->W_Chat->ControlChat();
+		}
+	}
+	else if (Key == EKeys::One)
 	{
 		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
 		DropSwordAnimation();

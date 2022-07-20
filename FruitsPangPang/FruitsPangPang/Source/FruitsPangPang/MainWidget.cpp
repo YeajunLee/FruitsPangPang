@@ -12,6 +12,7 @@
 #include "MiniMapWidget.h"
 #include "StoreWidget.h"
 #include "GameMatchWaitingWidget.h"
+#include "ChatWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
@@ -52,6 +53,13 @@ void UMainWidget::NativePreConstruct()
 			W_MatchWaiting = GameMatchWaitingWGT;
 			MatchWaitingBox->AddChildToHorizontalBox(GameMatchWaitingWGT);
 			HideMatchWaitingWidget();
+		}
+		{
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MChatWidget.MChatWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto ChatWGT = CreateWidget<UChatWidget>(GetWorld(), WidgetClass);
+			W_Chat = ChatWGT;
+			ChatBox->AddChildToHorizontalBox(ChatWGT);
 		}
 		break;
 	}

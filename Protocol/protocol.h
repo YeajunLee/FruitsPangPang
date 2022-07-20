@@ -27,7 +27,7 @@ const int HEALID_END = HEALID_START + HEAL_CNT;
 const int  MAX_OBJECT = 100;
 const int PLAYER_HP = 20;
 const int PLAYER_HAVE_ITEM_LOBBY = 20;
-
+const int MAX_CHAT_SIZE = 32;
 const char POS_TYPE_DURIAN = 1;
 
 const char INTERACT_TYPE_TREE = 1;
@@ -53,6 +53,7 @@ const char CL_PACKET_SIGNUP = 16;
 const char CS_PACKET_GETFRUITS_HEAL = 17;
 const char CL_PACKET_BUY = 18;
 const char CL_PACKET_EQUIP = 19;
+const char CL_PACKET_CHAT = 20;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -85,6 +86,7 @@ const char LC_PACKET_MATCH_UPDATE = 3;
 const char LC_PACKET_SIGNUP_OK = 4;
 const char LC_PACKET_BUYITEM_RESULT = 5;
 const char LC_PACKET_EQUIP_RESPONSE = 6;
+const char LC_PACKET_CHAT = 7;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -196,6 +198,12 @@ struct cl_packet_equip {
 	unsigned char size;
 	char	type;
 	char itemcode;
+};
+
+struct cl_packet_chat {
+	unsigned char size;
+	char type;
+	wchar_t msg[MAX_CHAT_SIZE];
 };
 //-------------------- Gameserver to client
 struct sc_packet_login_ok {
@@ -381,5 +389,12 @@ struct lc_packet_equip_response {
 	unsigned char size;
 	char type;
 	unsigned char itemcode;
+};
+
+struct lc_packet_chat {
+	unsigned char size;
+	char type;
+	char name[MAX_NAME_SIZE];
+	wchar_t msg[MAX_CHAT_SIZE];
 };
 #pragma pack(pop)

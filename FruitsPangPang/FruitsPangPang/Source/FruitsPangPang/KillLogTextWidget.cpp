@@ -6,11 +6,6 @@
 
 void UKillLogTextWidget::NativePreConstruct()
 {
-//	mMatchWaitOverlay->SetVisibility(ESlateVisibility::Hidden);
-//#define LOCTEXT_NAMESPACE "match"
-//	MatchingText->SetText(FText::FromString("Matching..."));
-//	CurrentMatchingPlayerCnt->SetText(FText::Format(LOCTEXT("match", "(0/{0})"), MAX_PLAYER_CONN));
-//#undef LOCTEXT_NAMESPACE
 }
 
 void UKillLogTextWidget::NativeDestruct()
