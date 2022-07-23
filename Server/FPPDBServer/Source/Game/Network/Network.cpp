@@ -144,6 +144,8 @@ void process_packet(int client_id, unsigned char* p)
 	case LD_PACKET_LOGIN_AUTHOR: {
 		ld_packet_login_author* packet = reinterpret_cast<ld_packet_login_author*>(p);
 		LoginInfo info{};
+		cout << "서버 로그인 :" << server->_id << static_cast<int>(server->_state) << endl;
+		cout << "패킷 사이즈 :" << packet->size  << "id : " << packet->id << "pass:"<<packet->pass << endl;
 		char ret = Login(packet->id, packet->pass, info);
 		send_login_authorization_ok_packet(client_id, packet->playerid, ret, info);
 		break;

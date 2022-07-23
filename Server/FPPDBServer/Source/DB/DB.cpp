@@ -144,6 +144,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 		}
 		else if (retcode == SQL_ERROR) {
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+			cout << "Login Error - Login Query - Fetch\n";
 			SQLCancel(hstmt);
 			return -2;
 		}
@@ -151,6 +152,7 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 	else {
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		// Process data  
+		cout << "Login Error - Exec" << LoginQuery.c_str() << endl;
 		SQLCancel(hstmt);
 		return -2;
 	}
@@ -275,6 +277,7 @@ int BuyItem(const char* name, const char& itemcode, const int& coin)
 	}
 	else if (retcode == SQL_ERROR) {
 		//키 중복때문에 들어올 가능성이 높음.
+		cout << "BuyItem Error - Exec\n";
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		return -1;	// 알 수 없는 이유로 실패
 	}
@@ -301,6 +304,7 @@ int EquipItem(const char* name, const short& skintype)
 	}
 	else if (retcode == SQL_ERROR) {
 		//키 중복때문에 들어올 가능성이 높음.
+		cout << "Equip Error - Exec\n";
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		return -1;	// 알 수 없는 이유로 실패
 	}
@@ -348,12 +352,14 @@ int GetPlayerInfo(const char* name, LoginInfo& p_info)
 			return true;	//여기서는 무조건 성공
 		}
 		else if (retcode == SQL_ERROR) {
+			cout << "GetPlayerInfo Error - Fetch\n";
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 			SQLCancel(hstmt);
 			return -2;
 		}
 	}
 	else {
+		cout << "GetPlayerInfo Error - Exec\n";
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		// Process data  
 		SQLCancel(hstmt);
@@ -384,6 +390,7 @@ int UpdatePlayerInfo(const char* name, const int& coin)
 	}
 	else if (retcode == SQL_ERROR) {
 		//키 중복때문에 들어올 가능성이 높음.
+		cout << "UpdatePlayerInfo Error - Exec\n";
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 		return -1;	// 알 수 없는 이유로 실패
 	}

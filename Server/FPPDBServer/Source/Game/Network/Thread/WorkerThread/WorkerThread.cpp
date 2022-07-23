@@ -103,7 +103,10 @@ void WorkerThread()
 			instq.type = Timer_Event::TIMER_TYPE::TYPE_PING_TEST;
 			instq.exec_time = chrono::system_clock::now() + 1000ms;
 			timer_queue.push(instq);
-
+			time_t tt = chrono::system_clock::to_time_t(instq.exec_time);
+			tm tttt{};
+			localtime_s(&tttt, &tt);
+			cout << tttt.tm_year + 1900 << "-" << tttt.tm_mon + 1 << "-" << tttt.tm_mday << "-" << tttt.tm_hour << "-" << tttt.tm_min << "-" << tttt.tm_sec << endl;
 			ZeroMemory(&wsa_ex->getWsaOver(), sizeof(wsa_ex->getWsaOver()));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 			*(reinterpret_cast<SOCKET*>(wsa_ex->getBuf())) = c_socket;

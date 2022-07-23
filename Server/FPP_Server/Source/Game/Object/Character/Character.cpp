@@ -144,7 +144,7 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_APPLE) : {
-		Hurt(4, attacker);
+		Hurt(5, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_WATERMELON) : {
@@ -152,11 +152,11 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PINEAPPLE) : {
-		Hurt(5, attacker);
+		Hurt(7, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_PUMPKIN) : {
-		Hurt(8, attacker);
+		Hurt(10, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
@@ -170,11 +170,11 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_NUT) : {
-		Hurt(7, attacker);
+		Hurt(15, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_BANANA) : {
-		Hurt(10, attacker);
+		//Hurt(10, attacker);
 		break;
 	}
 	default: {
@@ -199,7 +199,8 @@ void Character::Hurt(const int& damage, const int& attacker)
 		short userKillcount[8];
 
 		Character* attackerCharacter = reinterpret_cast<Character*>(objects[attacker]);
-		attackerCharacter->mKillCount++;
+		if(attackerCharacter->_id != this->_id)
+			attackerCharacter->mKillCount++;
 		FPP_LOG("User[%d] Die ", _id);
 		cout << _id << "´Â Á×À½\n";
 		Die();

@@ -58,11 +58,16 @@ void Punnet::interact(Object* interactobj)
 	}
 	else if (this->_ftype == FRUITTYPE::T_BANANA)
 	{
-		character->UpdateInventorySlotAtIndex(4, this->_ftype, 3);
+		character->UpdateInventorySlotAtIndex(4, this->_ftype, 7);
 	}
-	else
+	else if(this->_ftype == FRUITTYPE::T_NUT)
 	{
-		character->UpdateInventorySlotAtIndex(3, this->_ftype, 5);
+		character->UpdateInventorySlotAtIndex(3, this->_ftype, 2);
+	}
+	else if (this->_ftype == FRUITTYPE::T_DURIAN)
+	{
+		character->UpdateInventorySlotAtIndex(3, this->_ftype, 3);
+
 	}
 
 	for (auto& other : objects)
