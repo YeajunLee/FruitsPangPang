@@ -57,7 +57,6 @@ EBTNodeResult::Type UBTTaskNode_HealFinding::ExecuteTask(UBehaviorTreeComponent&
 			AHealSpawner* healspawner = Cast<AHealSpawner>(OverlapResult.GetActor());
 			if (nullptr != healspawner)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Find!!"));
 				healspawners.emplace_back(healspawner);
 			}
 		}

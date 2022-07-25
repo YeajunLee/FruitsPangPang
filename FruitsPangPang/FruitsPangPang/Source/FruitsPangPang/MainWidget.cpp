@@ -30,7 +30,7 @@ void UMainWidget::NativePreConstruct()
 	switch (WidgetType)
 	{
 	case -1:
-		UE_LOG(LogTemp, Error, TEXT("Widget Type Wrong !"));
+		//UE_LOG(LogTemp, Error, TEXT("Widget Type Wrong !"));
 		break;
 	case 0: {
 		{
@@ -183,7 +183,7 @@ void UMainWidget::UpdateKillLog(const FString& Attacker, const FString& Victim)
 	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
 	if (nullptr == WidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MKillLogTextWidget.MKillLogTextWidget_C'"));
+		//UE_LOG(LogTemp, Warning, TEXT("MainWidget Source is invalid !! check '/Game/Widget/MKillLogTextWidget.MKillLogTextWidget_C'"));
 		return;
 	}
 	auto KillLogTextWGT = CreateWidget<UKillLogTextWidget>(GetWorld(), WidgetClass);

@@ -103,9 +103,7 @@ void UBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
     
 
     if (!IsAttacking)
-    {
-        //UE_LOG(LogTemp, Warning, TEXT("Finish!"));    
-
+    {   
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
 

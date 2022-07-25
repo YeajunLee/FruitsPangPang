@@ -476,7 +476,6 @@ void Network::process_packet(unsigned char* p)
 			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 					{
@@ -497,7 +496,6 @@ void Network::process_packet(unsigned char* p)
 			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 					{
@@ -531,7 +529,6 @@ void Network::process_packet(unsigned char* p)
 			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->SlashMontage)
 					{
@@ -550,7 +547,6 @@ void Network::process_packet(unsigned char* p)
 			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 				if (mOtherCharacter[packet->id] != nullptr)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 					UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 					if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
 					{
@@ -662,12 +658,10 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
 				mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
@@ -679,12 +673,10 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				mPunnet[packet->objNum]->HarvestFruit();
 			}
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
 				mHealSpawner[packet->objNum]->HarvestFruit();
 			}
 
@@ -712,8 +704,6 @@ void Network::process_packet(unsigned char* p)
 			mMyCharacter->SetActorEnableCollision(false);
 
 			mMyCharacter->mInventory->mMainWidget->ShowRespawnWidget();
-			//UE_LOG(LogTemp, Log, TEXT("Die Packet received"));
-
 		}
 		else if (packet->id < MAX_USER)
 		{
@@ -783,7 +773,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAMEWAITING: {
 		//3초 기다리는 UI
-		UE_LOG(LogTemp, Warning, TEXT("WAITING CALLED"));
+		//UE_LOG(LogTemp, Warning, TEXT("WAITING CALLED"));
 		mMyCharacter->mLoadingWidget->RemoveFromParent();
 		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MWaitingWidget.MWaitingWidget_C'"));
 		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
@@ -793,7 +783,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAMESTART: {
 		//waiting 위젯 지우고, 게임모드 바꿔주는
-		UE_LOG(LogTemp, Warning, TEXT("START CALLED"));
+		//UE_LOG(LogTemp, Warning, TEXT("START CALLED"));
 		mMyCharacter->mWaitingWidget->RemoveFromParent();
 		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 
@@ -1129,8 +1119,6 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		}
 		if (escape) break;
 
-		//UE_LOG(LogTemp, Log, TEXT("move called"));
-
 		if (USER_START<= move_id && move_id < MAX_USER)
 		{
 			if (mOtherCharacter[move_id] != nullptr)
@@ -1187,7 +1175,6 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						//UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 						{
@@ -1207,7 +1194,6 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						//UE_LOG(LogTemp, Log, TEXT("Pick Sword Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->PickSwordMontage)
 						{
@@ -1240,7 +1226,6 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->SlashMontage)
 						{
@@ -1259,7 +1244,6 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
 					if (mOtherCharacter[packet->id] != nullptr)
 					{
-						//UE_LOG(LogTemp, Log, TEXT("Slash Anima"));
 						UAnimInstance* AnimInstance = mOtherCharacter[packet->id]->GetMesh()->GetAnimInstance();
 						if (AnimInstance && mOtherCharacter[packet->id]->StabbingMontage)
 						{
@@ -1471,12 +1455,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Generate"));
 				Game->mPunnet[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
 				Game->mHealSpawner[packet->objNum]->GenerateFruit(packet->fruitType);
 			}
 		}
@@ -1490,12 +1472,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 			}
 			else if (packet->useType == INTERACT_TYPE_PUNNET)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Harvest"));
 				Game->mPunnet[packet->objNum]->HarvestFruit();
 			}
 			else if (packet->useType == INTERACT_TYPE_HEAL)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Heal Harvest"));
 				Game->mHealSpawner[packet->objNum]->HarvestFruit();
 			}
 

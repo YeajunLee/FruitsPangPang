@@ -34,8 +34,6 @@ void AAI_Sword_Controller_Custom::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 	if (UseBlackboard(BBAsset, Blackboard))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Runtree"));
 		RunBehaviorTree(BTAsset);
-
 	}
 }

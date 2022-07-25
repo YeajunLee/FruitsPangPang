@@ -23,8 +23,6 @@ class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
 
 
 public:
-
-
 	// Sets default values for this character's properties
 	AMyCharacter();
 
@@ -125,7 +123,7 @@ public:
 
 	class UMainWidget* MakeMainHUD();
 
-	void ShowedInMinimap();
+	//void ShowedInMinimap();
 	class UScoreWidget* mScoreWidget;
 	
 

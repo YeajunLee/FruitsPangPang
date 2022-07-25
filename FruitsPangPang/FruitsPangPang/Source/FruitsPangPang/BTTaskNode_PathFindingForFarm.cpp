@@ -113,7 +113,7 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 		//patrol other spot
 		//가까운곳에 나무가 아예 없다면 랜덤한 장소로 이동한다. (플레이어와 마주치는짓은 하지 않는다)
 		//현재는 그냥 Failed를 반환
-		UE_LOG(LogTemp, Error, TEXT("Ai Can't Find Tree"));
+		//UE_LOG(LogTemp, Error, TEXT("Ai Can't Find Tree"));
 		trees.clear();
 		return 	EBTNodeResult::Failed; 
 		
@@ -204,7 +204,6 @@ EBTNodeResult::Type UBTTaskNode_PathFindingForFarm::ExecuteTask(UBehaviorTreeCom
 	if (mAI->bIsUndertheTree)
 	{
 		trees.clear();
-		//UE_LOG(LogTemp, Error, TEXT("YesUndertheTree"));
 
 		return EBTNodeResult::Succeeded;
 	}

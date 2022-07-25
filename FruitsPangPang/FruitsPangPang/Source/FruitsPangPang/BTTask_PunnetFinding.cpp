@@ -23,9 +23,6 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 
-	/*UObject* punnetObj = OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Sword_Controller_Custom::PunnetKey);
-	UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), static_cast<AActor*>(punnetObj));*/
-
 	UWorld* World = ControllingPawn->GetWorld();
 	if (nullptr == World) {
 		return EBTNodeResult::Failed;
@@ -63,7 +60,6 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 			APunnet* punnet = Cast<APunnet>(OverlapResult.GetActor());
 			if (nullptr != punnet)
 			{
-				//UE_LOG(LogTemp, Log, TEXT("Punnet Find!!"));
 				punnets.emplace_back(punnet);
 			}
 		}
@@ -151,7 +147,6 @@ EBTNodeResult::Type UBTTask_PunnetFinding::ExecuteTask(UBehaviorTreeComponent& O
 		{
 			// 방해하는 플레이어가 없다면 GoToTheTree(Punnet)
 			//OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Sword_Controller_Custom::PunnetKey, punnets[TargetPunnetIndex].mPunnet);
-			//UE_LOG(LogTemp, Warning, TEXT("%s"), punnets[TargetPunnetIndex].mPunnet);
 			UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), punnets[TargetPunnetIndex].mPunnet);
 			break;
 		}

@@ -18,18 +18,12 @@ EBTNodeResult::Type UBTTaskNode_GoToTheTree::ExecuteTask(UBehaviorTreeComponent&
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 
-	//UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
-	//if (nullptr == NavSystem)
-	//	return EBTNodeResult::Failed;
-
 	UObject* TreePos = OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAIController_Custom::TreePosKey);
 	UAIBlueprintHelperLibrary::SimpleMoveToActor(ControllingPawn->GetController(), static_cast<AActor*>(TreePos));
-
 
 	AAICharacter* ai = Cast<AAICharacter>(ControllingPawn);
 
 	if (ai->bIsDie) EBTNodeResult::Failed;
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *TreePos.ToString());
 	if (ai->bIsUndertheTree)
 		return EBTNodeResult::Succeeded;
 	return EBTNodeResult::Failed;

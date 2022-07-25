@@ -119,9 +119,6 @@ AMyCharacter::AMyCharacter()
 	{
 		dizzySound = dizzySoundAsset.Object;
 	}
-
-	/*NifeSkin = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Skins"));
-	NifeSkin->SetupAttachment(GetMesh());*/
 	
 }
 
@@ -148,9 +145,7 @@ void AMyCharacter::BeginPlay()
 	}
 	if (GetController()->IsPlayerController())
 	{
-		Network::GetNetwork()->mMyCharacter = this;
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		//	FString::Printf(TEXT("other id ")));		
+		Network::GetNetwork()->mMyCharacter = this;		
 		/*
 			Setting Actor Params Before SpawnActor's BeginPlay
 		*/
@@ -164,8 +159,6 @@ void AMyCharacter::BeginPlay()
 
 		//지금은 개발 편의성을 위해 여기 넣었지만, 나중에는 서버에서 패킷을 받았을 때 만들어줄 예정임.
 		MakeMainHUD();
-		//
-
 
 		FItemInfo itemClass;
 		itemClass.ItemCode = 1;	//토마토 30개 생성
@@ -200,16 +193,7 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
 		mInventory->UpdateInventorySlot(itemClass, 200);
 
-		
-		
-		//if (Network::GetNetwork()->init())
-		//{
-		//	//Network::GetNetwork()->C_Recv();
-		//	send_login_packet(s_socket);
-		//}
-	}
-	
-	
+	}	
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -242,39 +226,20 @@ void AMyCharacter::Tick(float DeltaTime)
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 
-
 			if (!bIsDie)
 				send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			//	FString::Printf(TEXT("MY id : My pos:%f,%f,%f , value : "), pos.X, pos.Y, pos.Z));
+		
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
-			//ShowedInMinimap();
 		}
 		else {
-			
+			//Update GroundSpeedd (22-04-05)
 			GroundSpeedd = ServerStoreGroundSpeed;
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		//	FString::Printf(TEXT("char before : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
+		
 		auto a = GetTransform().GetLocation().Y;
-		Controller->SetControlRotation(RotationControl);
-		if (a != GetTransform().GetLocation().Y)
-		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-			//	FString::Printf(TEXT("char after : %f,%f,%f"), this->GetTransform().GetLocation().X, GetTransform().GetLocation().Y, GetTransform().GetLocation().Z));
-
-		}
-
-		//Update GroundSpeedd (22-04-05)
-		
-		
+		Controller->SetControlRotation(RotationControl);		
 	}
-
-
-	//store item box widget 에서 buy 버튼을 누르면 bnikeSkin 이 true 바뀌게 되고 이때 nife skin 이 캐릭터에 부착됨.
-	
-	
 }
 
 // Called to bind functionality to input
@@ -300,8 +265,6 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	//PlayerInputComponent->BindAxis("TurnRate", this, &AMain::TurnAtRate);
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AMain::LookUpAtRate);
-
-
 }
 
 void AMyCharacter::ChangeSelectedHotKey(int WannaChange)
@@ -330,13 +293,13 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::One)
 	{
-		UE_LOG(LogTemp, Log, TEXT("One Hitted"));
+		//UE_LOG(LogTemp, Log, TEXT("One Hitted"));
 		DropSwordAnimation();
 		ChangeSelectedHotKey(0);		
 	}
 	else if (Key == EKeys::Two)
 	{
-		UE_LOG(LogTemp, Log, TEXT("two Hitted"));
+		//UE_LOG(LogTemp, Log, TEXT("two Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum == 2)
 		{
 			DropSwordAnimation();
@@ -347,7 +310,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::Three)
 	{
-		UE_LOG(LogTemp, Log, TEXT("three Hitted"));
+		//UE_LOG(LogTemp, Log, TEXT("three Hitted"));
 		ChangeSelectedHotKey(2);
 		if (mInventory->IsSlotValid(SelectedHotKeySlotNum))
 		{
@@ -357,7 +320,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::Four)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
+		//UE_LOG(LogTemp, Log, TEXT("Four Hitted"));
 		if (mInventory->IsSlotValid(2) && SelectedHotKeySlotNum==2)
 		{
 			DropSwordAnimation();
@@ -368,7 +331,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	}
 	else if (Key == EKeys::Five)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Five Hitted"));
+		//UE_LOG(LogTemp, Log, TEXT("Five Hitted"));
 		DropSwordAnimation();
 		ChangeSelectedHotKey(4);
 	}
@@ -378,7 +341,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		//SavedHotKeyItemCode = mInventory->mSlots[SelectedHotKeySlotNum].ItemClass.ItemCode;
 
-		UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
+		//UE_LOG(LogTemp, Log, TEXT("Wheel Down"));
 		int tmp = SelectedHotKeySlotNum;
 		DropSwordAnimation();
 		SelectedHotKeySlotNum = max(SelectedHotKeySlotNum - 1, 0);
@@ -400,7 +363,7 @@ void AMyCharacter::AnyKeyPressed(FKey Key)
 	else if (Key == EKeys::MouseScrollDown)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
+		//UE_LOG(LogTemp, Log, TEXT("Wheel Up"));
 		int tmp = SelectedHotKeySlotNum;
 		DropSwordAnimation();
 		SelectedHotKeySlotNum = min(SelectedHotKeySlotNum + 1, 4);
@@ -482,13 +445,6 @@ void AMyCharacter::MoveForward(float value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, value);
 
-		//auto pos = GetTransform().GetLocation();
-		//auto rot = GetTransform().GetRotation();
-		//
-		//send_move_packet(pos.X,pos.Y,pos.Z,rot, GroundSpeed,MOVE_FORWARD);
-
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		//	FString::Printf(TEXT("after x y z : %f %f %f "), pos.X, pos.Y, pos.Z));
 	}
 }
 
@@ -502,10 +458,6 @@ void AMyCharacter::MoveRight(float value)
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, value);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,
-		//	FString::Printf(TEXT("My pos:%f,%f,%f , value : %f "), Direction.X, Direction.Y, Direction.Z, value));
-
-		//SetActorLocation(GetTransform().GetLocation() * 0.1);
 	}
 }
 
@@ -571,7 +523,6 @@ void AMyCharacter::GetFruits()
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 			send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Tree"));
@@ -582,7 +533,6 @@ void AMyCharacter::GetFruits()
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
 			send_getfruits_punnet_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type = Punnet"));
@@ -608,9 +558,6 @@ void AMyCharacter::InteractNpc()
 void AMyCharacter::LMBDown()
 {
 	bLMBDown = true;
-
-	//UE_LOG(LogTemp, Log, TEXT("lmbdown"));
-
 	Attack();
 }
 
@@ -677,21 +624,6 @@ void AMyCharacter::AttackEnd()
 	}
 }
 
-//죽는 애니메이션(22-04-05)
-//스테이트 머신으로 돌림(22-04-30)
-//void AMyCharacter::Die()
-//{
-//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-//
-//	if (AnimInstance && DeathMontage)
-//	{
-//		AnimInstance->Montage_Play(DeathMontage, 1.f);
-//		AnimInstance->Montage_JumpToSection(FName("Default"), DeathMontage);
-//		UE_LOG(LogTemp, Warning, TEXT("die!!"));
-//	}
-//}
-
-
 void AMyCharacter::onTimerEnd()
 {
 	EnableInput(Cast<APlayerController>(this));
@@ -727,7 +659,7 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 void AMyCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::GreenOnionBeginOverlap(OverlappedComp,OtherActor,OtherComp,OtherBodyIndex, bFromSweep,SweepResult);
-	UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(OtherComp));
+	//UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(OtherComp));
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		if (GEngine)
@@ -759,10 +691,6 @@ void AMyCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, A
 void AMyCharacter::GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	Super::GreenOnionEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
-	//if (GEngine)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("end"));
-	//}
 }
 
 void AMyCharacter::CarrotBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -799,7 +727,6 @@ void AMyCharacter::GreenOnionAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("GO_AttackEnd"));
 
 		if (!this->SM_GreenOnion->bHiddenInGame)
 		{
@@ -810,8 +737,6 @@ void AMyCharacter::GreenOnionAttackEnd()
 			UE_LOG(LogTemp, Error, TEXT("Daepa is not Equipped %d"), c_id);
 
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 	}
 	DamagedActorCollector.clear();
 	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -830,16 +755,14 @@ void AMyCharacter::CarrotAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("CarrotAttackEnd"));
+
 		if (!this->SM_Carrot->bHiddenInGame)
 		{
 			dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
 		}
 		else
 			UE_LOG(LogTemp, Error, TEXT("Dangeun is not Equipped %d"), c_id);
-		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);	
 	}
 	DamagedActorCollector.clear();
 	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -1031,11 +954,8 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 		}
-	}
-
-	
+	}	
 }
-
 
 void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType, const int& fruitid)
 {
@@ -1075,8 +995,6 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 			UE_LOG(LogTemp, Error, TEXT("Bomb can't Spawn! ItemCode String : %s"), *path.ToString());
 		}
 	}
-
-
 }
 
 
@@ -1128,7 +1046,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		{
 			int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
 			send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
-			UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
+			//UE_LOG(LogTemp, Log, TEXT("Take Damage : NotifyHit %d"), m_ftype);
 		}
 	}
 
@@ -1318,7 +1236,7 @@ bool AMyCharacter::ConnServer()
 		int err_num = WSAGetLastError();
 		//error_display(err_num);
 		//system("pause");
-		UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
 		//exit(0);
 		closesocket(s_socket);
 		return false;
@@ -1380,7 +1298,7 @@ bool AMyCharacter::ConnLobbyServer()
 		int err_num = WSAGetLastError();
 		//error_display(err_num);
 		//system("pause");
-		UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
 		//exit(0);
 		closesocket(l_socket);
 		return false;

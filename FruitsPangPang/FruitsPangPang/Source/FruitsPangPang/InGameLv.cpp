@@ -68,9 +68,9 @@ void AInGameLv::Conn()
 	{
 		player->ConnServer();
 		send_login_packet(player->s_socket, 0);
-		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
+		//UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 	}
-	UE_LOG(LogTemp, Log, TEXT("Begin Played"));
+	//UE_LOG(LogTemp, Log, TEXT("Begin Played"));
 }
 
 void AInGameLv::CreateLoadingWidget()
