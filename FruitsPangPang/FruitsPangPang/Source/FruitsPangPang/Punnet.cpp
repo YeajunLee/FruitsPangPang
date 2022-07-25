@@ -59,7 +59,7 @@ void APunnet::GenerateFruit(int _FruitType)
 		if (false == CanHarvest)
 		{
 			FName path = AInventory::ItemCodeToItemFruitPath(_FruitType);
-			UE_LOG(LogTemp, Log, TEXT("Punnet Generate Fruit Type : %d"), _FruitType);
+			//UE_LOG(LogTemp, Log, TEXT("Punnet Generate Fruit Type : %d"), _FruitType);
 			UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;

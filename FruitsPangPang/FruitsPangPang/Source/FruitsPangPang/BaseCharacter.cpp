@@ -64,7 +64,6 @@ void ABaseCharacter::CarrotEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("BaseCharacter"));
 
 	bIsUndertheTree = false;
 

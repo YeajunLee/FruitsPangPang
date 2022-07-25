@@ -72,14 +72,6 @@ AAICharacter::AAICharacter()
 	AIControllerClass = AAIController_Custom::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; //레벨에 배치하거나 새로 생성되는 AI는 AIConstrollerCustom의 지배를 받게된다.
 
-	//BananaCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("BananaCollisionBox"));
-	//BananaCollisionBox->SetupAttachment(GetMesh());
-	//BananaCollisionBox->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
-	//BananaCollisionBox->SetRelativeScale3D(FVector(1.2f, 1.2f, 0.4f));
-	//BananaCollisionBox->SetMobility(EComponentMobility::Movable);
-	//BananaCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBananaBoxOverlapBegin);
-	//BananaBox->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBoxOverlapBegin);
-
 	BananaCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BananaCollision"));;
 	BananaCollision->SetupAttachment(GetMesh());
 	BananaCollision->SetRelativeLocation(FVector(0.f, 0.f, -130.f));
@@ -103,7 +95,6 @@ AAICharacter::AAICharacter()
 		dizzySound1 = dizzySoundAsset1.Object;
 	}
 
-	//movement = this->GetCharacterMovement();
 }
 
 // Called when the game starts or when spawned
@@ -113,7 +104,7 @@ void AAICharacter::BeginPlay()
 
 
 	overID = Network::GetNetwork()->getNewId();
-	UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
+	//UE_LOG(LogTemp, Log, TEXT("Ai Number :%d Genereate"), overID);
 	Network::GetNetwork()->mAiCharacter[overID] = this;
 	Network::GetNetwork()->init();
 	ConnServer();
@@ -148,7 +139,7 @@ void AAICharacter::EndPlay(EEndPlayReason::Type Reason)
 	closesocket(s_socket);
 	Network::GetNetwork()->release();
 	//Network::GetNetwork().reset();
-	UE_LOG(LogTemp, Log, TEXT("ENd Played"));
+	//UE_LOG(LogTemp, Log, TEXT("ENd Played"));
 }
 
 // Called every frame
@@ -211,7 +202,6 @@ void AAICharacter::Attack()
 						AnimInstance->Montage_Play(SlashMontage_AI, 1.5f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), SlashMontage_AI);
 						send_anim_packet(s_socket, Network::AnimType::Slash);
-						UE_LOG(LogTemp, Warning, TEXT("smartSlash!"));
 					}
 				}
 				else if (HotKeyItemCode == 8) //당근
@@ -221,7 +211,6 @@ void AAICharacter::Attack()
 						AnimInstance->Montage_Play(StabMontage_AI, 1.5f);
 						AnimInstance->Montage_JumpToSection(FName("Default"), StabMontage_AI);
 						send_anim_packet(s_socket, Network::AnimType::Stab);
-						UE_LOG(LogTemp, Warning, TEXT("smartStab!"));
 					}
 				}
 			}
@@ -293,59 +282,14 @@ void AAICharacter::PickSwordAnimation()
 
 void AAICharacter::DropSwordAnimation()
 {
-	//if (2 != SelectedHotKeySlotNum) return;
-	//if (!mInventory->IsSlotValid(2)) return;
-	//
-	//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	//if (AnimInstance && PickSwordMontage)
-	//{
-	//	FItemInfo info;
-	//	bool isempty;
-	//	int amount;
-	//	mInventory->GetItemInfoAtSlotIndex(SelectedHotKeySlotNum, isempty, info, amount);
-	//	switch (info.ItemCode)
-	//	{
-	//	case 7:
-	//		SM_GreenOnion->SetHiddenInGame(true, false);
-	//		GreenOnionBag->SetHiddenInGame(false, false);
-	//		SM_Carrot->SetHiddenInGame(true, false);
-	//		CarrotBag->SetHiddenInGame(true, false);
-	//		send_anim_packet(s_socket, Network::AnimType::PickSword_GreenOnion);
-	//		break;
-	//	case 8:
-	//		SM_Carrot->SetHiddenInGame(true, false);
-	//		CarrotBag->SetHiddenInGame(false, false);
-	//		SM_GreenOnion->SetHiddenInGame(true, false);
-	//		GreenOnionBag->SetHiddenInGame(true, false);
-	//		send_anim_packet(s_socket, Network::AnimType::PickSword_Carrot);
-	//		break;
-	//	}
-	//	AnimInstance->Montage_Play(PickSwordMontage, 1.5f);
-	//	AnimInstance->Montage_JumpToSection(FName("Default"), PickSwordMontage);
-	//}
-
 	send_anim_packet(s_socket, Network::AnimType::DropSword);
 }
-
-//void AAICharacter::PostInitializeComponents()
-//{
-//	Super::PostInitializeComponents();
-//
-//}
-
-//void AAICharacter::AttackEnd()
-//{
-//	bAttacking = false;
-//	Attack();
-//}
 
 void AAICharacter::Throw()
 {
 	FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket2");
 
 	auto ToTarget = UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsRotator(AAIController_Custom::TrackingTargetKey);
-
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *ToTarget.ToString());
 
 	//Ai가 바라보고 있는 방향벡터로 Rotater를 만든다음 그걸 소켓과 합쳐서 transform을 만든다.
 	//FRotator aiRotate = GetActorForwardVector().Rotation();
@@ -393,7 +337,6 @@ void AAICharacter::GetFruits()
 		{
 			Network::GetNetwork()->mTree[OverlapInteractId]->CanHarvest = false;
 			send_getfruits_tree_packet(s_socket, OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Tree Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Tree"));
@@ -404,7 +347,6 @@ void AAICharacter::GetFruits()
 		{
 			Network::GetNetwork()->mPunnet[OverlapInteractId]->CanHarvest = false;
 			send_getfruits_punnet_packet(s_socket,OverlapInteractId);
-			//UE_LOG(LogTemp, Log, TEXT("Punnet Fruit"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Overlap is -1 But Try GetFruits - Type:Punnet"));
@@ -499,7 +441,7 @@ void AAICharacter::GreenOnionAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("GO_AttackEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("GO_AttackEnd"));
 
 		if (!this->SM_GreenOnion->bHiddenInGame)
 		{
@@ -511,7 +453,7 @@ void AAICharacter::GreenOnionAttackEnd()
 
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+		//UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 	}
 	DamagedActorCollector.clear();
 	SM_GreenOnion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -530,7 +472,7 @@ void AAICharacter::CarrotAttackEnd()
 		TSubclassOf<UDamageType> dmgCauser;
 		dmgCauser = UDamageType::StaticClass();
 		dmgCauser.GetDefaultObject()->DamageFalloff = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("CarrotAttackEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("CarrotAttackEnd"));
 		if (!this->SM_Carrot->bHiddenInGame)
 		{
 			dmgCauser.GetDefaultObject()->DamageFalloff = 8.0f;
@@ -539,7 +481,7 @@ void AAICharacter::CarrotAttackEnd()
 			UE_LOG(LogTemp, Error, TEXT("Dangeun is not Equipped %d"), c_id);
 		UGameplayStatics::ApplyDamage(victim, 1, GetInstigatorController(), this, dmgCauser);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("start :"));
-		UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
+		//UE_LOG(LogTemp, Log, TEXT("Damage Type %d"), dmgCauser.GetDefaultObject()->DamageFalloff);
 	}
 	DamagedActorCollector.clear();
 	SM_Carrot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -597,7 +539,7 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		//UE_LOG(LogTemp, Warning, TEXT("sword attack"));
 		int m_ftype = static_cast<int>(DamageEvent.DamageTypeClass.GetDefaultObject()->DamageFalloff);
 		send_hitmyself_packet(s_socket, DMGCauserCharacter->c_id, m_ftype);
-		UE_LOG(LogTemp, Warning, TEXT("sword attack, Take Damage : NotifyHit %d"), m_ftype);
+		//UE_LOG(LogTemp, Warning, TEXT("sword attack, Take Damage : NotifyHit %d"), m_ftype);
 	}
 
 	return Damage;
@@ -624,7 +566,7 @@ bool AAICharacter::ConnServer()
 		int err_num = WSAGetLastError();
 		//error_display(err_num);
 		//system("pause");
-		UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
 		//exit(0);
 		closesocket(s_socket);
 		return false;

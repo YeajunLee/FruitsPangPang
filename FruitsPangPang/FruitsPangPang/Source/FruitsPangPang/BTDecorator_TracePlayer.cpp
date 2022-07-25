@@ -60,18 +60,7 @@ bool UBTDecorator_TracePlayer::CalculateRawConditionValue(UBehaviorTreeComponent
 		, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true
 		, FLinearColor::Gray, FLinearColor::Gray);
 
-
-	//for (const auto& hit : HitResult) 
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(hit.GetActor()));
-	//	if (hit.GetActor() != ai)
-	//		bOnlyPlayer = false;
-	//}
-	//ABaseCharacter* player = nullptr;
 	ABaseCharacter* player = Cast<ABaseCharacter>(HitResult.GetActor());
-
-	//UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(HitResult.GetActor()));
-	//UE_LOG(LogTemp, Log, TEXT("%s"), bOnlyPlayer? TEXT("true") : TEXT("false"));
 
 	bool bResult = (HitResult.GetActor() == player);
 

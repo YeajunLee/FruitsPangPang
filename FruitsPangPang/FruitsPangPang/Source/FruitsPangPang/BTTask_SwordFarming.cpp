@@ -55,7 +55,6 @@ void UBTTask_SwordFarming::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	if (swordAIController)
 	{
 		int itemCode = OwnerComp.GetBlackboardComponent()->GetValueAsInt(AAI_Sword_Controller_Custom::PunnetItemKey);
-		//UE_LOG(LogTemp, Warning, TEXT("%d"), itemCode);
 		// 대파나 당근을 get했으면
 		if (7 == itemCode || 8 == itemCode) {
 			//Succeeded

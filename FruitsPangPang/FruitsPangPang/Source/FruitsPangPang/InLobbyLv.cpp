@@ -52,8 +52,8 @@ void AInLobbyLv::Conn()
 			if (nullptr != Network::GetNetwork()->mMyCharacter)
 				send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
 		}
-		UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
+		//UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 
 	}
-	UE_LOG(LogTemp, Log, TEXT("Begin Played"));
+	//UE_LOG(LogTemp, Log, TEXT("Begin Played"));
 }
