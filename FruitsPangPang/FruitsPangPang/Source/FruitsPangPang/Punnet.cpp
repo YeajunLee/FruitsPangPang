@@ -6,6 +6,8 @@
 #include "MyCharacter.h"
 #include "BaseCharacter.h"
 #include "Inventory.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 APunnet::APunnet()
     : CanHarvest(false)
@@ -83,6 +85,8 @@ void APunnet::HarvestFruit()
     /*
     여기에 뭐 Harvest 되는 행동을 취하면 됨. 지금은 Destory로 단순히 없애기만함.
     */
+    UGameplayStatics::PlaySoundAtLocation(this, HarvestPunnetSound, GetActorLocation(), 0.5f);
+
     for (auto& fruit : mFruitMesh)
     {
         if (fruit != nullptr)

@@ -52,6 +52,9 @@ public:
 public:
 	USoundBase* dizzySound;
 
+
+	//login 화면 bgm은 언리얼 엔진 내 mLoginWidget의 event construct에서 처리.
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
 		class USoundCue* LobbyBGM;
 
