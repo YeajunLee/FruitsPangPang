@@ -9,6 +9,8 @@
 #include "AICharacter.h"
 #include "PointOfInterestComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 ATree::ATree()
     : CanHarvest(false)
@@ -88,6 +90,11 @@ void ATree::HarvestFruit()
     /*
     여기에 뭐 Harvest 되는 행동을 취하면 됨. 지금은 Destory로 단순히 없애기만함.
     */
+    if(TreeId >= 0 && TreeId <= 41) //0~41 초록나무, 42~55 주황나무
+        UGameplayStatics::PlaySoundAtLocation(this, HarvestTreeSound, GetActorLocation(), 0.7f);
+    else if(TreeId >= 42 && TreeId <= 55)
+        UGameplayStatics::PlaySoundAtLocation(this, HarvestTreeSound2, GetActorLocation(), 0.6f);
+
     for (auto& fruit : mFruitMesh)
     {
         if (fruit != nullptr)

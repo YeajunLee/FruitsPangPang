@@ -32,6 +32,10 @@ public:
 	void HarvestFruit();
 
 	class AFruit* mFruitMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+		class USoundBase* HealSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

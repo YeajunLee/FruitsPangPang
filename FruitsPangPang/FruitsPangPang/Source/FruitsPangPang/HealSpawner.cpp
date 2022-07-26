@@ -6,6 +6,8 @@
 #include "MyCharacter.h"
 #include "BaseCharacter.h"
 #include "Inventory.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 AHealSpawner::AHealSpawner()
     :HealSpanwerId(-1)
@@ -78,6 +80,8 @@ void AHealSpawner::HarvestFruit()
     /*
 	여기에 뭐 Harvest 되는 행동을 취하면 됨. 지금은 Destory로 단순히 없애기만함.
 	*/
+    UGameplayStatics::PlaySoundAtLocation(this, HealSound, GetActorLocation(), 0.25f);
+
 	if (mFruitMesh != nullptr)
 	{
 		mFruitMesh->Destroy();

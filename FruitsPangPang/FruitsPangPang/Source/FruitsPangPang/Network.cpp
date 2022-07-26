@@ -787,7 +787,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->mWaitingWidget->RemoveFromParent();
 		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
 
-		mMyCharacter->SpawnedInGameBGM = UGameplayStatics::SpawnSound2D(mMyCharacter, mMyCharacter->InGameBGM);
+		mMyCharacter->SpawnedInGameBGM = UGameplayStatics::SpawnSound2D(mMyCharacter, mMyCharacter->InGameBGM, 0.7f);
 
 		mMyCharacter->mMainWidget->bActivate = true;
 		FInputModeGameOnly gamemode;
