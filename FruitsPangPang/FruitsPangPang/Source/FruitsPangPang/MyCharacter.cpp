@@ -166,13 +166,13 @@ void AMyCharacter::BeginPlay()
 		itemClass.Name = AInventory::ItemCodeToItemName(1);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
 
-		mInventory->UpdateInventorySlot(itemClass, 30);
+		mInventory->UpdateInventorySlot(itemClass, 100);
 
-		itemClass.ItemCode = 6;	//수박 30개 생성
+		itemClass.ItemCode = 4;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = AInventory::ItemCodeToItemName(6);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(6);
-		mInventory->UpdateInventorySlot(itemClass, 30);
+		itemClass.Name = AInventory::ItemCodeToItemName(4);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
+		mInventory->UpdateInventorySlot(itemClass, 70);
 
 		itemClass.ItemCode = 7; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
@@ -218,7 +218,7 @@ void AMyCharacter::Tick(float DeltaTime)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 
-		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 45.f);
+		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
 		if (GetController()->IsPlayerController()) {
@@ -862,7 +862,7 @@ void AMyCharacter::Throw()
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14;
+		CameraRotate.Pitch += 14.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(11);
@@ -889,7 +889,7 @@ void AMyCharacter::Throw()
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
 		
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14;
+		CameraRotate.Pitch += 14.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
