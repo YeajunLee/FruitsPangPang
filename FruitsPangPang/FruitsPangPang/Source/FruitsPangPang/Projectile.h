@@ -40,6 +40,6 @@ public:
 
 	int uniqueID;	//바나나만 쓰는 변수. 바나나 위치 동기화를 위해 서버가 부여해주는 ID
 
-	UPROPERTY(VisibleAnywhere, Category = "default")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class UProjectileMovementComponent* ProjectileMovementComponent;
 };
