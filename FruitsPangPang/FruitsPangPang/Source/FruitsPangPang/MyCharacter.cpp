@@ -172,7 +172,7 @@ void AMyCharacter::BeginPlay()
 		itemClass.IndexOfHotKeySlot = 1;
 		itemClass.Name = AInventory::ItemCodeToItemName(4);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
-		mInventory->UpdateInventorySlot(itemClass, 70);
+		mInventory->UpdateInventorySlot(itemClass, 100);
 
 		itemClass.ItemCode = 7; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
@@ -862,7 +862,7 @@ void AMyCharacter::Throw()
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14.f;
+		//CameraRotate.Pitch += 15.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(11);
@@ -887,10 +887,13 @@ void AMyCharacter::Throw()
 	else
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BombSocket");
-		
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14.f;
-		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
+		FVector SocketLocation = SocketTransform.GetLocation();
+
+		CameraRotate.Pitch += 15.f;
+
+		FTransform trans(CameraRotate.Quaternion(), SocketLocation);
+
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 		FName path = AInventory::ItemCodeToItemBombPath(HotKeyItemCode);
 
@@ -925,7 +928,7 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14;
+		//CameraRotate.Pitch += 15.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		//FName path = AInventory::ItemCodeToItemBombPath(11);
 
@@ -965,7 +968,7 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 	{
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		CameraRotate.Pitch += 14;
+		//CameraRotate.Pitch += 15.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		//FName path = AInventory::ItemCodeToItemBombPath(11);
 
