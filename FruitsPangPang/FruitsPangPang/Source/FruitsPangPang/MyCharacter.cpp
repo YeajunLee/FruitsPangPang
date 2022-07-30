@@ -890,7 +890,7 @@ void AMyCharacter::Throw()
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
 		FVector SocketLocation = SocketTransform.GetLocation();
 
-		CameraRotate.Pitch += 15.f;
+		CameraRotate.Pitch += 14.f;
 
 		FTransform trans(CameraRotate.Quaternion(), SocketLocation);
 
