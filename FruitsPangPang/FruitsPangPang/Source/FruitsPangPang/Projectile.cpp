@@ -30,6 +30,12 @@ void AProjectile::BeginPlay()
 	
 }
 
+void AProjectile::EndPlay(const EEndPlayReason::Type Reason)
+{
+	Super::EndPlay(Reason);
+	CustomInitialize.Clear();
+}
+
 // Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
@@ -49,6 +55,7 @@ void AProjectile::durianPacket(const FVector& pos)
 		//Ai전용 패킷이 없음.
 	}
 }
+
 
 void AProjectile::ApplyDamageCPP(AActor* otherActor)
 {

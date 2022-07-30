@@ -901,12 +901,13 @@ void AMyCharacter::Throw()
 		AProjectile* bomb = GetWorld()->SpawnActor<AProjectile>(GeneratedBP, trans);
 		if (nullptr != bomb)
 		{
+			bomb->BombOwner = this;
+			bomb->CustomInitialize.Broadcast();
 			send_spawnitemobj_packet(s_socket, trans.GetLocation()
 				, trans.GetRotation().Rotator(), trans.GetScale3D(),
 				HotKeyItemCode, SavedHotKeySlotNum, 0);
 			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 
-			bomb->BombOwner = this;
 			bomb->ProjectileMovementComponent->Activate();
 		}
 		else {
@@ -952,6 +953,7 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 		if (nullptr != bomb)
 		{
 			bomb->BombOwner = this;
+			bomb->CustomInitialize.Broadcast();
 			bomb->ProjectileMovementComponent->Activate();
 		}
 		else {
@@ -992,6 +994,7 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 		if (nullptr != bomb)
 		{
 			bomb->BombOwner = this;
+			bomb->CustomInitialize.Broadcast();
 			bomb->ProjectileMovementComponent->Activate();
 		}
 		else {
