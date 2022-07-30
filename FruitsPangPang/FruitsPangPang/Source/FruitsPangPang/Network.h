@@ -25,7 +25,7 @@ void send_login_lobby_packet(SOCKET& sock, const char* name, const char* passwor
 void send_signup_packet(SOCKET& sock, const char* name, const char* password);
 void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
 void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale,
-	const int& fruitType, const int& itemSlotNum, const int& uniqueid);//uniqueid is sync for banana
+	const int& fruitType, const int& itemSlotNum);
 void send_getfruits_tree_packet(SOCKET& sock, const int& treeId);
 void send_getfruits_punnet_packet(SOCKET& sock, const int& punnetId);
 void send_getfruits_healspawner_packet(SOCKET& sock, const int& healspawnerId);
@@ -39,6 +39,7 @@ void send_match_request(SOCKET& sock,const short& Amount = -1);
 void send_buy_packet(SOCKET& sock, const int& itemcode);
 void send_equip_packet(SOCKET& sock, const int& itemcode);
 void send_chat_packet(SOCKET& sock,const WCHAR* msg);
+void send_step_banana_packet(SOCKET& sock, const int& bananaid);
 
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {
@@ -59,6 +60,7 @@ public:
 	class ATree* mTree[TREE_CNT];
 	class APunnet* mPunnet[PUNNET_CNT];
 	class AHealSpawner* mHealSpawner[HEAL_CNT];
+	class AProjectile* mBanana[BANANA_CNT];
 	static std::shared_ptr<class Network> GetNetwork();
 	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;

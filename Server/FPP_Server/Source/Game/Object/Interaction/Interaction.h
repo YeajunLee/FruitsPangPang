@@ -6,7 +6,7 @@
 class Interaction : public Object
 {
 public:
-	enum class INTERTYPE { NONE, TREE, PUNNET, HEAL };	//interact_type [tree,punnet]
+	enum class INTERTYPE { NONE, TREE, PUNNET, HEAL, SPECIAL };	//interact_type [tree,punnet]
 
 	Interaction(OBJTYPE type = OBJTYPE::INTERACT, INTERTYPE itype = INTERTYPE::NONE);
 	virtual ~Interaction();

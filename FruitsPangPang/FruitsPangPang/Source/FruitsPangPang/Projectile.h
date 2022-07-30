@@ -46,5 +46,8 @@ public:
 	int uniqueID;	//바나나만 쓰는 변수. 바나나 위치 동기화를 위해 서버가 부여해주는 ID
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+		int BananaJudging;	//바나나가 현재 밟혀서 서버에서 판단중이면 서버로 패킷 더이상 보내지 않음. 바나나만 쓰임.
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class UProjectileMovementComponent* ProjectileMovementComponent;
 };

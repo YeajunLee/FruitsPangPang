@@ -299,9 +299,6 @@ void AAICharacter::Throw()
 
 	int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
 
-	//혹시 만약에 바나나를 던지는걸 구현할 생각이라면 spawnitemobj_packet의 맨 마지막 인자를 유의미한 값을 넣어야하므로
-	//Mycharacter의 바나나 던지는것을 참고해주세요 - 수민
-
 	FName path = AInventory::ItemCodeToItemBombPathForAI(HotKeyItemCode);
 
 	UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
@@ -311,7 +308,7 @@ void AAICharacter::Throw()
 
 		send_spawnitemobj_packet(s_socket, trans.GetLocation(),
 			trans.GetRotation().Rotator(), trans.GetScale3D(), HotKeyItemCode,
-			SavedHotKeySlotNum, 0);
+			SavedHotKeySlotNum);
 		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 		bomb->BombOwner = this;
 		bomb->CustomInitialize.Broadcast();
@@ -372,20 +369,28 @@ void AAICharacter::OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 		{
 			if (banana->_fType == 11)
 			{
-				bStepBanana = true;
-				banana->Destroy();
-				GetCharacterMovement()->DisableMovement();
-				if (P_Star1 && P_Star1->Template)
+				if (0 == banana->BananaJudging)
 				{
-					P_Star1->ToggleActive();
-				}
-				UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
-				
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
+					banana->BananaJudging = 1;
+					send_step_banana_packet(s_socket, banana->uniqueID);
+				}				
 
 			}
 		}
 	}
+}
+
+void AAICharacter::StepBanana()
+{
+	bStepBanana = true;
+	GetCharacterMovement()->DisableMovement();
+	if (P_Star1 && P_Star1->Template)
+	{
+		P_Star1->ToggleActive();
+	}
+	UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
 }
 
 

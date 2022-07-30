@@ -161,36 +161,36 @@ void AMyCharacter::BeginPlay()
 		MakeMainHUD();
 
 		FItemInfo itemClass;
-		itemClass.ItemCode = 1;	//토마토 30개 생성
+		itemClass.ItemCode = 3;	//토마토 30개 생성
 		itemClass.IndexOfHotKeySlot = 0;
-		itemClass.Name = AInventory::ItemCodeToItemName(1);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(1);
+		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 
 		mInventory->UpdateInventorySlot(itemClass, 100);
 
-		itemClass.ItemCode = 4;	//수박 30개 생성
+		itemClass.ItemCode = 5;	//수박 30개 생성
 		itemClass.IndexOfHotKeySlot = 1;
-		itemClass.Name = AInventory::ItemCodeToItemName(4);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(4);
+		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 		mInventory->UpdateInventorySlot(itemClass, 100);
 
 		itemClass.ItemCode = 7; //대파 1개 생성
 		itemClass.IndexOfHotKeySlot = 2;
-		itemClass.Name = AInventory::ItemCodeToItemName(7);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(7);
+		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
-		itemClass.ItemCode = 9;	//두리안 30개 생성
+		itemClass.ItemCode = 10;	//두리안 30개 생성
 		itemClass.IndexOfHotKeySlot = 3;
-		itemClass.Name = AInventory::ItemCodeToItemName(9);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(9);
+		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 		mInventory->UpdateInventorySlot(itemClass, 30);
 
 		itemClass.ItemCode = 11; //바나나 1개 생성
 		itemClass.IndexOfHotKeySlot = 4;
-		itemClass.Name = AInventory::ItemCodeToItemName(11);
-		itemClass.Icon = AInventory::ItemCodeToItemIcon(11);
+		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
+		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 		mInventory->UpdateInventorySlot(itemClass, 200);
 
 	}	
@@ -641,19 +641,26 @@ void AMyCharacter::OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 		{
 			if (banana->_fType == 11)
 			{
-				bStepBanana = true;
-				banana->Destroy();
-				DisableInput(Cast<APlayerController>(this));
-				if (P_Star && P_Star->Template)
+				if (0 == banana->BananaJudging)
 				{
-					P_Star->ToggleActive();
-				}
-				UGameplayStatics::PlaySoundAtLocation(this, dizzySound, GetActorLocation());
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle,this ,&AMyCharacter::onTimerEnd , 2.5, false);
-				
+					banana->BananaJudging = 1;
+					send_step_banana_packet(s_socket, banana->uniqueID);
+				}				
 			}
 		}
 	}
+}
+
+void AMyCharacter::StepBanana()
+{
+	bStepBanana = true;
+	DisableInput(Cast<APlayerController>(this));
+	if (P_Star && P_Star->Template)
+	{
+		P_Star->ToggleActive();
+	}
+	UGameplayStatics::PlaySoundAtLocation(this, dizzySound, GetActorLocation());
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMyCharacter::onTimerEnd, 2.5, false);
 }
 
 void AMyCharacter::GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -860,28 +867,15 @@ void AMyCharacter::Throw()
 {
 	if (SavedHotKeySlotNum == 4)
 	{
+		//바나나는 서버에서 검증이 끝나야 spawn 되도록 설계 했습니다 - 수민
 		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
 		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		//CameraRotate.Pitch += 15.f;
 		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
 		int HotKeyItemCode = mInventory->mSlots[SavedHotKeySlotNum].ItemClass.ItemCode;
-		FName path = AInventory::ItemCodeToItemBombPath(11);
 
-		UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
-		if (nullptr != banana)
-		{
-			banana->uniqueID = Network::GetNetwork()->getNewBananaId();
-			send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
-				FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(),
-				HotKeyItemCode, SavedHotKeySlotNum, banana->uniqueID);
-			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
-			banana->BombOwner = this;
-			banana->ProjectileMovementComponent->Activate();
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
-		}
+		send_spawnitemobj_packet(s_socket, SocketTransform.GetLocation(),
+			FollowCamera->GetComponentRotation(), SocketTransform.GetScale3D(),
+			HotKeyItemCode, SavedHotKeySlotNum);
 
 	}
 	else
@@ -905,7 +899,7 @@ void AMyCharacter::Throw()
 			bomb->CustomInitialize.Broadcast();
 			send_spawnitemobj_packet(s_socket, trans.GetLocation()
 				, trans.GetRotation().Rotator(), trans.GetScale3D(),
-				HotKeyItemCode, SavedHotKeySlotNum, 0);
+				HotKeyItemCode, SavedHotKeySlotNum);
 			mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 
 			bomb->ProjectileMovementComponent->Activate();
@@ -927,19 +921,17 @@ void AMyCharacter::Throw(const FVector& location,FRotator rotation, const int& f
 	FName path = AInventory::ItemCodeToItemBombPath(fruitType);
 	if (11 == fruitType)
 	{
-		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
-		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		//CameraRotate.Pitch += 15.f;
-		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-		//FName path = AInventory::ItemCodeToItemBombPath(11);
 
+		FTransform trans(rotation.Quaternion(), location);
 		UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
+			Network::GetNetwork()->mBanana[fruitid] = banana;
 			banana->uniqueID = fruitid;
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();
+			
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Banana can't Spawn! ItemCode String : %s"), *path.ToString());
@@ -968,16 +960,12 @@ void AMyCharacter::ThrowInAIMode(const FVector& location, FRotator rotation, con
 	FName path = AInventory::ItemCodeToItemBombPathForAI(fruitType);
 	if (11 == fruitType)
 	{
-		FTransform SocketTransform = GetMesh()->GetSocketTransform("BananaSocket");
-		FRotator CameraRotate = FollowCamera->GetComponentRotation();
-		//CameraRotate.Pitch += 15.f;
-		FTransform trans(CameraRotate.Quaternion(), SocketTransform.GetLocation());
-		//FName path = AInventory::ItemCodeToItemBombPath(11);
-
+		FTransform trans(rotation.Quaternion(), location);
 		UClass* GenerateBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 		AProjectile* banana = GetWorld()->SpawnActor<AProjectile>(GenerateBP, trans);
 		if (nullptr != banana)
 		{
+			Network::GetNetwork()->mBanana[fruitid] = banana;
 			banana->uniqueID = fruitid;
 			banana->BombOwner = this;
 			banana->ProjectileMovementComponent->Activate();

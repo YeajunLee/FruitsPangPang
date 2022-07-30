@@ -9,6 +9,7 @@
 #include "Game/Object/Interaction/Tree/Tree.h"
 #include "Game/Object/Interaction/Punnet/Punnet.h"
 #include "Game/Object/Interaction/Heal/Heal.h"
+#include "Game/Object/Interaction/Banana/Banana.h"
 #include "Game/Object/Character/Character.h"
 #include "Game/Server/Server.h"
 
@@ -85,7 +86,12 @@ int main(int argc, char* argv[])
 		auto heal = reinterpret_cast<Heal*>(objects[i]);
 		heal->_id = i;
 	}
-
+	for (int i = BANANAID_START; i < BANANAID_END; ++i)
+	{
+		objects[i] = new Banana();
+		auto banana = reinterpret_cast<Banana*>(objects[i]);
+		banana->_id = i;
+	}
 	std::cout << "Creating Worker Threads\n";
 	vector<thread> worker_threads;
 	thread timer_thread{ TimerThread };
@@ -146,7 +152,7 @@ int main(int argc, char* argv[])
 	ZeroMemory(&mDBServer->server_addr, sizeof(mDBServer->server_addr));
 	mDBServer->server_addr.sin_family = AF_INET;
 	mDBServer->server_addr.sin_port = htons(DBSERVER_PORT);
-	//112.153.53.142
+	//112.152.55.49
 	inet_pton(AF_INET, "112.152.55.49", &mDBServer->server_addr.sin_addr);
 	mDBServer->wsa_ex_recv.getWsaBuf().buf = reinterpret_cast<char*>(mDBServer->wsa_ex_recv.getBuf());
 	mDBServer->wsa_ex_recv.getWsaBuf().len = BUFSIZE;

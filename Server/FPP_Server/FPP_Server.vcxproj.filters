@@ -54,6 +54,9 @@
     <ClCompile Include="Source\Game\Object\Interaction\Heal\Heal.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\Object\Interaction\Banana\Banana.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Network\Network.h">
@@ -90,6 +93,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Object\Interaction\Heal\Heal.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Object\Interaction\Banana\Banana.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
