@@ -311,6 +311,7 @@ void AAICharacter::Throw()
 			SavedHotKeySlotNum);
 		mInventory->RemoveItemAtSlotIndex(SavedHotKeySlotNum, 1);
 		bomb->BombOwner = this;
+		bomb->CustomInitialize.Broadcast();
 		bomb->ProjectileMovementComponent->Activate();
 	}
 	else {

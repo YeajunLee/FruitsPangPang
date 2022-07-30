@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDele_Dynamic);
+
 UCLASS()
 class FRUITSPANGPANG_API AProjectile : public AActor
 {
@@ -18,7 +20,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type Reason);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,6 +33,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SyncBananaTransform();
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+		FDele_Dynamic CustomInitialize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 		class ABaseCharacter* BombOwner;
