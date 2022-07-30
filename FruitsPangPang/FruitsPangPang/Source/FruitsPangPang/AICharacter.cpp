@@ -373,17 +373,7 @@ void AAICharacter::OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 				{
 					banana->BananaJudging = 1;
 					send_step_banana_packet(s_socket, banana->uniqueID);
-				}
-				//bStepBanana = true;
-				//banana->Destroy();
-				//GetCharacterMovement()->DisableMovement();
-				//if (P_Star1 && P_Star1->Template)
-				//{
-				//	P_Star1->ToggleActive();
-				//}
-				//UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
-				//
-				//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
+				}				
 
 			}
 		}
@@ -393,12 +383,13 @@ void AAICharacter::OnBananaBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 void AAICharacter::StepBanana()
 {
 	bStepBanana = true;
-	DisableInput(Cast<APlayerController>(this));
+	GetCharacterMovement()->DisableMovement();
 	if (P_Star1 && P_Star1->Template)
 	{
 		P_Star1->ToggleActive();
 	}
 	UGameplayStatics::PlaySoundAtLocation(this, dizzySound1, GetActorLocation());
+	
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAICharacter::OnTimeEnd, 2.5, false);
 }
 

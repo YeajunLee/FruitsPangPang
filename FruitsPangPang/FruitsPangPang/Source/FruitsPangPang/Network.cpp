@@ -627,8 +627,14 @@ void Network::process_packet(unsigned char* p)
 		////FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
 		//FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-		if(mMyCharacter->c_id == other_id)
-			mMyCharacter->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), packet->fruitType, packet->uniqueid);
+		if (mMyCharacter->c_id == other_id)
+		{
+			if (packet->fruitType == 11)
+			{
+				mMyCharacter->mInventory->RemoveItemAtSlotIndex(4, 1);
+				mMyCharacter->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), packet->fruitType, packet->uniqueid);
+			}
+		}
 		else
 			mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType,packet->uniqueid);
 
@@ -1525,7 +1531,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 
 
 		if (PacketOwner->c_id == packet->clientid)
-		{		
+		{
 			//밟힌 바바나 삭제. 
 			if (nullptr != mBanana[packet->bananaid])
 			{

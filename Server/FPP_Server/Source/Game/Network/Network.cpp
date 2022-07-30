@@ -582,7 +582,7 @@ void process_packet(int client_id, unsigned char* p)
 				if (!other->isPlayer()) break;
 				//if (other->_id == client_id) continue; 바나나는 자기 자신한테도 패킷을 보내야함. 무조건 서버 검증을 거치고 던지게 끔 설계
 				auto OtherPlayer = reinterpret_cast<Character*>(other);
-				if (character->bAi && OtherPlayer->bAi) continue;
+				if (character->bAi && OtherPlayer->bAi) continue;	//AI는 바나나 던질일이 없으므로 사실상 없는 코드.
 				OtherPlayer->state_lock.lock();
 				if (Character::STATE::ST_INGAME == OtherPlayer->_state)
 				{

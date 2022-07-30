@@ -48,7 +48,7 @@ void Banana::interact(Object* interactobj)
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;
 			auto OtherPlayer = reinterpret_cast<Character*>(other);
-			if (player->bAi && OtherPlayer->bAi) continue;
+			//if (player->bAi && OtherPlayer->bAi) continue; ai가 밟아도 패킷을 받아야하긴 하니깐.. 넣어줌.
 			OtherPlayer->state_lock.lock();
 			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
 			{
