@@ -18,13 +18,16 @@ const int TREE_CNT = 56;
 const int GREEN_TREE_CNT = 41;
 const int PUNNET_CNT = 11;
 const int HEAL_CNT = 10;
+const int BANANA_CNT = 2500;
 const int  TREEID_START = MAX_USER;
 const int  TREEID_END = TREEID_START + TREE_CNT;
 const int PUNNETID_START = TREEID_END;
 const int PUNNETID_END = PUNNETID_START + PUNNET_CNT;
 const int HEALID_START = PUNNETID_END;
 const int HEALID_END = HEALID_START + HEAL_CNT;
-const int  MAX_OBJECT = 100;
+const int BANANAID_START = HEALID_END;
+const int BANANAID_END = BANANAID_START + BANANA_CNT;
+const int  MAX_OBJECT = 3000;
 const int PLAYER_HP = 20;
 const int PLAYER_HAVE_ITEM_LOBBY = 20;
 const int MAX_CHAT_SIZE = 32;
@@ -40,7 +43,7 @@ const char CS_PACKET_ANIM = 3;
 const char CS_PACKET_SPAWNITEMOBJ = 4;
 const char CS_PACKET_GETFRUITS_PUNNET = 5;
 const char CS_PACKET_GETFRUITS_TREE = 6;
-//const char CS_PACKET_USEITEM = 7; 안쓰는 프로토콜. 수정가능
+const char CS_PACKET_STEP_BANANA = 7; 
 const char CS_PACKET_HIT = 8;
 //const char CS_PACKET_CHANGE_HOTKEYSLOT = 9; 안쓰는 프로토콜. 수정가능
 const char CS_PACKET_POS = 10;
@@ -76,6 +79,7 @@ const char SC_PACKET_GAMESTART = 15;
 const char SC_PACKET_GAMEEND = 16;
 const char SC_PACKET_SYNC_BANANA = 17;
 const char SC_PACKET_KILL_INFO = 18;
+const char SC_PACKET_STEP_BANANA = 19;
 
 const char SC_PACKET_CHEAT_GAMETIME = 100;
 
@@ -118,13 +122,18 @@ struct cs_packet_spawnitemobj {
 	float sx, sy, sz;		//scale
 	int fruitType;			//item code
 	int itemSlotNum;		//inventory slot num
-	int uniquebananaid;		//item id(using banana sync)
 };
 
 struct cs_packet_getfruits {
 	unsigned char size;
 	char type;
 	int obj_id;
+};
+
+struct cs_packet_step_banana {
+	unsigned char size;
+	char type;
+	int bananaid;
 };
 
 struct cs_packet_hit {
@@ -344,6 +353,12 @@ struct sc_packet_kill_info {
 	char Victim[MAX_NAME_SIZE];
 };
 
+struct sc_packet_step_banana {
+	unsigned char size;
+	char type;
+	int clientid;	//넘어질 client id 
+	int bananaid;	//사라질 바나나 id
+};
 //--------------LobbyServer to Client
 
 struct lc_packet_login_ok {

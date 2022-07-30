@@ -63,6 +63,8 @@ void send_sync_banana(const int& player_id,
 	const int& uniqueid	//item unique id ( using banana sync )
 );
 void send_kill_info_packet(const int& player_id, const int& attacker_id, const int& victim_id);
+void send_step_banana_packet(const int& player_id, const int& falldown_id, const int& banana_id);
+
 
 enum COMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic

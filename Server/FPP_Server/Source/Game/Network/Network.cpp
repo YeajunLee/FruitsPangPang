@@ -8,6 +8,7 @@
 #include "../Object/Interaction/Tree/Tree.h"
 #include "../Object/Interaction/Punnet/Punnet.h"
 #include "../Object/Interaction/Heal/Heal.h"
+#include "../Object/Interaction/Banana/Banana.h"
 #include "../Server/Server.h"
 
 using namespace std;
@@ -384,6 +385,17 @@ void send_kill_info_packet(const int& player_id, const int& attacker_id, const i
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_step_banana_packet(const int& player_id, const int& falldown_id, const int& banana_id)
+{
+	auto player = reinterpret_cast<Character*>(objects[player_id]);
+	sc_packet_step_banana packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_STEP_BANANA;
+	packet.clientid = falldown_id;
+	packet.bananaid = banana_id;
+	player->sendPacket(&packet, sizeof(packet));
+}
+
 void process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -548,24 +560,63 @@ void process_packet(int client_id, unsigned char* p)
 		}
 		int uniqueID = 0;
 		if (packet->fruitType == static_cast<int>(FRUITTYPE::T_BANANA))
-			uniqueID = character->_id * 10000000 + packet->uniquebananaid;
-		for (auto& other : objects) {
-			if (!other->isPlayer()) break;
-			if (other->_id == client_id) continue;
-			auto OtherPlayer = reinterpret_cast<Character*>(other);
-			if (character->bAi && OtherPlayer->bAi) continue;
-			OtherPlayer->state_lock.lock();
-			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
+		{
+			//바나나 오브젝트 풀에서 꺼내기
+			for (int i = BANANAID_START; i < BANANAID_END; ++i)
 			{
-				OtherPlayer->state_lock.unlock();
-				send_throwfruit_packet(client_id, OtherPlayer->_id,
-					packet->rx, packet->ry, packet->rz, packet->rw,
-					packet->lx, packet->ly, packet->lz,
-					packet->sx, packet->sy, packet->sz,
-					packet->fruitType, uniqueID);
+				auto banana = reinterpret_cast<Banana*>(objects[i]);
+				banana->state_lock.lock();
+				if (banana->_state == Banana::STATE::ST_FREE)
+				{
+					banana->_state = Banana::STATE::ST_ACTIVE;
+					banana->state_lock.unlock();
+					uniqueID = banana->_id;
+					break;	//꺼내는데 성공하면 더이상 반복문 돌 필요 없음. 바로 탈출
+				}
+				else {
+					banana->state_lock.unlock();
+				}
 			}
-			else OtherPlayer->state_lock.unlock();
+
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				//if (other->_id == client_id) continue; 바나나는 자기 자신한테도 패킷을 보내야함. 무조건 서버 검증을 거치고 던지게 끔 설계
+				auto OtherPlayer = reinterpret_cast<Character*>(other);
+				if (character->bAi && OtherPlayer->bAi) continue;
+				OtherPlayer->state_lock.lock();
+				if (Character::STATE::ST_INGAME == OtherPlayer->_state)
+				{
+					OtherPlayer->state_lock.unlock();
+					send_throwfruit_packet(client_id, OtherPlayer->_id,
+						packet->rx, packet->ry, packet->rz, packet->rw,
+						packet->lx, packet->ly, packet->lz,
+						packet->sx, packet->sy, packet->sz,
+						packet->fruitType, uniqueID);
+				}
+				else OtherPlayer->state_lock.unlock();
+			}
+
 		}
+		else {
+			for (auto& other : objects) {
+				if (!other->isPlayer()) break;
+				if (other->_id == client_id) continue;
+				auto OtherPlayer = reinterpret_cast<Character*>(other);
+				if (character->bAi && OtherPlayer->bAi) continue;
+				OtherPlayer->state_lock.lock();
+				if (Character::STATE::ST_INGAME == OtherPlayer->_state)
+				{
+					OtherPlayer->state_lock.unlock();
+					send_throwfruit_packet(client_id, OtherPlayer->_id,
+						packet->rx, packet->ry, packet->rz, packet->rw,
+						packet->lx, packet->ly, packet->lz,
+						packet->sx, packet->sy, packet->sz,
+						packet->fruitType, uniqueID);
+				}
+				else OtherPlayer->state_lock.unlock();
+			}
+		}
+		
 		break;
 	}
 	case CS_PACKET_GETFRUITS_TREE: {
@@ -584,6 +635,12 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_getfruits* packet = reinterpret_cast<cs_packet_getfruits*>(p);
 		Heal* heal = reinterpret_cast<Heal*>(objects[packet->obj_id + HEALID_START]);
 		heal->interact(object);
+		break;
+	}
+	case CS_PACKET_STEP_BANANA: {
+		cs_packet_step_banana* packet = reinterpret_cast<cs_packet_step_banana*>(p);
+		Banana* banana = reinterpret_cast<Banana*>(objects[packet->bananaid]);
+		banana->interact(object);
 		break;
 	}
 	case CS_PACKET_HIT: {
@@ -725,7 +782,7 @@ void process_packet(int client_id, unsigned char* p)
 		cs_packet_sync_banana* packet = reinterpret_cast<cs_packet_sync_banana*>(p);
 		Character* character = reinterpret_cast<Character*>(object);
 
-		int uniqueID = character->_id * 100000000 + packet->bananaid;
+		int uniqueID = packet->bananaid;
 
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;

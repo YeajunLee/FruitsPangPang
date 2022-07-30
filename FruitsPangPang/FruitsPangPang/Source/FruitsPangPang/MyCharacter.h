@@ -78,6 +78,8 @@ public:
 	UFUNCTION()
 		void OnCapsuleOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void StepBanana();
+
 	virtual void GreenOnionBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 	virtual void GreenOnionEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
@@ -102,6 +104,7 @@ public:
 
 	//fruitid is using sync banana
 	void Throw(const FVector& location,FRotator rotation, const int& fruitType, const int& fruitid);
+	//fruitid is using sync banana
 	void ThrowInAIMode(const FVector& location, FRotator rotation, const int& fruitType, const int& fruitid);
 	bool bLMBDown;
 	void LMBDown();

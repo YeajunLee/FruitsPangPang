@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Object\Interaction\Banana\Banana.cpp" />
     <ClCompile Include="Source\Game\Object\Interaction\Heal\Heal.cpp" />
     <ClCompile Include="Source\Game\Server\Server.cpp" />
     <ClCompile Include="Source\Game\Utility\Lock\FPPLock.cpp" />
@@ -154,6 +155,7 @@
     <ClCompile Include="Source\Game\Object\Interaction\Tree\Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Game\Object\Interaction\Banana\Banana.h" />
     <ClInclude Include="Source\Game\Object\Interaction\Heal\Heal.h" />
     <ClInclude Include="Source\Game\Server\Server.h" />
     <ClInclude Include="Source\Game\Utility\Lock\FPPLock.h" />

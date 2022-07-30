@@ -58,6 +58,8 @@ Network::Network()
 		p = nullptr;
 	for (auto& p : mHealSpawner)
 		p = nullptr;
+	for (auto& p : mBanana)
+		p = nullptr;
 	for (auto& p : mAiCharacter)
 		p = nullptr;
 	for (int i = 0; i < MAX_USER; ++i)
@@ -207,7 +209,7 @@ void send_anim_packet(SOCKET& sock, Network::AnimType type)
 }
 
 void send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotator& rotate, const FVector& scale,
-	const int& fruitType, const int& itemSlotNum, const int& uniqueid)
+	const int& fruitType, const int& itemSlotNum)
 {
 	cs_packet_spawnitemobj packet;
 	packet.size = sizeof(cs_packet_spawnitemobj);
@@ -217,7 +219,6 @@ void send_spawnitemobj_packet(SOCKET& sock, const FVector& locate, const FRotato
 	packet.sx = scale.X, packet.sy = scale.Y, packet.sz = scale.Z;
 	packet.fruitType = fruitType;
 	packet.itemSlotNum = itemSlotNum;
-	packet.uniquebananaid = uniqueid;
 
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
@@ -385,6 +386,16 @@ void send_chat_packet(SOCKET& sock,const WCHAR* msg)
 	packet.size = sizeof(packet);
 	packet.type = CL_PACKET_CHAT;
 	wcscpy_s(packet.msg, msg);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+}
+
+void send_step_banana_packet(SOCKET& sock, const int& bananaid)
+{
+	cs_packet_step_banana packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_STEP_BANANA;
+	packet.bananaid = bananaid;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
@@ -616,8 +627,10 @@ void Network::process_packet(unsigned char* p)
 		////FName path = TEXT("Blueprint'/Game/Assets/Fruits/tomato/Bomb_Test.Bomb_Test_C'"); //_C를 꼭 붙여야 된다고 함.
 		//FName path = AInventory::ItemCodeToItemBombPath(packet->fruitType);
 		//UClass* GeneratedBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-
-		mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType,packet->uniqueid);
+		if(mMyCharacter->c_id == other_id)
+			mMyCharacter->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz), packet->fruitType, packet->uniqueid);
+		else
+			mOtherCharacter[other_id]->Throw(FVector(packet->lx, packet->ly, packet->lz), FRotator(packet->rx, packet->ry, packet->rz),packet->fruitType,packet->uniqueid);
 
 		//auto bomb = mOtherCharacter[other_id]->GetWorld()->SpawnActor<AProjectile>(GeneratedBP, SocketTransform);
 		break;
@@ -828,28 +841,37 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_PACKET_SYNC_BANANA: {
 		sc_packet_sync_banana* packet = reinterpret_cast<sc_packet_sync_banana*>(p);
-		TArray<AActor*> actors;
-		UGameplayStatics::GetAllActorsOfClass(mMyCharacter->GetWorld(), AProjectile::StaticClass(), actors);
-		for (auto& actor : actors)
+		if (nullptr != mBanana[packet->bananaid])
 		{
-			AProjectile* banana = Cast<AProjectile>(actor);
-			if (nullptr != banana)
-			{
-				if (banana->_fType == 11)
-				{
-					if (banana->uniqueID == packet->bananaid)
-					{
-						banana->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
-						banana->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
-					}
-				}
-			}
+			mBanana[packet->bananaid]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			mBanana[packet->bananaid]->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
 		}
 		break;
 	}
 	case SC_PACKET_KILL_INFO: {
 		sc_packet_kill_info* packet = reinterpret_cast<sc_packet_kill_info*>(p);
 		mMyCharacter->mMainWidget->UpdateKillLog(FString(packet->Attacker), FString(packet->Victim));
+		break;
+	}
+	case SC_PACKET_STEP_BANANA: {
+		sc_packet_step_banana* packet = reinterpret_cast<sc_packet_step_banana*>(p);
+
+		//밟힌 바바나 삭제. 
+		if (nullptr != mBanana[packet->bananaid])
+		{
+			mBanana[packet->bananaid]->Destroy();
+			mBanana[packet->bananaid] = nullptr;
+		}
+
+		if (mMyCharacter->c_id == packet->clientid)
+		{			
+			//넘어지기
+			mMyCharacter->StepBanana();
+		}
+		else {
+			//넘어지기
+			mOtherCharacter[packet->clientid]->StepBanana();
+		}
 		break;
 	}
 	}
@@ -1484,22 +1506,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 	}
 	case SC_PACKET_SYNC_BANANA: {
 		sc_packet_sync_banana* packet = reinterpret_cast<sc_packet_sync_banana*>(p);
-		TArray<AActor*> actors;
-		UGameplayStatics::GetAllActorsOfClass(mAiCharacter[0]->GetWorld(), AProjectile::StaticClass(), actors);
-		for (auto& actor : actors)
+		if (nullptr != mBanana[packet->bananaid])
 		{
-			AProjectile* banana = Cast<AProjectile>(actor);
-			if (nullptr != banana)
-			{
-				if (banana->_fType == 11)
-				{
-					if (banana->uniqueID == packet->bananaid)
-					{
-						banana->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
-						banana->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
-					}
-				}
-			}
+			mBanana[packet->bananaid]->SetActorLocation(FVector(packet->lx, packet->ly, packet->lz));
+			mBanana[packet->bananaid]->SetActorRotation(FRotator(packet->rx, packet->ry, packet->rz));
 		}
 		break;
 	}
@@ -1509,6 +1519,34 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		UGameplayStatics::OpenLevel(PacketOwner->GetWorld(), FName("NewWorld"));
 		break;
 
+	}
+	case SC_PACKET_STEP_BANANA: {
+		sc_packet_step_banana* packet = reinterpret_cast<sc_packet_step_banana*>(p);
+
+
+		if (PacketOwner->c_id == packet->clientid)
+		{		
+			//밟힌 바바나 삭제. 
+			if (nullptr != mBanana[packet->bananaid])
+			{
+				mBanana[packet->bananaid]->Destroy();
+				mBanana[packet->bananaid] = nullptr;
+			}
+			//넘어지기
+			PacketOwner->StepBanana();
+		}
+		else {
+			//밟힌 바바나 삭제. 
+			if (nullptr != mBanana[packet->bananaid])
+			{
+				mBanana[packet->bananaid]->Destroy();
+				mBanana[packet->bananaid] = nullptr;
+			}
+			//넘어지기
+			if (mOtherCharacter[packet->clientid] != nullptr)
+				mOtherCharacter[packet->clientid]->StepBanana();
+		}
+		break;
 	}
 	default: {
 		//Unknwon Packet Error
