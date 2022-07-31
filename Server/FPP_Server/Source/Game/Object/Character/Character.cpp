@@ -144,7 +144,7 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_APPLE) : {
-		Hurt(5, attacker);
+		Hurt(4, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_WATERMELON) : {
@@ -161,7 +161,7 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
 		cout << " Hurt By GreeenOnion\n";
-		Hurt(7, attacker);
+		Hurt(8, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_CARROT) : {
@@ -257,32 +257,33 @@ void Character::Respawn(const int& RespawnSpot)
 
 	random_device rd;
 	mt19937 rng(rd());
-	uniform_int_distribution<int> RespawnControl(-50, 50);
+	uniform_int_distribution<int> RespawnControl(-200, 200);
+	uniform_int_distribution<int> RespawnZControl(0, 100);
 	switch (RespawnSpot)
 	{
 	case 0:
-		x = 17980.f + RespawnControl(rng), y = 1780.f + RespawnControl(rng), z = 100.f;
+		x = 17980.f + RespawnControl(rng), y = 1780.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 1:
-		x = 18350.f + RespawnControl(rng), y = 9610.f + RespawnControl(rng), z = 100.f;
+		x = 18350.f + RespawnControl(rng), y = 9610.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 2:
-		x = 18090.f + RespawnControl(rng), y = 17480.f + RespawnControl(rng), z = 100.f;
+		x = 18090.f + RespawnControl(rng), y = 17480.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 3:
-		x = 9730.f + RespawnControl(rng), y = 1620.f + RespawnControl(rng), z = 100.f;
+		x = 9730.f + RespawnControl(rng), y = 1620.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 4:
-		x = 9880.f + RespawnControl(rng), y = 18390.f + RespawnControl(rng), z = 100.f;
+		x = 9880.f + RespawnControl(rng), y = 18390.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 5:
-		x = 1990.f + RespawnControl(rng), y = 1740.f + RespawnControl(rng), z = 100.f;
+		x = 1990.f + RespawnControl(rng), y = 1740.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 6:
-		x = 1750.f + RespawnControl(rng), y = 10220.f + RespawnControl(rng), z = 100.f;
+		x = 1750.f + RespawnControl(rng), y = 10220.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 7:
-		x = 2200.f + RespawnControl(rng), y = 18140.f + RespawnControl(rng), z = 100.f;
+		x = 2200.f + RespawnControl(rng), y = 18140.f + RespawnControl(rng), z = 100.f + RespawnZControl(rng);
 		break;
 	case 8:	{
 		uniform_int_distribution<int> randomRespawn(0, 7);
