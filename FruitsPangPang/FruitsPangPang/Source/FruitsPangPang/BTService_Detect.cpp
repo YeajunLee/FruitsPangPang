@@ -54,15 +54,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	);
 
 	//2022-07-14
-	if (smartAIController)
+	/*if (smartAIController)
 	{
 		if (ai->bIsDie)
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
 		}
-	}
-
-	
+	}*/
 
 	// 오브젝트가 감지가 되면, 그 오브젝트가 Character인지 검사한다.
 	if (bResult)
@@ -75,7 +73,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (nullptr != newbie)
 			{
 				if (AIController)
-				{
+				{			
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, newbie);
 
 					// 디버깅 용.
@@ -91,12 +89,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 					if (nullptr != oldman)
 					{
 						if (oldman->bIsDie) {
-							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
 							return;
 						}
 						if (oldman->hp > newbie->hp)
 						{
-							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, newbie); // Character면, 블랙보드에 저장한다.
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, newbie); // Character면, 블랙보드에 저장한다.
 							// 디버깅 용.
 							DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
 							DrawDebugPoint(World, newbie->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);

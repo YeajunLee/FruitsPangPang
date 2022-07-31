@@ -48,12 +48,21 @@ EBTNodeResult::Type UBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Owne
     else if(smartAIController)
         Target = Cast<ABaseCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AAI_Smart_Controller_Custom::TargetKey));
 
+
     if (nullptr == Target)
         return EBTNodeResult::Failed;
-    if (Target->bIsDie)
+    if (Target->bIsDie) {
+        if(AIController)
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAIController_Custom::TargetKey, nullptr);
+        else if(smartAIController)
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(AAI_Smart_Controller_Custom::TargetKey, nullptr);
+
         return EBTNodeResult::Failed;
+    }
     if (AICharacter->bIsDie)
         return EBTNodeResult::Failed;
+
+
 
     if(AICharacter->bStepBanana == false)
         AICharacter->Attack();

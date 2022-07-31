@@ -181,7 +181,7 @@ void AMyCharacter::BeginPlay()
 		mInventory->UpdateInventorySlot(itemClass, 1);
 
 
-		itemClass.ItemCode = 10;	//滴府救 30俺 积己
+		itemClass.ItemCode = 9;	//滴府救 30俺 积己
 		itemClass.IndexOfHotKeySlot = 3;
 		itemClass.Name = AInventory::ItemCodeToItemName(itemClass.ItemCode);
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
