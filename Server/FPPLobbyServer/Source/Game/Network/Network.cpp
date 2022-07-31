@@ -80,7 +80,7 @@ void DisConnectClient(const int& clientid)
 	closesocket(player->_socket);
 	player->state_lock.lock();
 	player->_state = Player::STATE::ST_FREE;
-	player->bisAI = false;
+	player->ResetPlayer();
 	player->state_lock.unlock();
 }
 

@@ -62,3 +62,9 @@ void Player::sendPacket(void* packet, int bytes)
 		}
 	}
 }
+
+void Player::ResetPlayer()
+{
+	bisAI = false;
+	ShopInventory.clear();
+}

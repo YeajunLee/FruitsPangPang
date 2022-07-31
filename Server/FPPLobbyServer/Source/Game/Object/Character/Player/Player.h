@@ -24,6 +24,7 @@ public:
 	void recvPacket();
 	void PreRecvPacket(unsigned char* RemainMsg, int RemainBytes);
 	void sendPacket(void* packet, int bytes);
+	void ResetPlayer();
 public:
 	std::mutex db_lock;	//절대 datarace가 일어나면 안되는것들. coin/item보유 등등... 한꺼번에 묶어서 관리.
 	int mCoin;
