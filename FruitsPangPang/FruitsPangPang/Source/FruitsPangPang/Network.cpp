@@ -773,6 +773,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			//이거 고쳐야함 버그 있음.
 			//서버에서 받아오는게 무조건 c_id 0번째부터 character id 0번째부터 killcount 0번째에 넣어주는게 아님. 지금은 그런데 나중엔 어떻게될지모름.
+			//수정완. 서버에서 id에 맞춰서 넣어주도록 바꿈.
 			if (i == mMyCharacter->c_id)
 			{
 				mMyCharacter->killcount = packet->characterkillcount[i];
