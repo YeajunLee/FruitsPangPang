@@ -56,7 +56,7 @@ void error_display(int err_no)
 int Generate_Id()
 {
 	static int g_id = 0;
-	for (int i = 0; i < MAX_USER; ++i)
+	for (int i = 0; i < MAX_USER_LOBBY; ++i)
 	{
 		
 		auto user = reinterpret_cast<Player*>(objects[i]);
