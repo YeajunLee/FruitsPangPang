@@ -21,7 +21,7 @@ void WorkerThread()
 		WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
-			std::cout << "GQCS Error";
+			//std::cout << "GQCS Error";
 			error_display(err_no);
 			if (wsa_ex->getCmd() == CMD_SEND)
 				delete wsa_ex;
@@ -106,7 +106,7 @@ void WorkerThread()
 			break;
 		}
 		case CMD_ACCEPT: {
-			std::cout << "Accept Completed.\n";
+			//std::cout << "Accept Completed.\n";
 			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(wsa_ex->getBuf()));
 			int new_id = Generate_Id();
 			if (new_id != -1)
@@ -138,7 +138,7 @@ void WorkerThread()
 		case CMD_TREE_RESPAWN: {
 
 			auto tree = reinterpret_cast<Tree*>(objects[client_id]);
-			cout << "나무 id:" << client_id << endl;
+			//cout << "나무 id:" << client_id << endl;
 			tree->GenerateFruit();
 			delete wsa_ex;
 			break;
@@ -169,7 +169,7 @@ void WorkerThread()
 			}
 			RespawnPlayer->Respawn(8);
 
-			cout << "플레이어 " << client_id << "리스폰\n";
+			//cout << "플레이어 " << client_id << "리스폰\n";
 
 			for (auto& other : objects) {
 				if (!other->isPlayer()) break;

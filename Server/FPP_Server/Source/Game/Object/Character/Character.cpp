@@ -112,7 +112,7 @@ void Character::Die()
 	instq.type = Timer_Event::TIMER_TYPE::TYPE_PLAYER_RESPAWN;
 	instq.exec_time = chrono::system_clock::now() + 5000ms;
 	timer_queue.push(instq);
-	cout << "플레이어 " << _id << "사망\n";
+	//cout << "플레이어 " << _id << "사망\n";
 	mDeathCount++;
 	for (auto& other : objects) {
 		if (!other->isPlayer()) break;
@@ -160,12 +160,12 @@ void Character::HurtBy(const int& damageCauserType, const int& attacker)
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_GREENONION) : {
-		cout << " Hurt By GreeenOnion\n";
+		//cout << " Hurt By GreeenOnion\n";
 		Hurt(8, attacker);
 		break;
 	}
 	case static_cast<int>(FRUITTYPE::T_CARROT) : {
-		cout << " Hurt By Carrot\n";
+		//cout << " Hurt By Carrot\n";
 		Hurt(7, attacker);
 		break;
 	}
@@ -202,7 +202,7 @@ void Character::Hurt(const int& damage, const int& attacker)
 		if(attackerCharacter->_id != this->_id)
 			attackerCharacter->mKillCount++;
 		FPP_LOG("User[%d] Die ", _id);
-		cout << _id << "는 죽음\n";
+		//cout << _id << "는 죽음\n";
 		Die();
 
 		for (int i = USER_START; i < MAX_USER; ++i)
@@ -246,7 +246,7 @@ void Character::Heal(const int& amount)
 {
 	hp = min(hp + amount, maxhp);
 	send_update_userstatus_packet(_id);
-	cout << _id << "의 이후 hp : " << hp << endl;
+	//cout << _id << "의 이후 hp : " << hp << endl;
 }
 
 

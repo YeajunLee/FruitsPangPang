@@ -80,12 +80,12 @@ int Generate_Id()
 		{
 			user->_state = Character::STATE::ST_ACCEPT;
 			user->state_lock.unlock();
-			cout << i <<"번째 캐릭터 입장"<< endl;
+			//cout << i <<"번째 캐릭터 입장"<< endl;
 			return i;
 		}
 		user->state_lock.unlock();
 	}
-	cout << "Player is Over the MAX_USER" << endl;
+	//cout << "Player is Over the MAX_USER" << endl;
 	return -1;
 }
 
@@ -543,7 +543,7 @@ void process_packet(int client_id, unsigned char* p)
 		Character* character = reinterpret_cast<Character*>(object);
 		if (packet->itemSlotNum < 0)
 		{
-			cout << "유효하지 않은 item Slot 입니다 : " << packet->itemSlotNum << endl;
+			//cout << "유효하지 않은 item Slot 입니다 : " << packet->itemSlotNum << endl;
 			FPP_LOG("User[%d] 유효하지 않은 item Slot %d", client_id, packet->itemSlotNum);
 			break;
 		}
@@ -551,7 +551,7 @@ void process_packet(int client_id, unsigned char* p)
 		if (character->mSlot[packet->itemSlotNum].amount > 0)
 		{
 			character->mSlot[packet->itemSlotNum].amount -= 1;
-			cout << client_id << "번째 유저의" << packet->itemSlotNum << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[packet->itemSlotNum].amount << endl;
+			//cout << client_id << "번째 유저의" << packet->itemSlotNum << "번째 슬롯 아이템 1개 감소 현재 개수:" << character->mSlot[packet->itemSlotNum].amount << endl;
 			FPP_LOG("[%d]유저 [%d]번째 슬롯 아이템 1개 감소 현재 개수: %d", client_id, packet->itemSlotNum, character->mSlot[packet->itemSlotNum].amount);
 		}
 		else {
@@ -658,7 +658,7 @@ void process_packet(int client_id, unsigned char* p)
 		{
 		case POS_TYPE_DURIAN: {
 
-			cout << "위치 : 네트워크 패킷" << packet->x << "," << packet->y << "," << packet->z  << endl;
+			//cout << "위치 : 네트워크 패킷" << packet->x << "," << packet->y << "," << packet->z  << endl;
 			Timer_Event instq;
 			instq.x = static_cast<int>(packet->x);
 			instq.y = static_cast<int>(packet->y);
@@ -682,7 +682,7 @@ void process_packet(int client_id, unsigned char* p)
 			//break;
 		}
 		RespawnPlayer->Respawn(packet->numbering);
-		cout << "플레이어 " << client_id << "리스폰\n";
+		//cout << "플레이어 " << client_id << "리스폰\n";
 
 		for (auto& other : objects) {
 			if (!other->isPlayer()) break;

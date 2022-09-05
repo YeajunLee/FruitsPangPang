@@ -81,7 +81,7 @@ void Punnet::interact(Object* interactobj)
 		}
 	}
 
-	cout << "Punnet Interact" << endl;
+	//cout << "Punnet Interact" << endl;
 	Timer_Event instq;
 	instq.exec_time = chrono::system_clock::now() + 5000ms;
 	instq.type = Timer_Event::TIMER_TYPE::TYPE_PUNNET_RESPAWN;
@@ -109,7 +109,7 @@ void Punnet::GenerateFruit()
 	uniform_int_distribution<int> Punnet(static_cast<int>(FRUITTYPE::T_GREENONION), static_cast<int>(FRUITTYPE::T_BANANA));
 
 	_ftype = static_cast<FRUITTYPE>(Punnet(rng));
-	cout << "_ftype : " << (int)_ftype << endl;
+	//cout << "_ftype : " << (int)_ftype << endl;
 
 
 	CanInteract_lock.lock();

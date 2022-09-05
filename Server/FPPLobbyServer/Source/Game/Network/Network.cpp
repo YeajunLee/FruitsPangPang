@@ -422,7 +422,7 @@ void process_packet(int client_id, unsigned char* p)
 			gameserver->mServerPort = 4000 + newid;	//포트넘버
 			wchar_t tmp[20];
 			_itow_s(gameserver->mServerPort, tmp, 10);
-			ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Debug\\FPP_Server.exe"), tmp, NULL, SW_SHOW);
+			ShellExecute(NULL, TEXT("open"), TEXT("../FPP_Server\\x64\\Release\\FPP_Server.exe"), tmp, NULL, SW_SHOW);
 
 			cout << "서버 열린곳이 없음. 매칭 재시도\n";
 			{

@@ -31,7 +31,7 @@ void Heal::interact(Object* interactobj)
 	if (false == this->CanInteract)
 	{
 		CanInteract_lock.unlock();
-		cout << "interact fail !" << endl;
+		//cout << "interact fail !" << endl;
 		return;
 	}
 	else {
@@ -52,7 +52,7 @@ void Heal::interact(Object* interactobj)
 		}
 	}
 
-	cout << "Heal Interact" << endl;
+	//cout << "Heal Interact" << endl;
 	Timer_Event instq;
 	instq.exec_time = chrono::system_clock::now() + 5000ms;
 	instq.type = Timer_Event::TIMER_TYPE::TYPE_HEAL_RESPAWN;
