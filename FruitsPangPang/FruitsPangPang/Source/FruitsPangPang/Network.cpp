@@ -1020,50 +1020,51 @@ void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over
 void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
+	auto Game = Network::GetNetwork();
+	if (nullptr == Game->mMyCharacter) return;
 
-	if (nullptr == Network::GetNetwork()->mMyCharacter) return;
-
-	int to_process_data = num_bytes + Network::GetNetwork()->mMyCharacter->_prev_size;
+	int to_process_data = num_bytes + Game->mMyCharacter->_prev_size;
 	unsigned char* packet = over->getBuf();
 	int packet_size = packet[0];
 	while (packet_size <= to_process_data) {
-		Network::GetNetwork()->process_packet(packet);
+		Game->process_packet(packet);
 		to_process_data -= packet_size;
 		packet += packet_size;
 		if (to_process_data > 0) packet_size = packet[0];
 		else break;
 	}
-	Network::GetNetwork()->mMyCharacter->_prev_size = to_process_data;
+	Game->mMyCharacter->_prev_size = to_process_data;
 	if (to_process_data > 0)
 	{
 		memcpy(over->getBuf(), packet, to_process_data);
 	}
-	Network::GetNetwork()->mMyCharacter->recvPacket();
+	Game->mMyCharacter->recvPacket();
 }
 
 void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
+	auto Game = Network::GetNetwork();
 
-	if (nullptr == Network::GetNetwork()->mMyCharacter) return;
-	if (INVALID_SOCKET == Network::GetNetwork()->mMyCharacter->l_socket) return;
+	if (nullptr == Game->mMyCharacter) return;
+	if (INVALID_SOCKET == Game->mMyCharacter->l_socket) return;
 
-	int to_process_data = num_bytes + Network::GetNetwork()->mMyCharacter->l_prev_size;
+	int to_process_data = num_bytes + Game->mMyCharacter->l_prev_size;
 	unsigned char* packet = over->getBuf();
 	int packet_size = packet[0];
 	while (packet_size <= to_process_data) {
-		Network::GetNetwork()->process_LobbyPacket(packet);
+		Game->process_LobbyPacket(packet);
 		to_process_data -= packet_size;
 		packet += packet_size;
 		if (to_process_data > 0) packet_size = packet[0];
 		else break;
 	}
-	Network::GetNetwork()->mMyCharacter->l_prev_size = to_process_data;
+	Game->mMyCharacter->l_prev_size = to_process_data;
 	if (to_process_data > 0)
 	{
 		memcpy(over->getBuf(), packet, to_process_data);
 	}
-	Network::GetNetwork()->mMyCharacter->recvLobbyPacket();
+	Game->mMyCharacter->recvLobbyPacket();
 }
 
 
@@ -1071,26 +1072,27 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 void CALLBACK recv_Aicallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
-	//UE_LOG(LogTemp, Log, TEXT("recv_callback called"));
+	auto Game = Network::GetNetwork();
+
 	if (0 > over->getId() || 8 < over->getId()) return;
-	if (nullptr == Network::GetNetwork()->mAiCharacter[over->getId()]) return;
-	int to_process_data = num_bytes + Network::GetNetwork()->mAiCharacter[over->getId()]->_prev_size;
+	if (nullptr == Game->mAiCharacter[over->getId()]) return;
+	int to_process_data = num_bytes + Game->mAiCharacter[over->getId()]->_prev_size;
 	unsigned char* packet = over->getBuf();
 	int packet_size = packet[0];
 	while (packet_size <= to_process_data) {
-		Network::GetNetwork()->process_Aipacket(static_cast<int>(over->getId()), packet);
+		Game->process_Aipacket(static_cast<int>(over->getId()), packet);
 		to_process_data -= packet_size;
 		packet += packet_size;
 		if (to_process_data > 0) packet_size = packet[0];
 		else break;
 	}
-	Network::GetNetwork()->mAiCharacter[over->getId()]->_prev_size = to_process_data;
+	Game->mAiCharacter[over->getId()]->_prev_size = to_process_data;
 	if (to_process_data > 0)
 	{
 		memcpy(over->getBuf(), packet, to_process_data);
 	}
 
-	Network::GetNetwork()->mAiCharacter[over->getId()]->recvPacket();
+	Game->mAiCharacter[over->getId()]->recvPacket();
 }
 
 
@@ -1522,7 +1524,7 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 	}
 	case SC_PACKET_GAMEEND: {
 		PacketOwner->GetController()->UnPossess();
-		Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+		Game->bLevelOpenTriggerEnabled = true;
 		UGameplayStatics::OpenLevel(PacketOwner->GetWorld(), FName("NewWorld"));
 		break;
 
