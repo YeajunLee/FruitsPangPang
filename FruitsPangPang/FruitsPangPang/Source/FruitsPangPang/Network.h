@@ -62,7 +62,6 @@ public:
 	class AHealSpawner* mHealSpawner[HEAL_CNT];
 	class AProjectile* mBanana[BANANA_CNT];
 	static std::shared_ptr<class Network> GetNetwork();
-	int mSyncBananaID;	//바나나 Sync 맞추기용 Unique아이디	
 	int mGeneratedID;
 	short mAiAmount = - 1;	//들어와야 할 Ai의 갯수
 	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
@@ -76,7 +75,6 @@ private:
 
 public:
 	const int getNewId();
-	const int getNewBananaId();
 	void release();
 	bool init();
 	void process_packet(unsigned char* p);

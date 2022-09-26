@@ -50,7 +50,6 @@ Network::Network()
 	: mMyCharacter(nullptr)
 	, mGeneratedID(0)
 	,isInit(false)
-	,mSyncBananaID(0)
 {
 	for (auto& p : mTree)
 		p = nullptr;
@@ -105,31 +104,23 @@ void Network::release()
 			p = nullptr;
 		for (auto& p : mOtherCharacter)
 			p = nullptr;
-		mSyncBananaID = 0;
 		WSACleanup();
-		if (!bLevelOpenTriggerEnabled)	//openlevel로 인한 release가 아니라, editor중지때문에 생기는 release라면 false시켜줌.
+		if (!bLevelOpenTriggerEnabled)	
 		{
+			//openlevel로 인한 release가 아니라,
+			//editor중지때문에 생기는 release라면 false시켜줌.
 			bLoginFlag = false;
-			bLevelOpenTriggerEnabled = false;	//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
+			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
+			bLevelOpenTriggerEnabled = false;	
 		}
 		isInit = false;
 	}
-	
-
 }
 
 const int Network::getNewId()
 {
 	int Newid = mGeneratedID;
 	mGeneratedID++;
-
-	return Newid;
-}
-
-const int Network::getNewBananaId()
-{
-	int Newid = mSyncBananaID;
-	mSyncBananaID++;
 
 	return Newid;
 }
