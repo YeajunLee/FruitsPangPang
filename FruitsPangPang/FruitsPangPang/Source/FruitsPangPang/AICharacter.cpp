@@ -151,8 +151,14 @@ void AAICharacter::Tick(float DeltaTime)
 	auto rot = GetTransform().GetRotation();
 	if(overID == 0)
 		SleepEx(0, true);
-	if(!bIsDie)
-		send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI);
+
+	ServerSyncElapsedTime += DeltaTime;
+	if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+	{
+		if (!bIsDie)
+			send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI, GetCharacterMovement()->Velocity);
+		ServerSyncElapsedTime = 0.0f;
+	}
 
 	//Update GroundSpeedd (22-04-05)
 	float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();

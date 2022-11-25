@@ -178,7 +178,7 @@ void send_login_ok_packet(int player_id, const char* playername)
 	player->sendPacket(&packet, sizeof(packet));
 }
 
-void send_move_packet(int player_id, int mover_id, float value)
+void send_move_packet(int player_id, int mover_id, float value,const float& sx, const float& sy, const float& sz)
 {
 	auto player = reinterpret_cast<Character*>(objects[player_id]);
 	sc_packet_move packet{};
@@ -193,6 +193,9 @@ void send_move_packet(int player_id, int mover_id, float value)
 	packet.rz = objects[mover_id]->rz;
 	packet.rw = objects[mover_id]->rw;
 	packet.speed = value;
+	packet.sx = sx;
+	packet.sy = sy;
+	packet.sz = sz;
 	player->sendPacket(&packet, sizeof(packet));
 }
 
@@ -510,7 +513,7 @@ void process_packet(int client_id, unsigned char* p)
 			if (Character::STATE::ST_INGAME == OtherPlayer->_state)
 			{
 				OtherPlayer->state_lock.unlock();
-				send_move_packet(OtherPlayer->_id, client_id, packet->speed);
+				send_move_packet(OtherPlayer->_id, client_id, packet->speed, packet->sx, packet->sy, packet->sz);
 			}
 			else OtherPlayer->state_lock.unlock();
 		}

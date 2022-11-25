@@ -112,6 +112,14 @@ public:
 		bool bIsUndertheHealSpawner;	
 
 public:
+	//network 패킷 수 감소로 인한 움직임 보간처리.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "speed")
+		FVector CharMovingSpeed;
+
+	float ServerSyncElapsedTime;	//몇초 마다 이동 동기화 보낼것인지.
+	float ServerSyncDeltaTime;		//몇초 마다 이동 동기화 보낼것인지.
+
+public:
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
 	const char* SERVER_ADDR = "127.0.0.1";
 public:

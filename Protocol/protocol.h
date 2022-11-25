@@ -105,6 +105,7 @@ struct cs_packet_move {
 	char	type;
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
+	float sx, sy, sz;			//Speed For Interpolation
 	float speed;				//scala
 };
 
@@ -232,6 +233,7 @@ struct sc_packet_move {
 	int		id;
 	float x, y, z;
 	float rx, ry, rz, rw;
+	float sx, sy, sz;	//for speed interpolation
 	float speed;
 };
 

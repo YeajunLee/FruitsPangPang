@@ -226,8 +226,13 @@ void AMyCharacter::Tick(float DeltaTime)
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 
-			if (!bIsDie)
-				send_move_packet(s_socket,pos.X, pos.Y, pos.Z, rot, GroundSpeedd);
+			ServerSyncElapsedTime += DeltaTime;
+			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+			{
+				if (!bIsDie)
+					send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeedd,GetCharacterMovement()->Velocity);
+				ServerSyncElapsedTime = 0.0f;
+			}
 		
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
@@ -235,6 +240,9 @@ void AMyCharacter::Tick(float DeltaTime)
 		else {
 			//Update GroundSpeedd (22-04-05)
 			GroundSpeedd = ServerStoreGroundSpeed;
+			//Update Interpolation (22-11-25)
+			GetCharacterMovement()->Velocity = CharMovingSpeed;
+			
 		}
 		
 		auto a = GetTransform().GetLocation().Y;
