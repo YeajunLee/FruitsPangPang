@@ -23,7 +23,7 @@ static std::shared_ptr<class Network> m_Network;
 void send_login_packet(SOCKET& sock, const char& type);
 void send_login_lobby_packet(SOCKET& sock, const char* name, const char* password);
 void send_signup_packet(SOCKET& sock, const char* name, const char* password);
-void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, struct FQuat& rotate, const float& value);
+void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
 void send_spawnitemobj_packet(SOCKET& sock, const struct FVector& locate, const FRotator& rotate, const struct FVector& scale,
 	const int& fruitType, const int& itemSlotNum);
 void send_getfruits_tree_packet(SOCKET& sock, const int& treeId);
@@ -49,7 +49,7 @@ private:
 public:
 	enum class AnimType
 	{
-		Throw,PickSword_GreenOnion,PickSword_Carrot,DropSword,Slash,Stab
+		Throw,PickSword_GreenOnion,PickSword_Carrot,DropSword,Slash,Stab,Jump
 	};
 	class AMyCharacter* mMyCharacter;
 	class AAICharacter* mAiCharacter[8];

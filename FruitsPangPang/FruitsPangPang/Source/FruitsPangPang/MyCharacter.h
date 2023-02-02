@@ -14,6 +14,7 @@
 
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDele_Single_OneParam_In_Snyc, int32, Isinair);
 
 UCLASS()
 class FRUITSPANGPANG_API AMyCharacter : public ABaseCharacter
@@ -48,7 +49,11 @@ public:
 	//	class UStaticMeshComponent* CarrotMesh;
 
 	UParticleSystemComponent* P_Star;
+public:
+	//relate deligate
 
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+		FDele_Single_OneParam_In_Snyc SyncInAirDelegate;
 public:
 	USoundBase* dizzySound;
 
