@@ -103,6 +103,7 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
+	bool inair;					//in air? (for anim)
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
 	float sx, sy, sz;			//Speed For Interpolation
@@ -230,6 +231,7 @@ struct sc_packet_login_ok {
 struct sc_packet_move {
 	unsigned char size;
 	char type;
+	bool inair;					//in air? (for anim)
 	int		id;
 	float x, y, z;
 	float rx, ry, rz, rw;

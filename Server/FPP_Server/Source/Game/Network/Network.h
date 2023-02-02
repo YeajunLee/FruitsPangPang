@@ -36,7 +36,7 @@ void send_update_player_result(const int& player_id,const int& rank);
 
 
 void send_login_ok_packet(int player_id,const char* playername);
-void send_move_packet(int player_id, int mover_id, float value, const float& sx, const float& sy, const float& sz);
+void send_move_packet(int player_id, int mover_id, const bool& inair, float value, const float& sx, const float& sy, const float& sz);
 void send_anim_packet(int player_id, int animCharacter_id, char animtype);
 void send_throwfruit_packet(const int& thrower_character_id, const int& other_character_id,
 	const float& rx, const float& ry, const float& rz, const float& rw,	//rotate

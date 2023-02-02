@@ -156,7 +156,7 @@ void AAICharacter::Tick(float DeltaTime)
 	if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 	{
 		if (!bIsDie)
-			send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI, GetCharacterMovement()->Velocity);
+			send_move_packet(s_socket, GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GroundSpeed_AI, GetCharacterMovement()->Velocity);
 		ServerSyncElapsedTime = 0.0f;
 	}
 

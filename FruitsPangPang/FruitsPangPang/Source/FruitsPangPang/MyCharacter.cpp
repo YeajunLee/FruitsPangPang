@@ -193,7 +193,12 @@ void AMyCharacter::BeginPlay()
 		itemClass.Icon = AInventory::ItemCodeToItemIcon(itemClass.ItemCode);
 		mInventory->UpdateInventorySlot(itemClass, 200);
 
-	}	
+	}
+	else {
+		GetCharacterMovement()->BrakingDecelerationWalking = 0;
+		GetCharacterMovement()->BrakingFrictionFactor = 0;
+		GetCharacterMovement()->GravityScale = 0.0;
+	}
 }
 
 void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -204,6 +209,7 @@ void AMyCharacter::EndPlay(EEndPlayReason::Type Reason)
 		mInventory = nullptr;
 	}
 
+	SyncInAirDelegate.Clear();
 	closesocket(l_socket);
 	closesocket(s_socket);
 	Network::GetNetwork()->release();
@@ -230,7 +236,7 @@ void AMyCharacter::Tick(float DeltaTime)
 			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 			{
 				if (!bIsDie)
-					send_move_packet(s_socket, pos.X, pos.Y, pos.Z, rot, GroundSpeedd,GetCharacterMovement()->Velocity);
+					send_move_packet(s_socket,GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GroundSpeedd,GetCharacterMovement()->Velocity);
 				ServerSyncElapsedTime = 0.0f;
 			}
 		
@@ -242,7 +248,6 @@ void AMyCharacter::Tick(float DeltaTime)
 			GroundSpeedd = ServerStoreGroundSpeed;
 			//Update Interpolation (22-11-25)
 			GetCharacterMovement()->Velocity = CharMovingSpeed;
-			
 		}
 		
 		auto a = GetTransform().GetLocation().Y;
@@ -577,6 +582,16 @@ void AMyCharacter::LMBUp()
 void AMyCharacter::Jump()
 {
 	Super::Jump();
+	switch (GameState)
+	{
+	case 1:
+		if (GetController()->IsPlayerController()) {
+		send_anim_packet(s_socket, Network::AnimType::Jump);
+		}
+		break;
+	}
+
+
 }
 
 void AMyCharacter::Attack()

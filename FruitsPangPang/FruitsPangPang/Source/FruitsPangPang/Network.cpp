@@ -171,11 +171,12 @@ void send_signup_packet(SOCKET& sock, const char* name, const char* password)
 	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
 }
 
-void send_move_packet(SOCKET& sock, const float& x, const float& y, const float& z, FQuat& rotate, const float& value,const FVector& speedVec)
+void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value,const FVector& speedVec)
 {
 	cs_packet_move packet;
 	packet.size = sizeof(cs_packet_move);
 	packet.type = CS_PACKET_MOVE;
+	packet.inair = inair;
 	packet.x = x;
 	packet.y = y;
 	packet.z = z;
@@ -442,6 +443,10 @@ void Network::process_packet(unsigned char* p)
 			}
 			else if (mOtherCharacter[move_id] != nullptr)
 			{
+				if (mOtherCharacter[move_id]->SyncInAirDelegate.IsBound() == true)
+					mOtherCharacter[move_id]->SyncInAirDelegate.Broadcast(packet->inair);
+				//if(false == packet->inair)
+				//	mOtherCharacter[move_id]->GetCharacterMovement()->MovementMode = EMovementMode::MOVE_None;
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
@@ -567,7 +572,18 @@ void Network::process_packet(unsigned char* p)
 			}
 			break;
 		}
-
+		case static_cast<char>(Network::AnimType::Jump): {
+			if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+				if (mOtherCharacter[packet->id] != nullptr)
+				{
+					mOtherCharacter[packet->id]->Jump();
+				}
+			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+			}
+			break;
+		}
 		}
 		break;
 	}
@@ -1143,6 +1159,10 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 		{
 			if (mOtherCharacter[move_id] != nullptr)
 			{
+				if (mOtherCharacter[move_id]->SyncInAirDelegate.IsBound() == true)
+					mOtherCharacter[move_id]->SyncInAirDelegate.Broadcast(packet->inair);
+				//if (false == packet->inair)
+				//	mOtherCharacter[move_id]->GetCharacterMovement()->MovementMode = EMovementMode::MOVE_None;
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
@@ -1272,6 +1292,18 @@ void Network::process_Aipacket(int client_id, unsigned char* p)
 							AnimInstance->Montage_JumpToSection(FName("Default"), mOtherCharacter[packet->id]->StabbingMontage);
 
 						}
+					}
+				}
+				else {
+					UE_LOG(LogTemp, Error, TEXT("UnExpected ID Come To PACKET_ANIM id: %d"), anim_character_id);
+				}
+				break;
+			}
+			case static_cast<char>(Network::AnimType::Jump): {
+				if (USER_START <= anim_character_id && anim_character_id < MAX_USER) {
+					if (mOtherCharacter[packet->id] != nullptr)
+					{
+						mOtherCharacter[packet->id]->Jump();
 					}
 				}
 				else {
