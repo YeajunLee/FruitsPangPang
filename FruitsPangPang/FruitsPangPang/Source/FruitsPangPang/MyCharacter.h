@@ -221,6 +221,7 @@ public:
 	
 public:	
 
+	FDateTime Today;
 	//Related Shop, Equip Skin
 	int Cash;		//현재 가진 돈.
 	short skinType;	//현재 장착한 스킨 타입 0 - None , 1 - ... (스킨 아이템 번호)

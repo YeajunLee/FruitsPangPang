@@ -37,6 +37,8 @@ void send_enter_ingame_packet(const int& player_id,const short& server_port, con
 void send_match_update_packet(const int& player_id, const int& player_cnt);
 void send_buyitem_result_packet(const int& player_id, const int& remaincoin, const unsigned char& itemcode);
 void send_equip_response_packet(const int& player_id, const unsigned char& itemcode);
+void send_daily_reward_packet(const int& player_id, const char& successtype, const int& coin);
+void send_daypass_packet(const int& player_id,const char* id);
 void send_chat_packet(const int& player_id, const char* senderName, WCHAR* msg);
 
 struct Timer_Event {

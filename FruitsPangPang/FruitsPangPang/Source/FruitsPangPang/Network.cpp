@@ -160,6 +160,15 @@ void send_login_lobby_packet(SOCKET& sock, const char* name, const char* passwor
 }
 
 
+void send_daypass_packet(SOCKET& sock)
+{
+	cl_packet_daypass packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_PACKET_DAYPASS;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->getWsaBuf(), 1, 0, 0, &once_exp->getWsaOver(), send_callback);
+
+}
 void send_signup_packet(SOCKET& sock, const char* name, const char* password)
 {
 	cl_packet_signup packet;
@@ -912,7 +921,18 @@ void Network::process_LobbyPacket(unsigned char* p)
 		lc_packet_login_ok* packet = reinterpret_cast<lc_packet_login_ok*>(p);
 		switch (packet->loginsuccess)
 		{
-		case 1: {
+		case 1:	// case 1과 2는 접속한다는 공통점을 가지고, 1은 일일보상 획득 위젯을 추가로 띄워주는 차이점을 가지고있다.
+			//그렇기에 case 1에 위젯생성을 해주고, break를 걸지 않고 case2까지 실행되도록 한다.
+		{
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
+			MessageBoxWGT->DisappearWhenClosed = true;
+			MessageBoxWGT->AddToViewport();
+			MessageBoxWGT->MakeMessageBoxWithCode(packet->loginsuccess);
+		}
+		case 2:
+		{
 			if (mMyCharacter->mLoginWidget)
 			{
 				auto loginwgt = Cast< ULoginWidget>(mMyCharacter->mLoginWidget);
@@ -931,11 +951,14 @@ void Network::process_LobbyPacket(unsigned char* p)
 			MyCharacterName = mMyCharacter->CharacterName;
 			bLoginFlag = true;
 			bLevelOpenTriggerEnabled = false;	//openlevel로 인한 변경이 끝났으니 false로 바꿔줌.
-			FInputModeGameOnly gamemode;
-			if (nullptr != controller)
+			if (packet->loginsuccess == 2)
 			{
-				controller->SetInputMode(gamemode);
-				controller->SetShowMouseCursor(false);
+				FInputModeGameOnly gamemode;
+				if (nullptr != controller)
+				{
+					controller->SetInputMode(gamemode);
+					controller->SetShowMouseCursor(false);
+				}
 			}
 			for (int i = 0; i < static_cast<int>(packet->numberofitemshave); ++i)
 			{
@@ -986,7 +1009,7 @@ void Network::process_LobbyPacket(unsigned char* p)
 			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
 			auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
 			MessageBoxWGT->AddToViewport();
-			MessageBoxWGT->MakeMessageBoxWithCode(2);	//회원가입 성공
+			MessageBoxWGT->MakeMessageBoxWithCode(3);	//회원가입 성공
 			break;
 		}
 		default: {
@@ -1016,6 +1039,29 @@ void Network::process_LobbyPacket(unsigned char* p)
 	case LC_PACKET_CHAT: {
 		lc_packet_chat* packet = reinterpret_cast<lc_packet_chat*>(p);
 		mMyCharacter->mMainWidget->W_Chat->UpdateChat(FString(packet->name),FText::FromString(FString(packet->msg)));
+		break;
+	}
+	case LC_PACKET_DAILY_REWARD: {
+		lc_packet_daily_reward* packet = reinterpret_cast<lc_packet_daily_reward*>(p);
+
+		mMyCharacter->Cash = packet->coin;
+		auto controller = mMyCharacter->GetWorld()->GetFirstPlayerController();
+
+		FInputModeUIOnly gamemode;
+		if (nullptr != controller)
+		{
+			controller->SetInputMode(gamemode);
+			controller->SetShowMouseCursor(true);
+		}
+
+		FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/Widget/MMessageBoxWidget.MMessageBoxWidget_C'"));
+		auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+		auto MessageBoxWGT = CreateWidget<UMessageBoxWidget>(mMyCharacter->GetWorld(), WidgetClass);
+		MessageBoxWGT->DisappearWhenClosed = true;
+		MessageBoxWGT->AddToViewport();
+		MessageBoxWGT->MakeMessageBoxWithCode(packet->rewardsuccess);
+
+
 		break;
 	}
 	}

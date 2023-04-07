@@ -102,6 +102,21 @@ void send_request_player_info(const int& server_id, const int& client_id, const 
 	server->sendPacket(&packet, sizeof(packet));
 }
 
+void send_daily_reward(const int& server_id, const int& client_id, const char& succestype,const LoginInfo& info)
+{
+	auto server = reinterpret_cast<Server*>(servers[server_id]);
+	dl_packet_daily_reward packet;
+	memset(&packet, 0, sizeof(packet));
+
+	packet.size = sizeof(packet);
+	packet.type = DL_PACKET_DAILY_REWARD;
+	packet.playerid = client_id;
+	packet.rewardsuccess = succestype;
+	packet.coin = info.p_coin;
+
+	server->sendPacket(&packet, sizeof(packet));
+}
+
 void send_ping_test(const int& server_id)
 {
 	auto server = reinterpret_cast<Server*>(servers[server_id]);
@@ -185,6 +200,14 @@ void process_packet(int client_id, unsigned char* p)
 		gd_packet_update_player_info* packet = reinterpret_cast<gd_packet_update_player_info*>(p);
 		cout << "ÀÌ¸§ : " << packet->name << "µ· Áö±Þ:" << packet->coin << endl;
 		UpdatePlayerInfo(packet->name, packet->coin);
+		break;
+	}
+	case LD_PACKET_DAYPASS: {
+		ld_packet_daypass* packet = reinterpret_cast<ld_packet_daypass*>(p);
+		cout << "ÀÌ¸§ : " << packet->id << "µ· Áö±Þ: 100\n";
+		LoginInfo info;
+		int successtype = DailyReward(packet->id, info);
+		send_daily_reward(client_id, packet->playerid, successtype, info);
 		break;
 	}
 	}

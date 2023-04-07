@@ -27,6 +27,24 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 	}
 }
 
+bool IsDatePassed(const SQLWCHAR playerlastdate[4])
+{
+	time_t tt = time(nullptr);
+	tm now{};
+	localtime_s(&now, &tt);
+	//and 문은 처음이 false라면 바로 탈출하기 때문에 오차가 가장 클 date를 앞으로 보낸다. 
+	if(now.tm_mday == static_cast<int>(playerlastdate[2]) &&
+		now.tm_mon + 1 == static_cast<int>(playerlastdate[1]) &&
+		now.tm_year + 1900 == static_cast<int>(playerlastdate[0]))
+	{
+		//동일날짜 (같은날 접속)
+		return false;
+	}
+	//다른날짜 (일일보상 받아야함)
+	return true;
+}
+
+
 void InitializeDB()
 {
 	SQLRETURN retcode;
@@ -77,15 +95,20 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 	SQLINTEGER p_coin{};	//플레이어 보유코인
 	SQLSMALLINT p_skintype{}, p_playertype{}, p_playeritemcode{};//플레이어 장착 액세사리타입, 플레이어타입, 플레이어 보유아이템코드
 	SQLWCHAR p_name[21]{}, p_password[21]{};	//플레이어 이름, 플레이어 패스워드
-	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0, l_playeritemcode = 0;
-	SQLRETURN retcode{};
+	SQLWCHAR p_date[4]{};
+	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0, l_playeritemcode = 0, l_playerdate = 0, l_funcretcode = 0;
+	SQLRETURN retcode{}, funcretcode{};
 
 	//cout << "ODBC Connected !" << endl;
-	wstring LoginQuery{ L"EXEC try_login " };
+	wstring LoginQuery{ L"EXEC ? = try_login " };
 	wstring GetItemDataQuery{ L"EXEC get_playeritemdata " };
 	USES_CONVERSION;
 	LoginQuery += A2W(name);
+	LoginQuery += L",";
+	LoginQuery += A2W(password);
 	GetItemDataQuery += A2W(name);
+
+	retcode = SQLBindParameter(hstmt, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &funcretcode, 0, &l_funcretcode);	//exec을 하기전에 bind parameter
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)LoginQuery.c_str(), SQL_NTS);
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
@@ -99,7 +122,10 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &l_coin);
 		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &l_skintype);
 		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &l_playertype);
+		retcode = SQLBindCol(hstmt, 6, SQL_C_DATE, &p_date, 8, &l_playerdate);
 
+
+		
 		// Fetch and print each row of data. On an error, display a message and exit.  
 		retcode = SQLFetch(hstmt);
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
@@ -110,43 +136,48 @@ int Login(const char* name, const char* password, LoginInfo& p_info)
 			p_info.p_skintype = p_skintype;
 			p_info.p_playertype = p_playertype;
 
+			//try_login의 return값 받기 
+			while ((retcode = SQLMoreResults(hstmt)) != SQL_NO_DATA)
+				;
+
 			SQLCancel(hstmt);
 
-			if (0 == strcmp(p_info.p_password, password))
-			{
-				//--- 로그인 성공! 해당 플레이어의 아이템 정보를 가져와야함.
-				retcode = SQLExecDirect(hstmt, (SQLWCHAR*)GetItemDataQuery.c_str(), SQL_NTS);
-				if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+			//--- 로그인 성공! 해당 플레이어의 아이템 정보를 가져와야함.
+			retcode = SQLExecDirect(hstmt, (SQLWCHAR*)GetItemDataQuery.c_str(), SQL_NTS);
+			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 
-					retcode = SQLBindCol(hstmt, 1, SQL_C_SHORT, &p_playeritemcode, 100, &l_playeritemcode);
-					int i = 0;
-					while (1)
+				retcode = SQLBindCol(hstmt, 1, SQL_C_SHORT, &p_playeritemcode, 100, &l_playeritemcode);
+				int i = 0;
+				while (1)
+				{
+					retcode = SQLFetch(hstmt);
+					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 					{
-						retcode = SQLFetch(hstmt);
-						if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
-						{
-							p_info.p_itemcode[i] = p_playeritemcode;
-							++i;
-						}
-						else {
-							break;
-						}
+						p_info.p_itemcode[i] = p_playeritemcode;
+						++i;
 					}
-
-					p_info.p_numberofplayerhaveitem = i;
-
+					else {
+						break;
+					}
 				}
 
-				SQLCancel(hstmt);
-				return true;	//로그인 성공
+				p_info.p_numberofplayerhaveitem = i;
+
 			}
-			return -3;	//비밀번호가 다름
+
+			SQLCancel(hstmt);
+
+			return funcretcode;
+
 		}
 		else if (retcode == SQL_ERROR) {
+			//try_login의 return값 받기 
+			while ((retcode = SQLMoreResults(hstmt)) != SQL_NO_DATA)
+				;
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
 			cout << "Login Error - Login Query - Fetch\n";
 			SQLCancel(hstmt);
-			return -2;
+			return funcretcode;	//아이디가 없거나 비밀번호를 틀렸음. 
 		}
 	}
 	else {
@@ -396,4 +427,78 @@ int UpdatePlayerInfo(const char* name, const int& coin)
 	}
 
 	return -1;// 알수없는 이유로 실패.
+}
+
+int DailyReward(const char* name, LoginInfo& p_info)
+{
+	SQLINTEGER p_coin{};	//플레이어 보유코인
+	SQLSMALLINT p_skintype{}, p_playertype{};//플레이어 장착 액세사리타입, 플레이어타입
+	SQLWCHAR p_name[21]{}, p_password[21]{};	//플레이어 이름, 플레이어 패스워드
+	SQLWCHAR p_date[4]{};
+	SQLLEN l_Name = 0, l_Password = 0, l_coin = 0, l_skintype = 0, l_playertype = 0, l_playerdate = 0, l_funcretcode = 0;
+	SQLRETURN retcode{}, funcretcode{};
+
+	//cout << "ODBC Connected !" << endl;
+	wstring DailyRewardQuery{ L"EXEC ? = daily_reward " };
+	USES_CONVERSION;
+	DailyRewardQuery += A2W(name);
+
+	retcode = SQLBindParameter(hstmt, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &funcretcode, 0, &l_funcretcode);	//exec을 하기전에 bind parameter
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)DailyRewardQuery.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+
+
+		// Bind columns 1, 2, and 3  
+		// mssql에서 varchar(10) 을 했을 때, db에서 10글자 까지 저장이 가능.
+		// c++로 긁어올때 이 10글자는 1글자당 2byte로 치환되어서 sqlbindcol의 bufferlen에서 20byte + 문자열끝 2byte  총 22byte로 받아야 함.
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, p_name, 42, &l_Name);			//wchar는 한글자당 2byte이므로 10글자에는 20 + 2(문자열 끝)이 필요
+		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, p_password, 42, &l_Password);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &p_coin, 100, &l_coin);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &p_skintype, 100, &l_skintype);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &p_playertype, 100, &l_playertype);
+		retcode = SQLBindCol(hstmt, 6, SQL_C_DATE, &p_date, 8, &l_playerdate);
+
+
+
+		// Fetch and print each row of data. On an error, display a message and exit.  
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			WideCharToMultiByte(CP_ACP, 0, p_name, -1, p_info.p_name, 21, 0, 0);
+			WideCharToMultiByte(CP_ACP, 0, p_password, -1, p_info.p_password, 21, 0, 0);
+			p_info.p_coin = p_coin;
+			p_info.p_skintype = p_skintype;
+			p_info.p_playertype = p_playertype;
+
+			//try_login의 return값 받기 
+			while ((retcode = SQLMoreResults(hstmt)) != SQL_NO_DATA)
+				;
+
+			SQLCancel(hstmt);
+			
+			return funcretcode;
+
+		}
+		else if (retcode == SQL_ERROR) {
+			//try_login의 return값 받기 
+			while ((retcode = SQLMoreResults(hstmt)) != SQL_NO_DATA)
+				;
+			HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+			cout << "Daily Reward Error - Fetch\n";
+			SQLCancel(hstmt);
+			return funcretcode;	// 나올 일 없겠지만,, 여기까지 오면 오류
+		}
+	}
+	else {
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_DBC, retcode);
+		// Process data  
+		cout << "Daily Reward Error - Exec" << DailyRewardQuery.c_str() << endl;
+		SQLCancel(hstmt);
+		return -2;
+	}
+
+	// Process data  
+	SQLCancel(hstmt);
+	return -2;
 }

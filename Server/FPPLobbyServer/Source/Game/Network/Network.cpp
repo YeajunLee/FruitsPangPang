@@ -283,6 +283,32 @@ void send_equip_response_packet(const int& player_id, const unsigned char& itemc
 	player->sendPacket(&packet, sizeof(packet));
 }
 
+void send_daily_reward_packet(const int& player_id, const char& successtype, const int& coin)
+{
+	auto player = reinterpret_cast<Player*>(objects[player_id]);
+	lc_packet_daily_reward packet;
+	memset(&packet, 0, sizeof(packet));
+
+	packet.size = sizeof(packet);
+	packet.type = LC_PACKET_DAILY_REWARD;
+	packet.coin = coin;
+	packet.rewardsuccess = successtype;
+
+	player->sendPacket(&packet, sizeof(packet));
+}
+
+void send_daypass_packet(const int& player_id, const char* id)
+{
+	ld_packet_daypass packet;
+	memset(&packet, 0, sizeof(packet));
+
+	packet.size = sizeof(packet);
+	packet.type = LD_PACKET_DAYPASS;
+	packet.playerid = player_id;
+	strcpy_s(packet.id, id);
+	dbserver->sendPacket(&packet, sizeof(packet));
+}
+
 void send_chat_packet(const int& receiver_id, const char* senderName, WCHAR* msg)
 {
 	auto player = reinterpret_cast<Player*>(objects[receiver_id]);
@@ -495,6 +521,13 @@ void process_packet(int client_id, unsigned char* p)
 				other->state_lock.unlock();
 			}
 		}
+		break;
+	}
+	case CL_PACKET_DAYPASS: {
+		cl_packet_daypass* packet = reinterpret_cast<cl_packet_daypass*>(p);
+		Player* character = reinterpret_cast<Player*>(object);
+		send_daypass_packet(character->_id, character->name);
+		break;
 	}
 	}
 }
@@ -538,7 +571,9 @@ void process_packet_for_DB(unsigned char* p)
 		dl_packet_login_author_ok* packet = reinterpret_cast<dl_packet_login_author_ok*>(p);
 		switch (packet->loginsuccess)
 		{
-		case 1: 
+		case 1:
+			std::cout << "일일보상 지급" << endl; 
+		case 2:
 		{
 			Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
 			character->mSkinType = packet->skintype;
@@ -593,6 +628,17 @@ void process_packet_for_DB(unsigned char* p)
 			npc->Shop[packet->itemcode[i]].first = packet->itemcode[i];
 			npc->Shop[packet->itemcode[i]].second = packet->price[i];
 		}
+		break;
+	}
+	case DL_PACKET_DAILY_REWARD: {
+		dl_packet_daily_reward* packet = reinterpret_cast<dl_packet_daily_reward*>(p);
+		Player* character = reinterpret_cast<Player*>(objects[packet->playerid]);
+		if (packet->rewardsuccess == 1)
+			send_daily_reward_packet(packet->playerid, packet->rewardsuccess, packet->coin);
+		else
+			cout << "[심각한 오류] 사용자 [" << character->name << "]가 의도적으로 보상패킷을 보내고있음\n";
+		
+		break;
 	}
 	}
 }

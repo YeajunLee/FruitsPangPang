@@ -19,3 +19,4 @@ int BuyItem(const char* name, const char& itemcode, const int& coin);
 int EquipItem(const char* name, const short& skintype);
 int GetPlayerInfo(const char* name, LoginInfo& p_info);
 int UpdatePlayerInfo(const char* name, const int& p_info);
+int DailyReward(const char* name, LoginInfo& p_info);

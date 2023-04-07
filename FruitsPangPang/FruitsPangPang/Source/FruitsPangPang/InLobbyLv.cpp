@@ -30,11 +30,13 @@ void AInLobbyLv::BeginPlay() {
 	mc1->FinishSpawning(trans);
 	Conn();
 
+	
 	//To Loading ...
 
 	//To Do SomeThing ...
 
 }
+
 
 void AInLobbyLv::Conn()
 {

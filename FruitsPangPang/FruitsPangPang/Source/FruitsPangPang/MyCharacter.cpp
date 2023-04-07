@@ -127,7 +127,7 @@ void AMyCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
-
+	Today = FDateTime::Now();
 	GreenOnionBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GreenOnionBag->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GreenOnionBag"));
 	CarrotBag->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -242,6 +242,15 @@ void AMyCharacter::Tick(float DeltaTime)
 		
 			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 			GroundSpeedd = CharXYVelocity;
+
+			if (Today.GetDay() != FDateTime::Now().GetDay())
+			{
+				if (nullptr != Network::GetNetwork()->mMyCharacter)
+				{
+					send_daypass_packet(Network::GetNetwork()->mMyCharacter->l_socket);
+					Today = FDateTime::Now();
+				}
+			}
 		}
 		else {
 			//Update GroundSpeedd (22-04-05)
