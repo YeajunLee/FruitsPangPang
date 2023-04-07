@@ -27,5 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void MakeMessageBox(const FString& msg);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "button");
+		bool DisappearWhenClosed = false;
+
 	void MakeMessageBoxWithCode(const int& msgCode);
 };

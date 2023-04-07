@@ -37,10 +37,12 @@ const char LD_PACKET_BUYITEMUPDATE = 4;
 const char LD_PACKET_UPDATE_SKINTYPE = 5;
 const char GD_PACKET_GET_PLAYER_INFO = 6;
 const char GD_PACKET_UPDATE_PLAYER_INFO = 7;
+const char LD_PACKET_DAYPASS = 8;
 
 const char DL_PACKET_LOGIN_AUTHOR_OK = 1;
 const char DL_PACKET_SIGNUP_OK = 2;
 const char DL_PACKET_GETITEMINFO = 3;
+const char DL_PACKET_DAILY_REWARD = 4;
 
 
 #pragma pack (push, 1)
@@ -129,13 +131,20 @@ struct ld_packet_update_skintype {
 	char id[MAX_NAME_LEN];
 	short skintype;
 };
+
+struct ld_packet_daypass {
+	unsigned char size;
+	char type;
+	char id[MAX_NAME_LEN];
+	int playerid;
+};
 //------------------- Lobbyserver to DBserver
 
 struct dl_packet_login_author_ok {
 	unsigned char size;
 	char type;
 	int playerid;
-	char loginsuccess;			//1 성공, 0이하 - 실패
+	char loginsuccess;			//msgbox - 1 일일보상 접속 , 2 일반접속 , 3 회원가입, 0이하 - 실패
 	int coin;
 	short skintype;
 	short playertype;
@@ -147,7 +156,7 @@ struct dl_packet_signup_ok {
 	unsigned char size;
 	char type;
 	int playerid;
-	char loginsuccess;			//1 성공, 0이하 - 실패
+	char loginsuccess;			//msgbox - 1 일일보상 접속 , 2 일반접속 , 3 회원가입, 0이하 - 실패
 };
 
 struct dl_packet_getiteminfo {
@@ -156,5 +165,13 @@ struct dl_packet_getiteminfo {
 	char MaxItemAmount;						//상점에 현재 있는 아이템 종류의 갯수.
 	unsigned char itemcode[MAX_SHOP_ITEM];	//MAX_SHOP_ITEM : 최대로 상점에 들어가있을 수 있는 아이템 종류 갯수
 	short price[MAX_SHOP_ITEM];
+};
+
+struct dl_packet_daily_reward {
+	unsigned char size;
+	char type;
+	int playerid;
+	char rewardsuccess;		//성공및 실패
+	int coin;
 };
 #pragma pack(pop)

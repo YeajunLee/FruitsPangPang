@@ -57,6 +57,7 @@ const char CS_PACKET_GETFRUITS_HEAL = 17;
 const char CL_PACKET_BUY = 18;
 const char CL_PACKET_EQUIP = 19;
 const char CL_PACKET_CHAT = 20;
+const char CL_PACKET_DAYPASS = 21;
 
 const char CS_PACKET_CHEAT = 50;
 const char CHEAT_TYPE_GAMETIME = 0;
@@ -91,6 +92,7 @@ const char LC_PACKET_SIGNUP_OK = 4;
 const char LC_PACKET_BUYITEM_RESULT = 5;
 const char LC_PACKET_EQUIP_RESPONSE = 6;
 const char LC_PACKET_CHAT = 7;
+const char LC_PACKET_DAILY_REWARD = 8;
 
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -215,6 +217,11 @@ struct cl_packet_chat {
 	unsigned char size;
 	char type;
 	wchar_t msg[MAX_CHAT_SIZE];
+};
+
+struct cl_packet_daypass {
+	unsigned char size;
+	char type;
 };
 //-------------------- Gameserver to client
 struct sc_packet_login_ok {
@@ -370,7 +377,7 @@ struct lc_packet_login_ok {
 	char type;
 	int		id;
 	char name[MAX_NAME_SIZE];
-	char loginsuccess;			//1 성공, 0이하 - 실패
+	char loginsuccess;			//msgbox - 1 일일보상 접속 , 2 일반접속 , 3 회원가입, 0이하 - 실패
 	int coin;
 	short skintype;
 	char numberofitemshave;		//아래변수의 index용
@@ -394,7 +401,7 @@ struct lc_packet_match_update {
 struct lc_packet_signup_ok {
 	unsigned char size;
 	char type;
-	char loginsuccess;
+	char loginsuccess;		//msgbox - 1 일일보상 접속 , 2 일반접속 , 3 회원가입, 0이하 - 실패
 };
 
 struct lc_packet_buyitem_result {
@@ -415,5 +422,12 @@ struct lc_packet_chat {
 	char type;
 	char name[MAX_NAME_SIZE];
 	wchar_t msg[MAX_CHAT_SIZE];
+};
+
+struct lc_packet_daily_reward {
+	unsigned char size;
+	char type;
+	char rewardsuccess;		//성공및 실패
+	int coin;
 };
 #pragma pack(pop)
