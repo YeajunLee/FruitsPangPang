@@ -42,46 +42,51 @@ void send_equip_packet(SOCKET& sock, const int& itemcode);
 void send_chat_packet(SOCKET& sock,const WCHAR* msg);
 void send_step_banana_packet(SOCKET& sock, const int& bananaid);
 
+
+
 class FRUITSPANGPANG_API Network : public std::enable_shared_from_this<Network>
 {
-private:
-	WSADATA WSAData;
-	void error_display(int err_no);
 public:
 	enum class AnimType
 	{
-		Throw,PickSword_GreenOnion,PickSword_Carrot,DropSword,Slash,Stab,Jump
+		Throw, PickSword_GreenOnion, PickSword_Carrot, DropSword, Slash, Stab, Jump
 	};
-	class AMyCharacter* mMyCharacter;
-	class AAICharacter* mAiCharacter[8];
-	FString MyCharacterName;
-	FString MyCharacterPassWord;
-	UPROPERTY()
-	class AMyCharacter* mOtherCharacter[MAX_USER];
-	class ATree* mTree[TREE_CNT];
-	class APunnet* mPunnet[PUNNET_CNT];
-	class AHealSpawner* mHealSpawner[HEAL_CNT];
-	class AProjectile* mBanana[BANANA_CNT];
-	static std::shared_ptr<class Network> GetNetwork();
-	int mGeneratedID;
-	short mAiAmount = - 1;	//들어와야 할 Ai의 갯수
-	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
-	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
-	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
-	bool bIsAlreadyMatching = false;	//이미 매칭중이라면 true
-	short GameServerPort = -1;		//게임서버 접속용 port
 	Network();
 	~Network();
-private:
-	bool isInit;
 
-public:
 	const int getNewId();
 	void release();
 	bool init();
 	void process_packet(unsigned char* p);
 	void process_LobbyPacket(unsigned char* p);
 	void process_Aipacket(int client_id, unsigned char* p);
+
+private:
+	WSADATA WSAData;
+	void error_display(int err_no);
+private:
+	bool isInit;
+
+public:
+	class AMyCharacter* mMyCharacter;
+	class AAICharacter* mAiCharacter[8];
+	FString MyCharacterName;
+	FString MyCharacterPassWord;
+	UPROPERTY()
+		class AMyCharacter* mOtherCharacter[MAX_USER];
+	class ATree* mTree[TREE_CNT];
+	class APunnet* mPunnet[PUNNET_CNT];
+	class AHealSpawner* mHealSpawner[HEAL_CNT];
+	class AProjectile* mBanana[BANANA_CNT];
+	static std::shared_ptr<class Network> GetNetwork();
+	int mGeneratedID;
+	short mAiAmount = -1;	//들어와야 할 Ai의 갯수
+	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
+	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
+	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
+	bool bIsAlreadyMatching = false;	//이미 매칭중이라면 true
+	short GameServerPort = -1;		//게임서버 접속용 port
+
 };
 
 
